@@ -303,19 +303,6 @@ let g:p4Autoread = -1
 let g:p4PromptToCheckout = 0
 let g:no_plugin_maps = 1
 let g:loaded_perforcemenu = 1
-if hostname() == "DWYATT-XP"
-    let g:p4DefaultPreset = 'perforce:1666 DWYATT-XP dwyatt'
-    let g:p4ClientRoot = 'e:/p4'
-elseif hostname() == "DWYATT-2K8R2"
-    let g:p4DefaultPreset = 'perforce:1666 dwyatt-2k8r2 dwyatt'
-    let g:p4ClientRoot = 'c:/p4'
-elseif hostname() == "dqw-linux"
-    let g:p4DefaultPreset = 'perforce:1666 dqw-linux dwyatt'
-    let g:p4ClientRoot = '/home/dwyatt/p4'
-else
-    let g:p4DefaultPreset = 'perforce:1666 dwyatt-lt dwyatt'
-    let g:p4ClientRoot = 'c:/p4'
-endif
 
 nmap <silent> ,co :PO<CR>
 if has("unix")
@@ -336,43 +323,7 @@ command! MyChanges :PF changes -u dwyatt -m -l <args>
 
 " Initial path seeding
 set path=
-set path+=/usr/local/funambol-client-sdk/include/**
 set tags=
-
-"-----------------------------------------------------------------------------
-" Viki Plugin Stuff
-"-----------------------------------------------------------------------------
-let g:vikiMenuPrefix = ''
-let g:vikiNameTypes = "Siwfeux"
-let g:deplatePrg = "rake --quiet"
-let g:vikiUseParentSuffix = 1
-let g:vikiOpenFileWith_html  = "silent !firefox %{FILE}"
-let g:vikiOpenFileWith_ANY   = "silent !start %{FILE}"
-let g:vikiNameSuffix=".viki"
-let g:viki_intervikis = {}
-let g:viki_intervikis['ROOT']  = [g:p4ClientRoot . '/dwyatt-dev/viki',                           '.viki']
-let g:viki_intervikis['BES']   = [g:p4ClientRoot . '/dwyatt-dev/viki/BES',                       '.viki']
-let g:viki_intervikis['BESG']  = [g:p4ClientRoot . '/dwyatt-dev/viki/BESG',                      '.viki']
-let g:viki_intervikis['BESX']  = [g:p4ClientRoot . '/dwyatt-dev/viki/BESX',                      '.viki']
-let g:viki_intervikis['BESD']  = [g:p4ClientRoot . '/dwyatt-dev/viki/BESD',                      '.viki']
-let g:viki_intervikis['OBES']  = [g:p4ClientRoot . '/dwyatt-dev/viki/OpenBES',                   '.viki']
-let g:viki_intervikis['ARC']   = [g:p4ClientRoot . '/dwyatt-dev/viki/Archive',                   '.viki']
-let g:viki_intervikis['EXT']   = [g:p4ClientRoot . '/dwyatt-dev/viki/BES/Extension',             '.viki']
-let g:viki_intervikis['DDD']   = [g:p4ClientRoot . '/dwyatt-dev/viki/Books/DomainDrivenDesign',  '.viki']
-let g:viki_intervikis['ICPP']  = [g:p4ClientRoot . '/dwyatt-dev/viki/Books/ImperfectC++',        '.viki']
-let g:viki_intervikis['EV']    = [g:p4ClientRoot . '/dwyatt-dev/viki/EnterpriseVault',           '.viki']
-let g:viki_intervikis['BOOST'] = [g:p4ClientRoot . '/dwyatt-dev/viki/Boost',                     '.viki']
-let g:viki_intervikis['CODE']  = [g:p4ClientRoot . '/dwyatt-dev/viki/Code',                      '.viki']
-let g:viki_intervikis['TECH']  = [g:p4ClientRoot . '/dwyatt-dev/viki/Technology',                '.viki']
-let g:viki_intervikis['UML']   = [g:p4ClientRoot . '/dwyatt-dev/viki/UML',                       '.viki']
-let g:viki_intervikis['INF']   = [g:p4ClientRoot . '/dwyatt-dev/viki/Infrastructure',            '.viki']
-let g:viki_intervikis['BASE']  = [g:p4ClientRoot . '/dwyatt-dev/viki/Infrastructure/BASE',       '.viki']
-let g:viki_intervikis['CORE']  = [g:p4ClientRoot . '/dwyatt-dev/viki/Infrastructure/CORE',       '.viki']
-let g:vikiFolds = ""
-autocmd! BufRead,BufNewFile,BufEnter *.viki setl ft=viki | setl sts=2 | setl sw=2 | setl ts=2 | setl tw=80 | setl makeprg=rake\ --silent\ %:t | if expand('%:h') != '' | :lcd %:h | endif
-autocmd! Filetype viki compiler deplate
-exec 'nmap <silent> ,vv :e ' . g:p4ClientRoot . '/dwyatt-dev/viki/index.viki<CR>'
-nmap <silent> <C-BS> :call viki#GoBack()<CR>
 
 "-----------------------------------------------------------------------------
 " NERD Tree Plugin Settings
@@ -382,9 +333,6 @@ nmap <F7> :NERDTreeToggle<CR>
 
 " Close the NERD Tree with Shift-F7
 nmap <S-F7> :NERDTreeClose<CR>
-
-" Store the bookmarks file in perforce
-exe 'let NERDTreeBookmarksFile="' . g:p4ClientRoot . '/dwyatt-dev/vimruntime/NERDTreeBookmarks"'
 
 " Show the bookmarks table on startup
 let NERDTreeShowBookmarks=1
@@ -424,8 +372,8 @@ nmap ,tM :MentionsTwitter<cr>
 function! TwitVimMappings()
     nmap <buffer> U :exe ":UnfollowTwitter " . expand("<cword>")<cr>
     nmap <buffer> F :exe ":FollowTwitter " . expand("<cword>")<cr>
-    nmap <buffer> 9 :BackTwitter<cr>
-    nmap <buffer> 0 :ForwardTwitter<cr>
+    nmap <buffer> 7 :BackTwitter<cr>
+    nmap <buffer> 8 :ForwardTwitter<cr>
     nmap <buffer> 1 :PreviousTwitter<cr>
     nmap <buffer> 2 :NextTwitter<cr>
     nmap <buffer> ,sf :SearchTwitter #scala OR #akka<cr>
@@ -453,22 +401,6 @@ nmap <silent> ,ff :FufFile<cr>
 nmap <silent> ,fc :FufMruCmd<cr>
 nmap <silent> ,fm :FufMruFile<cr>
 nmap <silent> ,fp :FufFile ~/git/*<cr>
-
-"-----------------------------------------------------------------------------
-" YankRing Settings
-"-----------------------------------------------------------------------------
-nmap <F4> :YRShow<cr>
-
-"-----------------------------------------------------------------------------
-" Vim Outliner Settings
-"-----------------------------------------------------------------------------
-let otl_map_tabs=1
-let g:no_otl_insert_maps=1
-
-augroup derek_otl
-    au!
-    au Filetype otl :imap <c-bs> <bs><bs>* 
-augroup END
 
 "-----------------------------------------------------------------------------
 " Functions
@@ -529,80 +461,11 @@ endfunction
 
 command! -nargs=+ DiffCurrent call DiffCurrentFileAgainstAnother(<f-args>)
 
-function! SetPathToRightPerforceSpot()
-    let fullpath = expand('%:p')
-    let dirs = split(fullpath, '/')
-    if len(dirs) > 2
-        let dir = dirs[2]
-        if dir != "50" && dir != "50dev" && dir != "bcmi"
-            let dir = "hydrah"
-        endif
-        " Set up some paths for automatic file loading
-        execute "setl path="
-        execute "setl path+=" . g:p4ClientRoot . "/" . dir . "/enterprise/**"
-        execute "setl path+=" . g:p4ClientRoot . "/" . dir . "/redirector/**"
-        execute "setl path+=" . g:p4ClientRoot . "/" . dir . "/wutility/**"
-        execute "setl path+=" . g:p4ClientRoot . "/" . dir . "/common/bes/**"
-        execute "setl path+=" . g:p4ClientRoot . "/" . dir . "/common/crypto/**"
-        execute "setl path+=" . g:p4ClientRoot . "/" . dir . "/common/desktop/**"
-        execute "setl path+=" . g:p4ClientRoot . "/" . dir . "/common/device/**"
-        execute "setl path+=" . g:p4ClientRoot . "/" . dir . "/common/DST/**"
-        execute "setl path+=" . g:p4ClientRoot . "/" . dir . "/common/enterprise/**"
-        execute "setl path+=" . g:p4ClientRoot . "/" . dir . "/common/include"
-        execute "setl path+=" . g:p4ClientRoot . "/" . dir . "/common/ITPolicyTemplate/**"
-        execute "set tags=" . g:p4ClientRoot . "/" . dir . "/tags"
-        execute "let g:autotagTagsFile=" . g:p4ClientRoot . "\"/" . dir . "/tags\""
-        execute "setl path+=" . g:p4ClientRoot . "/dwyatt-dev/vimruntime/**"
-    endif
-endfunction
-
 function! RunSystemCall(systemcall)
     let output = system(a:systemcall)
     let output = substitute(output, "\n", '', 'g')
     return output
 endfunction
-
-function! OnlyTwoPerforceDiff(from, to)
-    let base  = bufname('BASE')
-    let mine  = substitute(base, '#.*\]', '', '')
-    let base  = bufnr(base)
-    let mine  = bufnr(mine)
-    let their = bufnr(bufname('THEIR'))
-    let merge = bufnr(bufname('MERGE'))
-    only
-    execute "buffer " . base
-    diffoff
-    execute "buffer " . their
-    diffoff
-    execute "buffer " . mine
-    diffoff
-    execute "buffer " . merge
-    diffoff
-    if a:from == "base"
-        execute "buffer " . base
-    elseif a:from == "their"
-        execute "buffer " . their
-    else
-        execute "buffer " . mine
-    endif
-    diffthis
-    if a:to == "base"
-        execute "vertical sbuffer " .  base
-    elseif a:to == "their"
-        execute "vertical sbuffer " .  their
-    else
-        execute "vertical sbuffer " .  mine
-    endif
-    diffthis
-    wincmd x
-endfunction
-
-command! DiffBaseToTheir call OnlyTwoPerforceDiff("base", "their")
-command! DiffTheirToBase call OnlyTwoPerforceDiff("their", "base")
-command! DiffBaseToMine  call OnlyTwoPerforceDiff("base", "mine")
-command! DiffMineToBase  call OnlyTwoPerforceDiff("mine", "base")
-command! DiffMineToTheir call OnlyTwoPerforceDiff("mine", "their")
-command! DiffTheirToMine call OnlyTwoPerforceDiff("their", "mine")
 
 function! HighlightAllOfWord(onoff)
     if a:onoff == 1
@@ -726,11 +589,6 @@ command! FreemindToList call FreemindToListF()
 "-----------------------------------------------------------------------------
 " Auto commands
 "-----------------------------------------------------------------------------
-augroup derek_scons
-    au!
-    au BufNewFile,BufRead SCons* setf scons
-augroup END
-
 augroup derek_xsd
     au!
     au BufEnter *.xsd,*.wsdl,*.xml setl tabstop=4 shiftwidth=4
