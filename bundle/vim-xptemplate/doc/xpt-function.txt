@@ -1,0 +1,35 @@
+
+						      *S()*   *xpt-substitute*
+S({pattern},{replace},[{flag}])
+	Substitute typed content with pattern and replace. Just like
+	|substitute()|.
+
+									 *C()*
+C()
+	Get function context, see |xpt-snippet-function-ctx|.
+
+								   *E({expr})*
+E({expr})
+	Equals to |expand()|.
+
+									 *N()*
+N()
+	Current edited item name. Valid only to |xpt-snippet-post-filter|.
+
+									 *V()*
+V()
+	Current typed text. Valid only to |xpt-snippet-post-filter|.
+
+								   *R({name})*
+R({name})
+	Reference to history item. Get value by name.
+
+					       *S({expr},{pat},{sub},{flags})*
+S({expr},{pat},{sub},{flags})
+	Equals to |substitute()|.
+
+									*SV()*
+SV()
+	Equals to S(V(),{pat},{sub},{flag}).
+
+" vim:tw=78:ts=8:sw=8:sts=8:noet:ft=help:norl:

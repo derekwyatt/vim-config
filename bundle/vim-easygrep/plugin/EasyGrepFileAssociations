@@ -1,0 +1,72 @@
+" EasyGrepFileAssociations
+" Version 0.96
+"
+" This file is made up of Key-value pairs that associate file types
+" individual file extensions should only show up in one pair; behavior may be
+" inconsistent if they show up in several.  To include filetypes in multiple
+" groups, you can link to a group using <Key> where key is a groupname
+" Note that individual file extensions need not be listed in this file if they
+" do not have associated file types
+" extensions should not be complicated regular expressions for matching to
+" happen correctly
+" TODO: consider how extensions dominate another, try this syntax <!C>
+" TODO: consider extension ordering for dominating
+
+Ada=*.adb *.ads *.ada *.gpr *.ada_m *.adc
+Assembly=*.asm *.[sS] *.[aA] *.mac *.lst *.i
+B=*.mch *.ref *.imp
+Basic=*.vbs *.dsm *.ctl *.bas *.frm *.sba *.iba *.ibi *.fb *.bi
+BibTeX=*.bib *.bst <TeX>
+C#=*.cs <C++>
+C++=*.cpp *.hpp *.cxx *.hxx *.cc *.hh *.c++ *.inl <C>
+C=*.c *.h
+CUDA=*.cu *.cuh <C++>
+Cobol=*.cbl *.cob
+ColdFusion=*.cfm *.cfi *.cfc
+Configuration=.*rc *.conf *.cf *.cfg *.config *.ini
+D=*.d <C++>
+Diff=*.diff *.rej *.patch
+EDIF=*.edf *.edif *.edn *.edo
+Eiffel=*.[eE]
+Erlang=*.erl *.hrl *.yaws
+Forth=*.fs *.ft *.frt
+Fortran=*.[fF] *.for *.FOR *.fortran *.fpp *.FPP *.ftn *.FTN *.[fF]77 *.[fF]90 *.[fF]95
+HDL=*.hdl *.vhd *.vhdl *.vbe *.vst *.v *.va *.vams *.tdf
+Haskell=*.hs *.lhs *.chs
+Image=*.xpm *.xpm2
+Jam=Prl*.* JAM*.* Jamroot Jamfile *.jpl *.jpr
+Java=*.java *.jav *.jj *.jjt
+Lex=*.lex *.l *.ll
+Lisp=*.lsp *.lisp *.el *.cl *.jl *.L
+Make=*.m4 *.ac *.in *.am *[mM]akefile *.mk *.mak *.dsp
+Math=*.m *.asv *.mv *.mpl *.mws *.nb
+OCAML=*.ml *.mli *.mll *.mly
+ObjectiveC=*.m *.mm <C>
+Oracle=*.tyb *.typ *.tyc *.pkb *.pks *.ora <SQL>
+PHP=*.php *.phtml *.ctp
+Perl=*.pl *.PL *.pm *.pod
+PostScript=*.ps *.pfa *.afm *.eps *.epsf *.epsi *.ai *.ppd
+Python=*.py *.pyw
+Qt=*.moc *.qmake *.ui *.ts <C++>
+Ruby=*.rb *.rbw *.gem *.gemspec [rR]akefile *.erb *.rhtml
+RubyOnRails=*.builder *.rxml *.rjs <Ruby>
+SQL=*.sql *.sqlj *.msql *.mysql *.pls *.plsql *.zsql
+Scheme=*.scm *.ss
+Shell=*.sh *.bash *.ebuild *.ksh *.tcsh *.cmd *.bat
+Spice=*.sp *.spice *.spy *.spi
+Tcl=*.tcl *.tk *.itcl *.itk *.jacl
+TeX=*.tex *.latex *.sty *.dtx *.ltx *.bbl *.mkii *.mkiv *.texinfo *.texi *.txi
+Text=*.txt *.inf *.INF
+Vera=*.vr *.vri *.vrh
+Vim=*.vim .vimrc .gvimrc *.vba .exrc _exrc .vim*
+Virata=*.hw *.module *.pkg
+VisualStudioProject=*.sln *.vcproj *.icproj *.csproj *.rc *.def
+Web=*.htm *.html *.shtml *.stm *.xhtml *.xht *.css *.js *.javascript *.es *.jsp *.asp *.asa
+X11=XF86* .X* *.ad <Configuration>
+XML=*.xml *.dtd
+Xquery=*.xq *.xql *.xqm *.xquery *.xqy
+Xsd=*.xsd <XML>
+Xslt=*.xsl *.xslt <XML>
+Yacc=*.y *.yy
+Yaml=*.yaml *.yml
+

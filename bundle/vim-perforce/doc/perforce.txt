@@ -1,0 +1,2441 @@
+*perforce.txt*  A feature Rich Perforce SCM Integration for Vim.
+                    Requires Vim 6.0
+            Last Change: 01-Sep-2006 @ 16:54
+          Since Version: 1.4
+               Revision: 1.3.0
+         Plugin Version: 4.1
+                 Author: Hari Krishna Dara (hari_vim at yahoo dot com)
+
+                                            *perforce-introduction*
+                                            *perforce-plugin*
+This is a fairly complete integration with the perforce version control system
+for the most commonly used operations, including many administrative commands.
+It includes a great menu that is modelled very close to the p4win (the perforce
+GUI client) and is quite extensive.
+
+==============================================================================
+OVERVIEW                                    *perforce-overview*
+
+|perforce-installation|     How to install the plugin.
+
+|perforce-filetype|         Perforce filetype plugin and setting it up for p4.
+
+|perforce-settings|         An explanation of how to configure the plugin, for
+                            both the perforce related parameters and the plugin
+                            customizations, such as enabling menu.
+
+|perforce-ruler|            Setting up the ruler to show an active status of the
+                            file.
+
+|perforce-syntax|           Perforce syntax plugin.
+
+|perforce-help|             Browse the p4 help conveniently from within vim.
+
+|perforce-reinitialize|     Describes how to reinitialize the plugin to load the
+                            latest settings from the environment without
+                            restarting vim.
+
+|perforce-commands|         A description of various commands that can be
+                            issued on Vim command-line.
+
+|perforce-revisions|        Specifying perforce revisions conveniently.
+
+|perforce-interactive-commands|
+                            How to execute interactive perforce commands.
+
+|perforce-forms|            How to edit the perforce forms (specifications) from
+                            within vim.
+
+|perforce-submit|           Special handling of submit command.
+
+|perforce-list-commands|    Commands that can be used in a list of items window.
+
+|perforce-extensions|       Some useful extensions in the form of new options
+                            and commands.
+
+|perforce-misc-commands|    Some additional useful commands.
+
+|perforce-special-commands| Some useful commands and mappings.
+
+|perforce-utils|            Additional utilties (perforce/perforceutils.vim).
+
+|perforce-API|              New API provided by the plugin (experimental).
+
+|perforce-tips|             Some useful tips.
+
+|perforce-limitations|      Current limitations of the plugin.
+
+|perforce-troubleshooting|  Some notes how to trouble shoot problems.
+
+|perforce-changes|          A change list for current version from previous
+                            versions.
+
+|perforce-known-issues|     A list of known bugs.
+
+|perforce-wishlist|         Wishlist items that may be worth doing for a future
+                            version.
+
+|perforce-bugreporting|     Reporting bugs.
+
+|perforce-acknowledgements| Acknowledgements.
+
+==============================================================================
+
+                                            *perforce-installation*
+
+To install, place the perforce.vim script in one of the runtime plugin
+directories along with the genutils.vim scripts that it depends on. This
+typically is .vim/plugin or vimfiles/plugin directory under your home directory.
+To get the latest versions of these plugins, goto the following webplages:
+     perforce.vim: http://www.vim.org/script.php?script_id=240
+     genutils.vim: http://www.vim.org/script.php?script_id=197
+
+The distribution contains the following files:
+    - plugin/perforce.vim
+        - Thin interface to the plugin (autoload/perforce.vim).
+    - autoload/perforce.vim
+        - The perforce plugin itself loaded on demand.
+    - ftplugin/perforce.vim
+        - The perforce filetype plugin file. See below on how to configure the
+          perforce filetype.
+    - syntax/perforce.vim.
+        - Syntax definition file for perforce forms.
+    - doc/perforce.txt.
+        - The online help file (this file).
+    - perforce/perforcemenu.vim.
+        - Additional module to install and configure a menu for the plugin.
+          See |perforce-menu|.
+    - perforce/perforcebugrep.vim.
+        - An utility script that can be used to generate useful information
+          while sending bugreports about the plugin. See
+          |perforce-bugreporting|.
+    - perforce/perforceutils.vim.
+        - Thin interface to autoload/perforceutils.vim
+    - autoload/perforceutils.vim
+        - Additional misc. utilities loaded on demand.
+
+If you obtained the plugin as a zip archive,
+    - Just extract it in your runtime directory.
+    - Start a new instance or go to an existing instance of vim.
+    - Execute:
+>
+        :helpt <your runtime directory>/doc
+<
+      This should generate the help tags for the perforce plugin help.
+    - Setup perforce filetype as described in |perforce-filetype| section.
+    - Make sure p4 command is in your path or set |p4CmdPath| property.
+    - Set the |p4ClientRoot| property and additionally any other
+      |perforce-settings| that you like.
+    - Optionally set 'cmdheight' property to at least 2 to avoid seeing the more
+      prompt for most of the messages the plugin gives.
+    - The plugin requires that you have Vim 7.0 version installed.
+    - If you want to enable the perforceutils.vim plugin, add the following line
+      to your vimrc:
+>
+        runtime perforce/perforceutils.vim
+<
+    - If you want to enable the menu, add the following line to your vimrc, at
+      the end of perforce configuration lines:
+>
+        runtime perforce/perforcemenu.vim
+<
+    - The core of the plugin is autoloaded by Vim the first time a perforce
+      command needs to be executed. This improves the startup time of Vim
+      considerably in some situations. If you want the plugin to be loaded
+      immediately, you can force an autoload by adding the following command to
+      your vimrc:
+>
+        PFIntialize
+<
+
+Note: It is important to make sure your 'shellredir' properly set such that, vim
+captures both the standard output and standard error messages from the external
+perforce command. If this is not correctly set, the plugin will not be able to
+show the error messages generated by p4 command to you.
+
+Also note that on Windows, if you use a UNIX like shell for your 'shell'
+setting, the plugin will not work correctly unless the 'shellslash' option is
+set.
+
+                                            *loaded_perforce*
+Later, if you need to temporarily disable the plugin without needing to remove
+the files, you can set the loaded_perforce variable in your vimrc. You can also
+set the no_perforce_maps to disable just the mappings defined in this plugin or
+no_plugin_maps to disable mappings in all the plugins (provided they all honor
+this setting), in your vimrc.
+==============================================================================
+
+                                            *perforce-filetype*
+                                            *perforce-ftplugin*
+The package comes with a perforce ftplugin (|filetype-plugin|) which sets a
+few text mode options suitable for editing the forms and a syntax plugin to
+colorize the spec files. The ftplugin also positions the cursor at the
+appropriate line based on the type of spec you are editing. When you open
+perforce forms from within vim using |perforce-interactive-commands|, you
+don't have to do anything special for this to work, but if you want the same
+to work while editing forms using p4 command directly, then you need to add
+the following lines in your scripts.vim:
+>
+        if getline(1) =~ '^# A Perforce '
+          setfiletype perforce
+        endif
+<
+If you do not have this file already, then you need to create it under
+vimfiles or .vim directory (or anywhere in your 'rtp'). For details see help
+on |new-filetype-scripts|. Note that you also need to enable filetype plugins
+for this to work, see |filetype-plugin| for more information.
+
+==============================================================================
+
+                                            *perforce-settings*
+                                            *perforce-customizing*
+The plugin allows a lot of customization by reading some global variables. You
+can define a set of global variables in your startup script (.vimrc/_vimrc) and
+they are automatically read by the plugin during the Vim startup and are used
+for customizing the behavior.
+
+Note that all the setting names are case sensitive and the boolean settings can
+be set to the value 0 to disable and any non-zero number (for the matter of
+fact, any string will also do) to enable. All the settings can be changed at
+runtime without restarting vim; see |perforce-reinitialize|.
+
+The settings can also be changed at runtime, see |perforce-reinitialize|.
+
+Here is a list of all the options:
+    |p4CmdPath|, |p4DefaultPreset|, |p4DefaultOptions|, |p4ClientRoot|,
+    |p4EnableRuler|, |p4RulerWidth|, |p4EnableActiveStatus|,
+    |p4ASIgnoreDefPattern|, |p4ASIgnoreUsrPattern|, |p4OptimizeActiveStatus|,
+    |p4UseGUIDialogs|, |p4PromptToCheckout|, |p4DefaultListSize|,
+    |p4DefaultDiffOptions|, |p4EnableMenu|, |p4UseExpandedMenu|,
+    |p4EnablePopupMenu|, |p4UseExpandedPopupMenu|, |p4Presets|,
+    |p4MaxLinesInDialog|, |p4CheckOutDefault|, |p4SortSettings|, |p4TempDir|,
+    |p4SplitCommand|, |p4UseVimDiff2|, |p4EnableFileChangedShell|,
+    |p4HideOnBufHidden|, |p4Depot|, |p4Autoread|, |p4FileLauncher|,
+    |p4CurPresetExpr|, |p4CurDirExpr|, |p4UseClientViewMap|
+
+                                            *perforce-command-path*
+                                            *p4CmdPath*
+The plugin executes the external p4 command for all its operations. By default
+the command is found in the PATH, but if it doesn't exist in the path you can
+still specify the location by using the p4CmdPath variable.
+>
+        :let g:p4CmdPath = '<path_to_p4_command>'
+<
+    Example: >
+        :let g:p4CmdPath = '~/bin/perforce/bin/p4'
+<
+                                            *perforce-presets*
+                                            *p4Presets*
+This is a useful setting when you work with multiple perforce installations at
+the same time. This allows you to predefine a set of configurations that you
+can switch between without needing to restart vim or manually enter the
+details while using the |PFSwitch| command. Set this variable in your vimrc
+with a comma separated list of settings. Each setting should be of
+the form (separated with one or more spaces):
+>
+            <port> <client> <user>
+<
+You can include as many of these specifications as you want, just separate them
+with commas.
+>
+            :let g:p4Presets = 'port1 client1 user1,port2 client2 user2'
+<
+Once set, you can use the |PFSwitch| command in one of three ways to choose the
+setting.
+
+        1. If you know the index of the setting to which you want to
+           switch to (starting with 0), just pass that as an argument to the
+           command as
+>
+            " Switch to the third setting.
+            :PFSwitch 2
+<
+        2. If you don't know the index, just invoke the command without any
+           arguments. You will be prompted to enter the index after displaying
+           a list of available settings.
+
+        3. If you have expanded menu enabled (see |p4UseExpandedMenu| or
+           |p4UseExpandedPopupMenu|), then you can choose the desired setting
+           to switch to using the "Settings" sub-menu under "Perforce" group.
+
+                                            *perforce-P4CONFIG*
+                                            *P4CONFIG*
+As a special case, you can have one of the specifications as "P4CONFIG",
+allowing you to switch to the P4CONFIG feature of external p4 command
+interactively, see |perforce-dynamic-client|.
+>
+            :let g:p4Presets = 'p1 c1 u1,P4CONFIG,p2 c2 u2'
+<
+Setting port field to "P4CONFIG" also has the same effect. This results in
+plugin not passing the options for port, client and user explicitly such that p4
+can determine them based on the P4CONFIG file. However you can still override
+them by explicitly specifying the corresponding option to PF command.
+
+                                                    *p4DefaultPreset*
+If you don't have the P4CLIENT, P4USER and P4PORT environment variables set, you
+can use this setting to initialize the plugin with corresponding values. The
+format for the value is exactly same as a single entry in |p4Presets| setting.
+In fact, you can also set this to an index in the |p4Presets|.
+>
+        :let g:p4DefaultPreset = '<your_perforce_port> <your_perforce_client_name> <your_perforce_user_name>'
+<
+    Example: >
+        :let g:p4DefaultPreset = 'localhost:1666 hari_client hari'
+        :let g:p4DefaultPreset = 2 " Start with the second setting in p4Presets.
+<
+Note that the plugin automatically chooses some defaults for the above based on
+your environment, if you don't explicitly set them in your startup script.
+
+                                            *perforce-default-options*
+                                            *perforce-common-options*
+                                            *p4DefaultOptions*
+If you need to pass in additional arguments every time the external p4 command
+is run, you can use the following setting. The arguments are passed to p4
+literally. For the set of options that you can specify here, see perforce help
+for "usage" (use ":PH usage" command, see |perforce-help|)
+>
+        :let g:p4DefaultOptions = '<default_options_to_p4>'
+<
+    Example: >
+        :let g:p4DefaultOptions = '-H hkrishna'
+<
+                                            *perforce-buffer-local-options*
+In addition you can also use the buffer local variables "b:p4Options",
+"b:p4Client", "b:p4User", "b:p4Port" and "b:clientRoot" to override the global
+options (see ":PH usage" for option list) at a buffer level. The plugin
+automatically sets these options whenever you create a new perforce result
+window such that any future commands originating from the same window
+automatically inherit them.  This is especially useful when you temporarily
+switch to a different client/user by providing one at command-line, and later do
+more operations on the results (provided the given client/user is valid on the
+current m/c). >
+
+        :PF -c hari_tmp opened
+        :PFileDiff
+>
+The PFileDiff will automatically use the "hari_tmp" client as b:p4Client is set
+to that value. You can also use b:p4Options to set any option that is accepted
+in the global options section of PF command (see |perforce-global-options|),
+however for the client view mapping to work correctly, you need to have
+b:p4Client and b:clientRoot set. >
+
+        :let b:p4Options = '-H my_host'
+<
+All commands executed when this buffer is active will automatically inherit
+these global options.
+
+NOTE: Currently the b:clientRoot variable needs to be set manually.
+
+                                            *perforce-client-root*
+                                            *p4ClientRoot*
+The client root is required for certain commands (it is same as what you
+specify in the Root: property in the client settings), so if not specified and
+if the |p4EnableActiveStatus| setting is enabled, the plugin will run the "p4
+info" command to read the client root setting from the perforce server. But
+this will introduce a short delay in autoload time (especially if you are
+talking to a perforce server that is installed out side your network). To avoid
+this, use the following setting to specify the client root.
+>
+        :let g:p4ClientRoot = '<client_root_directory>'
+<
+    Example: >
+        :let g:p4ClientRoot = 'c:/dev'
+<
+If |p4EnableActiveStatus| is disabled, the current directory is used as the
+default.
+
+                                            *perforce-gui-dialogs*
+                                            *p4UseGUIDialogs*
+By default the plugin uses console dialogs for some of the prompts. This is
+convenient as you can then use the input-history and expression register
+|quote=|. But if you like, you can enable this setting to force using GUI
+dialogs for all the prompts.
+>
+        :let g:p4UseGUIDialogs = 1
+<
+
+                                            *perforce-automatic-checkout*
+                                            *p4PromptToCheckout*
+The plugin by default prompts you to checkout, when you start editing a
+readonly file under the client root. You can disable this behavior by using the
+following setting:
+>
+        :let g:p4PromptToCheckout = 0
+<
+Note that you can still manually checkout (or edit) the file even when this
+option is disabled by using "PE" or "PF edit" command.
+
+When the checkout prompt is given, you have the option saying Yes, No or Cancel.
+When accidental changes to the buffer bring up the checkout prompt, you can
+select Cancel to revert the state of the buffer as much as possible (you may
+still have to press <Esc> sometimes). One advantage of selecting Cancel in these
+cases is that the next time you start making a genuine change, you will get the
+checkout prompt as expected (otherwise, you will only get this prompt once).
+
+                                            *perforce-list-size*
+                                            *perforce-default-list-size*
+                                            *p4DefaultListSize*
+When you execute "changes", "jobs" and "filelog" perforce commands, the number
+of entries is limited to 100 to avoid generating a large volume of data. But you
+can change the value to whatever you like:
+>
+        :let g:p4DefaultListSize = 1000
+<
+To disabling it completely (show the entire list) set it to a negative number:
+>
+        :let g:p4DefaultListSize = -1
+<
+
+                                            *perforce-default-diff-options*
+                                            *p4DefaultDiffOptions*
+You can set the default diff options to be passed to all the "diff" and "diff2"
+operations (both direct and indirect execution of these commands), by using the
+following setting:
+>
+        :let g:p4DefaultDiffOptions = '-dwbu5'
+<
+For the options that you can set here, see the help for "diff" or "diff2" by
+running the "PH diff" or "PH diff2" command.
+
+Note, this setting can't be used to specify options to the external diff
+program.
+
+                                            *perforce-menu*
+                                            *p4EnableMenu*
+The distribution comes with an additional module called perforcemenu.vim to
+install a Perforce sub-menu on the main or PopUp menu.  By default the menu is
+not added as many people (including myself) don't use menus (I have the entire
+menu bar disabled). Use the following setting to enable the Perforce sub-menu:
+>
+        :let g:p4EnableMenu = 1
+<
+The above setting will create a very basic menu with the most needed commands.
+This makes it easy to use shortcut keys if you have the |winaltkeys| correctly
+configured. To enable a more full featured menu, see |p4UseExpandedMenu|.
+
+                                            *perforce-expanded-menu*
+                                            *p4UseExpandedMenu*
+By default the |p4EnableMenu| option creates a full-featured menu that is
+modelled closely after the p4Win utility, which comes with perforce. But you can
+disable this and have only a basic menu with the most commonly used set of
+commands (this was the default for older versions of the plugin). Use the
+following setting in your startup script:
+>
+        :let g:p4UseExpandedMenu = 0
+<
+If you want a basic menu on the main menu (for the ease of using the shortcut
+keys), then you can consider having the full-featured version on the popup
+menu, see |p4EnablePopupMenu| and |p4UseExpandedPopupMenu| settings.
+
+                                            *perforce-popup-menu*
+                                            *p4EnablePopupMenu*
+This is similar to |p4EnableMenu| except that enabling this option, adds a
+Perforce sub-menu on the PopUp menu instead of the main menu.
+>
+        :let g:p4EnablePopupMenu = 1
+<
+                                            *perforce-expanded-popup-menu*
+                                            *p4UseExpandedPopupMenu*
+This is similar to |p4UseExpandedMenu| except that enabling this option, adds a
+more full-featured Perforce sub-menu on the PopUp menu.
+>
+        :let g:p4UseExpandedPopupMenu = 1
+<
+                                            *loaded_perforcemenu*
+Note: If you never use the menu features of the plugin, consider setting
+"loaded_perforcemenu" to a non-zero value, to avoid getting this module sourced.
+
+                                            *perforce-max-lines-in-dialog*
+                                            *p4MaxLinesInDialog*
+Commands that use a dialog box to show the result (such as |PEdit|) assume
+that the messages generated by the perforce command are only a few lines. But
+depending on the arguments (e.g., "PEdit ..." and there are many files under
+the current directory ...), there can be too many lines to display in a dialog
+so the display mode is automatically switched to a new window instead of the
+dialog. Though the default limit is 1, which helps to draw your attention for
+the conditions that you normally expect a one line result (e.g., you checkout a
+file and someone else already checked out the file), you can change it by
+setting the following line:
+>
+            :let g:p4MaxLinesInDialog = <number of lines>
+<
+    Example:
+>
+            :let g:p4MaxLinesInDialog = 5
+<
+                                            *p4CheckOutDefault*
+When you start modifying a read-only file, the plugin prompts you to checkout
+the file from perforce. Set this option to 1 to make the default option to
+"Yes" and 2 for "No". The default is 2 to avoid accidentally checking out a
+file. >
+
+            :let g:p4CheckOutDefault = <option number>
+<
+    Example:
+>
+            :let g:p4CheckOutDefault = 1
+<
+                                            *p4SortSettings*
+The |PFSettings| command by default sorts the setting so that they are in
+alphabetical order. But this will alter the position of the settings as new
+settings get added, so if you want them to always appear in the same familiar
+order, then set this to 0 to disable sorting. >
+
+            :let p4SortSettings = 0
+<
+                                            *p4TempDir*
+This setting points to the directory which should be used by the plugin for
+creating any temporary files. This setting is used for vdiff and vdiff2
+commands, but currently these commands don't really create any files on the
+filesystem, as the directory is used to merely generate the filenames for
+temporary files (the filename is still such that it is valid on the filesystem,
+so that you can write the contents to it for any reason, but you will have to
+reset the 'buftype' option first). But this may change in future when new
+features/commands get added which require the temporary files to be on
+filesystem. >
+
+            :let p4TempDir = "c:/temp/vim-p4"
+<
+                                            *p4SplitCommand*
+When the plugin creates new windows as a result of issuing perforce commands, it
+by default uses |:split| command, which creates a horizontally split window above
+or below the current window depending on your 'splitbelow' setting. But if you
+would like to change the way the windows are created, you can set this setting
+to any split command that is valid (such as |:vsplit| or "topleft split"). For
+all possible commands see |:vertical|. >
+
+            :let p4SplitCommand = "vsplit"
+<
+                                            *p4UseVimDiff2*
+If this option is set, the plugin uses vdiff2 instead of diff2 in the filelog
+window. See |perforce-vim-diff|. >
+
+            :let p4UseVimDiff2 = 1
+<
+                                            *p4EnableFileChangedShell*
+The plugin normally listens to the |FileChangedShell| events and refreshes the
+ruler automatically (See |perforce-ruler|), keeping the status up to date. But
+because of the way this event works, the plugin has to emulate the |timestamp|
+warning messages that would be generated by Vim by default, when there is no
+listener for this event. If you don't like this feature for any reason, you can
+disable it by setting this option to 0. >
+
+            :let p4EnableFileChangedShell = 0
+<
+Note that the plugin no longer refreshes the ruler whenever vim detects that the
+file has been modified externally requiring a reload of the buffer (and this
+anyway happens only if the buffer is currently visible in a window, or if the
+'hidden' option is set). To manually refresh the ruler see
+|perforce-refresh-file-status|.
+
+                                            *p4BufHidden*
+This setting is useful if you do not normally set the 'hidden' option. The
+plugin normally sets the 'bufhidden' option for the perforce plugins to the
+value "wipe" such that they are automatically wiped out when they are unloaded.
+This keeps your buffer list clean and also conserves the vim resources as you
+can potentially end up creating a lot of buffers, one for each perforce command
+that you execute from with in Vim. But this would prevent you from switching
+back and forth between the perforce result buffers and other regular buffers.
+If you often find yourself working with perforce windows for a long time, you
+should consider setting this option to the value "hide" instead, avoiding unload
+of the buffers when they are hidden. When you set this value, an interesting and
+useful side effect is that you can use <C-O> and <Tab> to navigate the preview
+window, which can be very useful while viewing the description of list items,
+see |perforce-list-commands|. >
+
+        :let g:p4BufHidden = 'hide'
+
+Note: You have three other alternatives to essentially get the same
+functionality at different levels, avoiding the unload of the buffers:
+        - Set the 'hidden' global option to avoid unloading all buffers. This
+          essentially avoids unloading every buffer that is loaded/created in
+          Vim, not just perforce windows.
+        - Manually set 'bufhidden' local option to "hide" for any particular
+          perforce window that you are interested in keeping around. Once set,
+          this prevents the buffer from getting wipedout, until explicitly
+          requested to do so. >
+
+            :setlocal bufhidden=hide
+<
+        - Use the |:hide| command instead of quitting the buffer by other means,
+          such as the |:quit| command everytime. This again prevents the buffer
+          from getting unloaded even after it is hidden, but conveniently so
+          only when you use :hide command. If the buffer is later shown back
+          in another window and then hidden without having one of the other
+          settings appropriately set, then it will get unloaded and will get
+          wipedout.
+
+See |PFWipeoutBufs| command for a way to cleanup all the hidden perforce buffers
+that get accumulated, when you use one of the above techniques.
+
+Note: There are other values that the 'bufhidden' can take, and so does the
+g:p4BufHidden option, but they are not useful. They leave the perforce result
+buffers lying around, without any useful side effect.
+
+                                            *p4Depot*
+The plugin at any time can operate only on one preset depot, which by default is
+"depot". If your perforce server has multiple depots or if your depot name is
+not "depot", then you can use this setting:
+>
+        :let g:p4Depot = 'proj'
+>
+to switch to a different depot than "depot". You can also do this at any time by
+using the |PFSettings| command interactively.
+
+                                            *p4Autoread*
+By default, the plugin automatically reloads the file that get externally
+modified as a side effect of some perforce commands (such as get and edit), if
+the buffer inside vim is not yet modified. But you can disable this feature by
+using this setting: >
+
+        :let g:p4Autoread = -1
+>
+A value of -1 means, use the 'autoread' vim setting and a value of 0 means don't
+autoread and a value of 1 means autoread (the default).
+
+                                            *perforce-ruler*
+The below are some additional settings that are related to configuring the
+perforce ruler.
+
+                                            *p4EnableRuler*
+You can enable this setting to see additional information in the Vim ruler about
+the current file's status. If the status for the current file doesn't exist yet,
+nothing is shown. To make the status automatically available when you open a
+file, you can enable the active status option, see |p4EnableActiveStatus|. You
+can also manually obtain the status by executing the |PFRefreshFileStatus|
+command any time. See |p4RulerWidth| on how to adjust the width of the ruler. By
+default this setting is enabled, to disable it use, >
+
+        :let g:p4EnableRuler = 0
+<
+The plugin modifies the 'rulerformat' for this to work, so if you are also
+modifying this, make sure you do it before the plugin gets loaded (doing it in
+the vim startup file will ensure this.)
+
+Note that enabling this option alone is not sufficient, you should also have the
+|p4EnableActiveStatus| setting enabled or use the |PFRefreshFileStatus| command.
+Also see |p4OptimizeActiveStatus| setting.
+
+                                            *perforce-ruler-width*
+                                            *p4RulerWidth*
+By default the plugin uses an additional 25 columns to show the perforce file
+status. You might want to increase this value if you have long client names in
+your perforce setup:
+>
+        :let g:p4RulerWidth = 50
+<
+                                            *perforce-active-status*
+                                            *p4EnableActiveStatus*
+Enabling this option along with |p4EnableRuler| will provide you a quick look
+at the current file's status in the perforce depot, as soon as it is opened.
+By default this setting is enabled, but you can disable it if it introduces
+significant delay for every file you open (as it involves running an external
+command which in turn has to talk to a server). >
+
+        :let g:p4EnableActiveStatus = 0
+<
+If the response is slow and you would still like to have this feature, you can
+disable this option and and use the |PFRefreshFileStatus| command, for whichever
+file and whenever you want to see/update the ruler.
+
+Besides using the status for showing the ruler, if available, it is also used to
+make better decisions during some perforce operations.
+
+Note, you need to still have the |p4EnableRuler| setting enabled to actually see
+the status in the ruler. Also the default |p4OptimizeActiveStatus| setting
+optimises it such that the "fstat" is done only the first time the file is
+opened.
+
+                                        *perforce-active-status-ignore-patterns*
+                                        *p4ASIgnoreDefPattern*
+                                        *p4ASIgnoreUsrPattern*
+These are regular expression patterns matching the filenames for which the
+active status should be ignored. If the current filename matches the default
+ignore pattern or the user defined ignore pattern, then it is assumed that the
+file doesn't exist in the depot and no fstat is done on it. By default the
+user pattern is empty and the default pattern is set to all files under tmp
+and temp sub-directories and any file with log, dif, diff, out, buf and bak as
+extension (case insensitive), which is expressed by the following pattern: >
+
+  '\c\%(\<t\%(e\)\?mp\/.*\|^.*\.tmp$\|^.*\.log$\|^.*\.diff\?$\|^.*\.out$\|' .
+      \ '^.*\.buf$\|^.*\.bak$\)\C'
+<
+To add additional patterns, the "p4ASIgnoreUsrPattern" should be used. The
+"p4ASIgnoreDefPattern" can however be set to an empty value such that the
+default pattern is completely ignored. Setting the default pattern to empty
+string without defining the user pattern will completely disabled this feature,
+resulting in a 'p4 fstat' call to every file that is opened (the file still
+needs to be under the client root).
+
+                                            *perforce-optimize-filestatus*
+                                            *p4OptimizeActiveStatus*
+Enabling this option along with |p4EnableActiveStatus| and |p4EnableRuler| will
+allow the plugin to determine a brief status of the file in perforce and show it
+as part of the ruler, without loosing much of the responsiveness.  When you
+enable this option, the plugin determines the status only the first time you
+open the file and any other time there is a possibility for change in the status
+(after executing the |PEdit|, |PRevert| etc.) and when you manually ask the
+plugin to update the status using the |PFRefreshFileStatus| command. By default,
+this option is enabled, to disable it use, >
+
+        :let g:p4OptimizeActiveStatus = 0
+<
+When this option is set, the current file status shown in the ruler may not be
+the most up to date status, so when it is important (see
+|perforce-negative-revisions|) make sure you update it manually.
+
+                                            *perforce-file-launcher*
+                                            *p4FileLauncher*
+This setting is used to choose the launcher application for executing the
+|PFileLaunch| command in a filelist window. For non-windows platforms, this
+needs to be explicitly set before you can use the |PFileLaunch| command, but on
+windows, this by default is set to the following command: >
+
+ 	start rundll32 url.dll,FileProtocolHandler
+<
+This works almost the same as double clicking the file under explorer, so proper
+file associations are assumed. You can however change the command to whatever
+you like.
+
+                                            *perforce-dynamic-client*
+For those users who have a need to dynamically switch between different perforce
+clients, the plugin provides ability to set expressions that can be used to
+provide call back hooks and determine the appropriate client. This is especially
+useful when you have multiple clients mapped on to the same root and there is a
+way to deduce the client based on the usage patterns and or current file.
+
+                                            *p4CurPresetExpr*
+                                            *p4CurDirExpr*
+These by default are set to an empty string, but can be assigned any Vim
+expression that is valid on the RHS of a variable assignment. The expression is
+evaluated and the result is used as the corresponding setting.
+
+The "p4CurPresetExpr" setting is used only when using |P4CONFIG| setting. The
+"p4CurDirExpr" at any time can also be used to determine the working directory
+of the p4 operation, which in turn could impact which |P4CONFIG| file is picked
+up.
+
+For the more demanding users, these expressions provide the call-back hooks
+required to determine the client based on your environment.
+
+Note that when you specify an expression which returns a different current
+directory than the current Vim working directory (as returned by |getcwd()|),
+the plugin doesn't attempt to modify any relative filenames that you specify on
+the command-line to be relative to the new directory, so you need to make sure
+you specify a valid filename in this case (or specify full paths all the time).
+This could get tricky especially if you can't predict which directory your
+expression would return. If your logic to find the current directory is really
+that complex, then you could use the experimental API (see |perforce-API| that
+the plugin provides to manipulate the filename arguments yourself from with in
+the "p4CurDirExpr" before returning the directory name. However, while adding
+new filenames to arguments (such as the default filename for certain commands)
+the plugin automatically uses full filenames, when you specify a "-d" option on
+the command-line or through the return value of "p4CurDirExpr".
+
+It is recommended to return an empty string from "p4CurDirExpr", when the
+directory is same as Vim's current working directory.
+
+See also |perforce-switch-client|.
+
+See |perforce-tips| for an interesting and useful idea for using "p4CurDirExpr"
+setting.
+
+                                            *p4UseClientViewMap*
+This is an experimental feature, so defaults to 0.
+
+Use this setting to make the plugin look into your client View: mappings while
+translating depot paths to local paths and vice versa. The plugin translates the
+paths without needing to run "p4 where" command, by extracting the View: data
+from the client specification and building an internal representations for that.
+This is done the first time the translation is required and it is cached to
+avoid executing the "p4 client" command everytime. When the views in your client
+specification change, you need to manually update this mapping by running the
+|PFUpdateViews| command.
+
+Make sure you don't have any syntactic errors in your views (such as unmatched
+wildcards), as the plugin is not as forgiving as perforce itself in handling
+them (this is done for simplicity).
+==============================================================================
+
+                                            *perforce-syntax*
+The perforce plugin comes with a Vim syntax plugin for perforce filetype, and
+works even when the |perforce-filetype| plugin is not setup. Most of the
+output windows generated for perforce commands are set to the "perforce"
+filetype and results in automatically sourcing this syntax file. Like any syntax
+plugin, you can do further customizations and overrides from your vimrc or from
+an "after" plugin (as the case may be). To customize syntax colors, here is a
+complete list of all the syntax groups that the plugin defines (replace the tag
+on the right hand side with your own preferred highlight group such as Comment,
+Special etc.):
+>
+        hi link perforceSpecKey           <your_preferred_highlighting_group>
+        hi link perforceComment           <your_preferred_highlighting_group>
+        hi link perforceDate              <your_preferred_highlighting_group>
+        hi link perforceCommands          <your_preferred_highlighting_group>
+        hi link perforceHelpKeys          <your_preferred_highlighting_group>
+        hi link perforceClientRoot        <your_preferred_highlighting_group>
+        hi link perforceKeyName           <your_preferred_highlighting_group>
+        hi link perforceDepotFile         <your_preferred_highlighting_group>
+        hi link perforceLocalFile         <your_preferred_highlighting_group>
+        hi link perforceVerSep            <your_preferred_highlighting_group>
+        hi link perforceVersion           <your_preferred_highlighting_group>
+        hi link perforceSubmitType	  <your_preferred_highlighting_group>
+        hi link perforceDefaultSubmitType <your_preferred_highlighting_group>
+        hi link perforceViewExclude       <your_preferred_highlighting_group>
+        hi link perforceDepotView         <your_preferred_highlighting_group>
+        hi link perforceClientView        <your_preferred_highlighting_group>
+<
+==============================================================================
+
+                                            *perforce-help*
+The plugin comes with a help browser to browse the perforce help from within
+vim window and move back and forth between different help pages. To start the
+help just type |PH| or "PF help" command or alternatively choose the appropriate
+menu entry. The plugin opens a new window that is positioned the way the vim
+built-in help does. Once you close the help window, all the other window sizes
+are restored, again the way the vim built-in help does.
+
+Once you are in the help window, you can see that the perforce help keywords
+are highlighted with a different color. To get additional perforce help on the
+keyword, you can just move on to the keyword and press |Enter| or |K|. You can
+also press double-click with your left mouse button.
+
+The |PH|, |PHelp| or "PF help" command takes a set of arguments that are passed
+to the perforce help command, which makes it easier to get to the help page if
+you know the keywords. The |PH| and |PHelp| commands also support command
+completion for help topics.
+
+You can use <BS> and <Tab> to navigate the help history. This makes it easy
+to view the perforce help and makes it feel like a hyper-text browser. Use "q"
+or any other vim command to quit the help window.
+==============================================================================
+
+                                            *perforce-commands*
+                                            *:PF*
+                                            *perforce-global-options*
+                                            *perforce-command-options*
+                                            *perforce-command*
+                                            *perforce-arguments*
+The plugin defines a set of new commands to interact with perforce. The most
+basic command is the "PF" command that is equivalent to the "p4" command on
+the shell. This command takes arguments that are processed and passed to the
+external p4 command and the output is collected back. Depending on the type of
+command and various user settings, the output is either displayed in a new
+window, a preview window or in a dialog box.
+
+The command syntax resembles that of p4 command. There are five different types
+of arguments that can be passed to PF command:
+>
+        :[range]PF [<p4 global options>] <p4 command>
+                [<p4 command options>] [<arguments>]
+<
+All the argument sections are optional except for the command name itself. It
+provides the flexibility to issue complex commands (essentially anything that is
+possible at the shell prompt) such as the below:
+>
+        :PF -c client -u user integrate -b branch -s source target1 target2
+<
+where, the "-c client -u user" are global options, "integrate" is the p4
+command, "-b branch -s source" are the command options and the "target1
+target2" are the arguments to the corresponding perforce command.
+
+Note: See |perforce-common-options| for informaton on providing global options
+transparently.
+
+All commands executed through "PF" go through a common internal function that
+does argument validations/modifications/customizations etc. in addition to any
+command specific operations. This results in a very consistent argument handling
+throughout all the perforce commands.
+
+    Example: >
+        " Run p4 diff on the current file and display the diff in a new window.
+        :PF diff
+
+        " Show all the opened files under the src directory (assuming you we are
+        "   currnetly above this directory) in a new window.
+        :PF opened src/...
+
+        " Open the client specification for editing.
+        :PF client
+<
+Most commands take variable number of arguments. Some commands that require a
+filename default to current file or ask you for an argument, if you didn't pass
+any.
+
+You can additionally pipe the output of p4 through external commands (filters)
+before the plugin sees the output. Anything after an unprotected bar ("|") is
+considered as the external filters and so is specially treated by the plugin,
+and the processing on such arguments is reduced to a minimum, which means that
+you need to take care of the shell specific issues (such as enclosing the
+arguments in quotes etc.) yourself. If you need to specify the bar symbol as
+part of the perforce arguments (not really as the shell pipe symbol), then you
+need to protect it with a back-slash, as discussed in the
+|perforce-special-chars| section.
+
+    Example (useful for older versions of p4 client that didn't support -u
+    argument): >
+        PChanges -s pending | grep hari
+<
+If you find yourself using a combination frequently, you can create a new
+command for it to make it easier to type. For the above combination, the
+following can be placed in .vimrc:
+>
+     command! MyPChanges PChanges -m -1 -s pending | grep hari
+<
+Note, If you want to by-pass additional command specific processing, then you
+can use the |PFRaw| command instead of the "PF" command.
+
+The :PF command also supports custom command completion, to complete partial
+perforce command names as well as filenames. Most filename expansions
+automatically happen (like, %, <cfile> etc.), and # followed by a revision
+specifier is treated specially when occurred at the end of the argument, and is
+prevented from getting expanding as a Vim buffer name.
+
+                                            *perforce-special-chars*
+Some of the characters in the arguments are treated specially by the plugin,
+unless they are protected by prefixing them with a back-slash. The characters
+that are treated specially are:
+
+    character       special meaning ~
+    <space>         argument separator.
+    &               codeline modifier. See
+                    |perforce-alternative-codeline-modifier|
+    |               pipe symbol.
+    \               protects other special characters, unless protected by
+                    itself.
+
+                                            *perforce-command-mode-specifier*
+                                            *perforce-filter* *perforce-pipe*
+You can also specify the run mode of the perforce command as one of the "run"
+(default), "filter" or "pipe" by specifying one of the '++r', '++f' or '++p'
+option respectively to the PF command in the <p4 global options> section as
+described in the |perforce-commands| section. These options are just used as
+directives to the command-processor and are not passed to the external p4
+command. The "filter" and "pipe" modes are most useful with the "-x -"
+perforce global option (see ":PH usage" for details) and "display" mode is used
+mainly for internal purposes.
+
+    option  details ~
+    ++p     Write (pipe) the lines specified by the given [range] to the p4
+            command on standard input. This works like the |:write_c| command.
+            This only pipes contents to p4, and doesn't read the output back, so
+            the contents are not effected.
+    ++f     Filter the lines specified by the given [range] through the p4
+            command. This works like the |filter| command. You can create a new
+            buffer or modify buffer containing the output of another perforce
+            command, and pass the contents as arguments to a perforce command
+            and get back the results. In fact the '++c' option of diff does
+            exactly this. It first obtains the list of opened files in the given
+            change list and passes them as arguments to the diff command. See
+            |perforce-extensions|.  The |PW| command is just an alias for this
+            feature so that you can skip the bang for convenience (you can't
+            specify -x option with this command, however).
+
+The default [range] for the ":PF" command is the whole buffer (1,$). There is no
+direct equivalent of Vim's |:read!| syntax here, but it can easily be done using
+the "filter" mode on an empty line created at the location where you want to
+read the output of p4 command.
+
+                                            *:PEdit*      *:PRevert*   *:PAdd*
+                                            *:PDiff*      *:PDiff2*    *:PPrint*
+                                            *:PGet*       *:PSync*
+                                            *:POpened*    *:PHelp*
+                                            *:PDelete*    *:PLock*
+                                            *:PSubmit*    *:PUnlock*
+                                            *:PClient*    *:PClients*  *:PUser*
+                                            *:PUsers*     *:PBranch*
+                                            *:PBranches*  *:PLabel*
+                                            *:PLabels*    *:PJob*      *:PJobs*
+                                            *:PJobspec*   *:PResolve*
+                                            *:PChange*    *:PChanges*
+                                            *:PDepot*     *:PDepots*   *:PHave*
+                                            *:PDescribe*  *:PFiles*    *:PFstat*
+                                            *:PGroup*     *:PGroups*
+                                            *:PLabelsync* *:PIntegrate*
+                                            *:PPasswd*
+
+While the perforce commands can be executed using the "PF xxx" syntax, some
+of them have an equivalent PXxx command. So the following two: >
+
+        :PF opened -c 123456
+<
+    and >
+
+        :POpened -c 123456
+<
+are identical. However, if you intend to pass some global arguments to p4,
+then you are forced to use the first syntax. E.g., if you want to change the
+user specification of another user, instead of changing the P4USER env.
+variable, or using the |PFSwitch| command, you can use the following approach:
+>
+        :PF -u other_user user
+<
+                                            *perforce-describe*
+The describe command by default adds the "-s" option to avoid generating the
+diff, unless a diff option is explicitly specified (implying that you would like
+to see the diff too).
+
+Note that the commands that normally prompt a confirmation message (such as
+revert) accept a "++y" argument to avoid the prompt.
+>
+        :PF ++y revert -c 12345
+<
+                                            *:PE*  *:PR*  *:PA*  *:PD*  *:PD2* *:PP*
+                                            *:PG*  *:PO*  *:PH*
+Some of the more frequently used commands have a shortcut to make it faster to
+type.  Following table gives the mapping:
+
+        Short-cut       Command ~
+        PA              add
+        PD              diff
+        PD2             diff2
+        PE              edit
+        PG              get/sync
+        PH              help    |perforce-help|
+        PO              opened
+        PP              print
+        PR              revert
+
+You can also define your own shortcuts easily, e.g., >
+
+        :command! -nargs=* PB :PF branch <args>
+<
+Place this command in your .vimrc so that it gets executed every time you
+start Vim.
+
+                                            *:PFRaw*
+PFRaw command is like |PF| command except that it bypasses all the processing
+that the |PF| command does. You should be able to pass most of the perforce
+arguments as they are to this command. The raw output from the p4 command is
+collected and placed in a new window
+
+Note that you can't use PFRaw to execute any p4 command that requires user
+interaction (such as "PFRaw client") unless you can pass in a "-o" options to
+it. In fact the |PF| command and the corresponding specialized commands (such
+as PClient) pass the "-o" argument internally to generate forms.
+
+                                            *perforce-initialize*
+                                            *perforce-reinitialize*
+                                            *:PFInitialize*
+Changing some settings may have impact on other plugin or Vim settings, so to
+propagate these changes, you should execute the :PFInitialize command.
+When you want to change a setting while within Vim, you can directly set the
+value of the corresponding global variable, but you should also call the
+:PFInitialize command. It is recommended to use the |:PFsettings| command, which
+not only makes it easier to find and enter values for these settings, it will
+also execute :PFInitialize for you.
+
+    Examples:
+        You can remove the Perforce sub-menu from the main menu by using
+        the following commands: >
+
+            :let g:p4EnableMenu = 0
+            :PFInitialize
+<
+        You can re-enable the menu, may be the full-featured one by setting: >
+
+            :let g:p4EnableMenu = 1
+            :let g:p4UseExpandedMenu = 1
+            :PFInitialize
+<
+                                            *:PFSettings*
+To make the above process easier, the PFSettings command prompts you with a
+list of settings to select from (without the common p4 prefix) and let you
+modify them. You can optionally pass in the setting name and value on the
+command line too. If passing the setting name, you can use Vim's completion
+mechanism to complete partially typed in name.
+>
+        :PFSettings [setting name] [new value]
+<
+The command reinitializes the plugin after making the modifications. A typical
+dialog to turn on perforce menu for a gvim window could look like this:
+>
+            :PFSettings
+            0   User                  1   Client                2   Password
+            3   Port                  4   Presets               5   ClientRoot
+            ...
+            9   EnableMenu            ...
+            ...
+            .
+            .
+            Select the setting: 9<Enter>
+            Current value for EnableMenu is: 0
+            Enter new value: 1<Enter>
+<
+You should see the menu turned on at the end of this process. You can quit the
+dialog at any time by just pressing <Enter> without typing anything.
+
+If you know the name of the setting (or use command-completion), you can specify
+the setting and its new value directly on the command-line, to avoid the
+dialogs.  E.g., to change the default diff options: >
+
+            :PFSettings DefaultDiffOptions -dwbu
+            Current value for DefaultDiffOptions: "-du" New value: "-dwbu"
+<
+Note, there is also an abbreviation defined for this command as "PFS".
+
+                                            *perforce-switch-client*
+                                            *:PFSwitchPortClientUser*
+                                            *:PFSwitch*
+If you are connecting to multiple perforce installations, the PFSwitch command
+can be used to quickly switch between them. For an explanation of how to
+store these configurations to avoid typing, or use the Settings menu, see
+|p4Presets|.
+
+When you want to switch to a different perforce server, or just switch to a
+different client or user, without leaving Vim or needing to change any
+environment variables, use the PFSwitch command in one of the following ways:
+
+    1. Prompt for the setting to choose from. Enter the index in the list of
+       settings.  >
+
+        :PFSwitch
+<
+    2. If you know the index, pass it as an argument.  >
+
+        :PFSwitch <index into p4Presets starting with 0>
+<
+    3. To switch to an arbitrary setting, pass in the arguments as below: >
+
+        :PFSwitch <port> [<client>] [<user>]
+<
+       As a special case, you can pass in P4CONFIG as the only argument to
+       switch to using the P4CONFIG feature of the external p4 command (see
+       also |perforce-dynamic-client| and |perforce-P4CONFIG|. You can use Vim
+       command completion mechanism to complete from the |p4Presets|.
+    4. You can also use PFSwitchPortClientUser which prompts you for the
+       individual values. >
+
+        :PFSwitchPortClientUser
+<
+See also |p4Presets|.
+
+Note, this command resets the cached file statuses of all the buffers such that
+their statuses are determined again based on the new client.
+
+                                            *:PFWipeoutBufs*
+This command can be used periodically to cleanup all the hidden perforce buffers
+that are not already wipedout because they are not yet unloaded (see
+|p4HideOnBufHidden| for ways to do this). By default, this command only prints
+the list of buffers that will be wipedout, so to actually wipeout the buffers,
+run the command with "++y" option. >
+
+        :PFWipeoutBufs ++y
+<
+                                            *perforce-update-views*
+                                            *:PFUpdateViews*
+Use this command to update the internal structures corresponding to the client
+view mapping. When run, it discards the local cache and reconstructs it by
+running "p4 client" command.
+==============================================================================
+
+                                            *perforce-revisions*
+For convenience most commands (such as sync and print) take in a revision (as
+specified by "help revisions") as the last argument and apply it to the
+current file. You need to however protect the '#'s with a backslash such that
+it is not substituted by vim with the current alternative-file |#|.
+    Examples: >
+
+        :PP \#1 - To see the revision 1 of the current file.
+        :PP @2002/01/01 - To see the current file as of a date.
+        :PP @65000 - To see the current file as of change 65000.
+<
+                                            *perforce-negative-revisions*
+In addition, you can also pass in a negative or positive number as a revision
+to specify an offset from the have revision. If you have the
+|perforce-active-status| feature enabled, the have revision value is available
+automatically, otherwise the plugin executes the file status such that it can
+generate the new revision after the offset.  >
+
+        :PP \#-2 " To see the (#head - 2)'th revision.
+        :PD2 \#-1 \#-0 " Diff between the have and the previous revisions.
+        :PD2 #\#have #\#head " Diff between the have and the head revisions for
+                            "   the alternate file..
+<
+Note: Observe the "-0" given as the revision number to mean the head revision.
+
+Note: PD2 (which is a shortcut for "PDiff2" or "PF diff2") also supports an
+interactive mode in which you can just type in PD2 by its own with no
+arguments, and the plugin will prompt you to specify the two revisions. You
+can specify any revision specifier that is normally supported on the
+command-line, in addition numbers are always treated as revisions so you don't
+have to prefix them with a \#. >
+
+        :PD2
+        Version 1? 10
+        Version 2? 2002/12/15
+<
+Note: To be able to specify revision offsets, you need to have all the resultant
+files already open in the current vim session.
+
+                                    *perforce-alternative-codeline-modifier*
+Another convenient feature supported by plugin is to allow specifying an
+alternative codeline in addition to the revision specifiers by using the '&'
+modifier. Suppose you want to diff between the revision 2 of the currently
+opened file with the head revision of the same file but from another codeline
+called 'other', then the following syntax makes it easy >
+
+        :PD2 \#head&other \#2 " Same as 'PD2 \#1 \#2' if 'other' is the parent
+                              "   codeline and if they are in sync.
+<
+You can pass multiple such modifiers too, though the main use is with the
+depot-modifier as described below.
+
+                                            *perforce-depot-modifier*
+The '&depot' modifier is treated specially. Instead of treating 'depot' (or the
+name of the current depot) as an alternative codeline, the filename is converted
+to its corresponding depot name. This is useful if the local file is not part of
+your client spec or is deleted from the depot. See also
+|perforce-edit-alternative-file| >
+        :PF filelog a-deleted-file&other&depot
+<
+
+                                            *perforce-local-modifier*
+The '&local' modifier is treated specially. Instead of treating 'local' as an
+alternative codeline, the filename is converted to its corresponding local name.
+
+==============================================================================
+
+                                            *perforce-forms*
+                                            *perforce-specifications*
+                                            *perforce-interactive-commands*
+Most of the perforce forms can be edited right from with in vim. The perforce
+command line normally invokes the external editor to edit the forms and when
+you save and quit the editor, the form is read back and the corresponding
+settings are updated. E.g., the following steps describe how you modify client
+specification using the p4 command:
+>
+        $ p4 client
+
+        # A Perforce Client Specification.
+        #
+        #  Client:      <so and so>.
+        .
+        .
+        :wq
+
+        Client <so and so> saved.
+<
+    The aim of the plugin is to be able to do most of such actions without
+needing to leave Vim. So when you execute a command that requires editing a
+form, the plugin automatically generates the form in a new window for you to
+edit. You can then modify it as you would normally in the external editor
+invoked by the p4 command, and to finally save it, use the normal |:write| or
+the special "W" (|perforce-W|) command. The plugin then tries to send the
+changes back to the server and generates the result also on the same window. The
+entire process would appear the same as above, except for
+
+        1. you would use "PF client" or |PClient| in Vim, instead of the
+           "p4 client" in the shell.
+        2. Edit the specification as you would otherwise.
+        3. The specification will be automatically written back to perforce when
+           you save it like any other file (using :w or :W).
+
+Note that you can also use :wq to save and quit the window at the same time, but
+because of a known issue in Vim as of the release version of 6.1, your changes
+could be lost if the specification has an error. There is a patch available for
+this that fixes the problem, so apply the patch or use the safer :WQ command.
+
+What is the advantage?
+
+        - You don't have to leave your Vim window or look for a command prompt.
+        - If you change your mind, it is easy to quit/leave or even postpone
+          (especially for submits, where you can convert it to a new
+          change list) the spec window.
+        - On errors you can just undo (by pressing 'u') and retry, as many
+          times as you need to.
+        - You have the option of opening the specification while viewing its
+          corresponding list. E.g., you can execute "PF changes -s pending"
+          and press "O" command on any change to open its change specification
+          and easily modify it.
+        - You can also view multiple specifications at the same time. You can
+          for example easily move files from one change list into another.
+        - You have additional commands defined local to the spec window, that
+          are specific to the type of spec being edited.
+        - Based on your working habits, you have other advantages that are
+          inherent in using the same Vim session for multiple things.
+        - It is much easier to use the Vim editing techniques to filter the
+          filelist or edit the description instead of using the GUI in p4Win.
+        - To me, it is also more fun to do it this way :)
+
+Unlike in earlier versions of the plugin, the specification buffers are now
+regular buffers, so they get marked as 'modified' when you start editing them.
+This prevents you from accidentally quitting the buffers, without writing them
+back to perforce. Also, Vim creates 'swapfile's for these buffers, so in case
+your session crashes, you can retrieve your changes (such as the description or
+your filelist) from the swapfile (see |crash-recover|). The swapfile will
+usually be created in the current directory or in a fixed directory specified by
+'directory' setting. When working with perforce specifications, the swapfiles
+could also be created in the temp directory, as the buffer names are often
+invalid on the file system (in which case the swap filename may not be that
+obvious).
+
+                                            *perforce-W*
+                                            *perforce-WQ*
+The W command accepts arguments that are in turn passed to the corresponding
+p4 command, so you can pass additional arguments such as "-r" while using
+submit form.
+
+There is also a WQ command which is same as the W command except that it also
+close the form window when there are no errors.
+
+The equivalent menu entries are "Save Current Spec" and "Save and Quit Current
+Spec".
+
+                                            *perforce-changelist*
+The change command accepts a set of perforce filename patterns that are
+passed directly to "opened" to filter the files that should be included in the
+changelist. Without specifying the patterns, the command would work exactly the
+way the native "p4" command works, which means the changelist will start with
+all the opened files that are in the "default" changelist.
+
+==============================================================================
+
+                                            *perforce-submit*
+The submit command is handled slightly differently than other interactive
+commands, as the "PF submit" or |PSubmit| internally runs the "PF change"
+command to generate a submission template. There are a few additional features
+implemented which are discussed below.
+
+PSubmit command accepts additional arguments which are passed in as they are
+to "opened" command to generate the list of files to submit, so it is possible
+to create the template with a set of files to submit such as, "PSubmit % #" to
+submit the current and alternate files only (which is more flexible than the
+native command). Of course you can always run with out arguments to generate a
+full list of files and then remove the ones that you don't want. You can also
+pass in the -c changelist# to submit the given changelist non-interactively (or
+submit it from "changes" list). You can convert a submission template into a
+changelist by simply using the PSubmitPostpone instead of the W or WQ command.
+Similarly, when you are in the change specification, you can use the
+PChangeSubmit to submit the current change instead of first saving it using W or
+WQ command and then submitting the change list using the "PSubmit -c
+changelist#".
+
+On partial errors during the submissions (such as those that require a resolve
+before submission), perforce sometimes automatically creates a changelist for
+the files in the submission template, in which case the changelist number is no
+longer "new" and the status is no longer "pending", so the plugin automatically
+detects this scenario and adjusts the template for these values. All you have to
+do in such cases is to 'undo' as you normally would, and fix the error before
+trying to submit again.
+
+Note, arguments such as '-r' are remembered when the PSubmit is first invoked
+and are used during the :W or :WQ command.
+
+==============================================================================
+
+                                            *perforce-list-commands*
+                                            *perforce-list-view*
+                                            *perforce-item-list*
+When executing a perforce command that generates a list of {something} such as
+changes, you have special commands defined that are local to the buffer and
+are specific to the list you are viewing. This allows you to visually perform
+some operations on the individual item without needing to type a separate
+command on the item.
+
+There are commands defined for both the commandline as well as key mappings
+and menu items for these operations. Note however that the same mapping can
+behave differently on different list views, depending on what is the list that
+you are viewing. E.g., pressing D normally means delete the specific item, but
+on a filelog window when you select two history entries (select all the lines
+between the two versions, inclusive) and press D, you get a diff between the two
+versions.
+
+There are some generic list commands that work in most of the list views with
+somewhat consistent behavior:
+
+Note that for commands that generate a list of files (such as opened), there
+is a different set of commands defined, see |perforce-filelist|.
+
+                                            *perforce-common-list-commands*
+These commands are available in all the listing windows.
+
+                                            *:PItemDescribe* *:PItemOpen*
+                                            *:PItemDelete*
+    Command             Key         Meaning ~
+    PItemDescribe       <Enter>     Describe the current item. This shows a
+                                    summary of the current item in a
+                                    |preview-window|.
+    PItemOpen           O           Open the current item for editing.
+    PItemDelete         D           Delete the current item. You will have be
+                                    prompted to confirm the deletion.
+
+                                            *perforce-client-list*
+You can use all the commands described in |perforce-common-list-commands|, as
+well as the below:
+
+                                            *:PClientsTemplate*
+    Command             Key         Meaning ~
+    PClientsTemplate    P           Using the current client as a template,
+                                    start creating a new client spec. You will
+                                    prompted for the name of the new client.
+
+                                            *perforce-labels-list*
+You can use all the commands described in |perforce-common-list-commands|, as
+well as the below:
+
+                                            *:PLabelsSyncClient*
+                                            *:PLabelsSyncLabel* *:PLabelsFiles*
+                                            *:PLabelsTemplate*
+    Command             Key         Meaning ~
+    PLabelsSyncClient   S           Sync the client to the current label.
+    PLabelsSyncLabel    C           Sync the the label to the current client.
+    PLabelsFiles        I           List the files associated with this label.
+    PLabelsTemplate     T           Using the current label as a template, start
+                                    editing a new label spec. You will be
+                                    prompted to enter the name of the new label.
+
+                                            *perforce-changes-list*
+You can use all the commands described in |perforce-common-list-commands| as
+well as the below:
+
+                                            *:PChangesSubmit* *:PChangesOpened*
+                                            *:PChangesDiff*
+    Command             Key         Meaning ~
+    PChangesSubmit      S           Submit the current change list. You will
+                                    be prompted to confirm.
+    PChangesOpened      o           List files associated with this
+                                    changelist.
+    PChangesDiff        d           Show diff for the current pending or
+                                    submitted changelist.
+
+                                            *perforce-filelog-list*
+You can only use the describe command described in
+|perforce-common-list-commands| however there are other convenience commands
+defined for this view:
+
+                                            *:PFilelogDiff* *:PFilelogDSync*
+                                            *:PFilelogDescribe* *:PFilelogPrint*
+    Command             Key         Meaning ~
+    PFilelogDiff        D           Show diff between two selected versions
+                                    (works only in the visual mode).
+    PFilelogDSync       S           Sync to the current version.
+    PFilelogDescribe    C           Describe the changelist for the current
+                                    change.
+    PFilelogPrint       p           Run print on the current version.
+
+You can generate the diff between two version while viewing the history. For
+this, you need to select all the lines between the two version, inclusive, and
+press the 'D' key. You can also use the PFilelogDiff with a range of lines as
+a prefix, without needing to select the lines.
+
+    Example:
+        You can mark the first version as 'a' using the 'ma' command and mart
+        the second line as 'b' using the 'mb' command and execute: >
+
+            :'a,'bPFilelogDiff
+<
+
+                                            *perforce-filelist*
+When you execute the commands |POpened|, |PHave|, |PFiles| and |PDescribe| that
+generate a list of files, you can use the file list window to do further
+operations on the files.
+
+                                        *:PFileDiff* *:PFileProps* *:PFileEdit*
+                                        *:PFileRevert* *:PFilePrint* *:PFileSync*
+                                        *:PFileChange* *:PFileLaunch* *:PFileLog*
+    Command             Key         Meaning ~
+    PFileDiff           D           Run "p4 diff" on the current file.
+    PFileProps          P           Print the properties (fstat) of the
+                                    current file.
+    PFileEdit           I           Edit (checkout) the current file.
+    PFileRevert         R           Revert the current file.
+    PFilePrint          P           Print the current file in the preview
+                                    window. This is mostly same as
+                                    PItemDescribe, but handles the deleted and
+                                    binary files correctly.
+    PFileGet                        Sync the current file to the revision
+                                    specified in the filelist.
+    PFileSync           S           Sync the current file to the head
+                                    revision.
+    PFileChange         C           Open change list for the current file.
+    PFileLaunch         A           Launch the current file. On windows, it
+                                    works almost the same way as double clicking
+                                    the file in explorer. On non-windows
+                                    platforms, you need to explicitly configure
+                                    a launcher command by using the
+                                    |p4FileLauncher| setting. You need to have
+                                    (correct revision of) the file already on
+                                    the filesystem, if not first do a sync as
+                                    described above.
+    PFileLog                        Run "filelog" on current file.
+
+In addition, the plugin sets up 'includeexpr' such that you can use |gf| and
+|<cfile>| on the depot files. Since |gf| would result in the current buffer
+getting hidden, the current perforce buffer showing the filelist could get
+wipedout (unless this is prevented using the techniques described in
+|p4BufHidden|). If you have any mappings using |<cfile>| they should work well.
+
+Note: There is no quick help available to see which commands are available and
+what the mappings are for any given perforce result buffer. However, the output
+of nmap command is pretty useful and sufficient for this purpose. Type the
+following command as it is to see the perforce commands with their mappings
+(among others) >
+        :nmap <buffer>
+<
+==============================================================================
+
+                                            *perforce-extensions*
+There are some useful extensions provided over the perforce commands to make
+your job easier.
+
+|perforce-pending-change-diff|      Restricting diff to an open changelist.
+|perforce-vim-diff|                 Diffing using vim's built-in diff feature.
+|perforce-external-diff|            Diffing using external diff tool.
+
+                                            *perforce-pending-change-diff*
+This provides an useful "++c" option to the PDiff command to specify a change
+number that is open on this client. The plugin internally queries the open files
+under this change list and restricts the diff to only these files. >
+
+        PF diff ++c 1111 //depot/branch/src/...
+<
+The above restricts changes to only the changelist '1111' and under the src
+directory.
+
+                                            *perforce-builtin-commands*
+                                            *perforce-vim-diff*
+The plugin provides two built-in commands vdiff and vdiff2 to view diff using
+the Vim's built-in diff features instead of using the perforce diff and diff2
+commands respectively. If you need to customize the view, then read help on
+|diff-options|. These commands do not accept any options and will ignore them if
+any are provided. Make sure you don't have any windows that have diff mode set
+before running these commands as otherwise they will participate in the diff
+too.
+
+                                            *perforce-vdiff*
+                                            *:PVDiff*
+                                            *perforce-vdiff2*
+                                            *:PVDiff2*
+These commands are an alternative to the perforce diff and diff2 commands that
+use the Vim's built-in |vdiff| feature to generate the diff. Both command work
+exactly same as both accept upto two arbitrary local or depot files as
+arguments, but while "vdiff" command works with the files as they are specified
+(local or depot paths), the "vdiff2" command tries to convert them to depot
+paths as much as possible. There is also difference in how they choose default
+arguments when the number of arguments is less than 2. The "vdiff" commands are
+also a lot more flexible than the "diff" commands in that you can mix any two
+filenames as arguments, including those from different codelines, local and
+depot files and even those that are not even related.
+
+With only one file (or the current file when no arguments) specified as
+argument, the "vdiff" command like the "diff" command, diffs the file against
+that of depot, where as the "vdiff2" command, like the "diff2" command prompts
+you to enter the two depot version that you would like to diff for the specified
+file.
+>
+        :PF vdiff " Diff the current file against depot.
+        :PVDiff % &altBranch " Diff the current file against the same from a
+                              " different branch.
+        :PVDiff2 \#1 \#2 " Diff the revisions 1 and 2 for the current file.
+<
+                                            *PFDiffOff*
+These commands always open new windows split vertically side-by-side to start
+diff settings (diff settings are local to windows), so that your existing
+windows are not disturbed. When you are done viewing the diff, you can just
+close the diff windows and be done. But in case you need to reset the diff
+settings, there is a command called "PFDiffOff" provided for convenience. The
+command is very flexible in the sense that, it can identify the diff windows
+that belong to one diff operation and when run from one of them, can turn off
+the diff settings on all the related windows.  This is useful to incrementally
+add/remove diff windows using PVDiff and PVDiff2 commands. If run outside of any
+perforce diff windows, it turns off diff for all perforce windows.
+
+                                            *perforce-default-diff-format*
+Pass the dummy option "-d" (with no diff flags) to perforce commands that
+produce diff output to force the format to be in the default diff format. This
+is useful in case the |p4DefaultDiffOptions| is used and you temporarily want
+the diff output to be of default type. This option is not really recognized by
+the p4 command, and so will be removed from the command string before seen by
+the p4 command (and so is merely used to avoid adding the default diff options).
+>
+        :PF describe -d 100
+<
+                                            *perforce-external-diff*
+                                            *perforce-GNU-diff*
+The "diff" command now supports running external GNU diff to generate the diff
+output. To use this feature, make sure you have GNU diff installed in the path
+and pass one or more of the valid GNU diff command options using the following
+syntax:
+>
+        +<short or long option>[=<optional argument>]
+<
+E.g., to generate diff output for the current file in unified format with the
+whole file in context (like the diff output in p4Win), you could use the
+following comand:
+>
+        :PDiff +U=99999
+<
+Just make sure that the number is large enough to include the whole file.
+Another example is:
+>
+        :PDiff +strip-trailing-cr +context=10 +W=120 +w
+<
+                                            *perforce-execute-direct*
+                                            *:PExec*
+This is a built-in command that executes arbitrary vim commands after
+processing the command-line the same way as it would if you executed any regular
+perforce command. This is useful to execute external perforce commands (though
+not limited to them) directly, when you find that you can't do some task using
+the features provided by the plugin alone. You typically want to execute
+perforce commands using Vim's |:!| feature, e.g.: >
+
+        :!p4 sync %
+<
+But if you want to take advantage of the various command-line shortcuts provided
+by the plugin, then you would just pass the command as it is to :PExec: >
+
+        :PExec !p4 sync %&altbranch#3
+<
+The above would sync the current file in a parallel branch called
+"altbranch" to the version 3. Using the command also has the other inherent
+advantages such as, you don't have to protect the filenanme special character
+such as "#". The plugin also performs the same escaping mechanism on the
+external command that it does on the regular plugin commands, however any
+filters specified are not currently escaped.
+
+Note, the above two commands are just examples that can easily be achieved using
+the following plugin commands: >
+
+        :PF sync
+        :PF sync &altbranch#3
+<
+==============================================================================
+
+                                            *perforce-misc-commands*
+These are some misc. commands that are provided by the plugin in addition to the
+commands that are already described.
+    |PFRefreshActivePane|, |PFRefreshFileStatus|,
+    |perforce-edit-alternative-file|, |PFSwitch|, |PW|, |PFToggleCkOut|,
+    |PFLastMessage|, |PDiffLink|, |PDiffPLink|
+
+                                            *perforce-refresh-active-pane*
+                                            *:PFRefreshActivePane*
+This command allows you to refresh the active perforce window (the window where
+the cursor currently is). The window should have been a result of a perforce
+command, to be able to refresh it. There is also a menu entry and a normal-mode
+mapping <Leader>prap to do the same.
+
+                                            *perforce-refresh-file-status*
+                                            *:PFRefreshFileStatus*
+Use this command to manually refresh the |perforce-ruler|. Useful when you
+have the automatic refresh disabled by setting the |p4EnableActiveStatus|
+to 0. You can also use the normal-mode mapping <Leader>prfs to do the same.
+
+                                            *perforce-edit-alternative-file*
+                                            *E*
+                                            *ES*
+These commands allow you to open the current file from an alternative codeline.
+The syntax of the command is: >
+
+    E [codeline] [files: default %]
+    ES [codeline] [files: default %]
+<
+The difference between the two is that ES opens the file by splitting the
+current window, where as E opens the file in the current window. You can specify
+more than one file in which case the first one is still opened, but the
+remaining files are just added to the buffer list so you can open them later
+using a buffer explorer, or using :e #<buf>. If no arguments are passed, (just
+type E or ES on its own), you will be prompted to enter the codeline.
+
+                                            *perforce-write-file-contents*
+                                            *:PW*
+The |PW| command is a special command that you can use to filter the current
+file contents through p4. You can specify the range of lines that need to be
+written to the command and the default range is the entire file (1,$). The "W"
+(|perforce-W|) or "WQ" (|perforce-WQ|) command described in |perforce-forms|
+internally uses this command to write the form back to the perforce command and
+read the result back. The command itself uses the |perforce-filter| feature to
+do its job.
+
+The following command can be used to revert the contents of the current file
+without using the perforce "revert" command.  You can save the file, but you can
+always do |:undo| to get back to your original contents (provided you haven't
+lost your undo history). So this can be used to temporarily revert contents to
+the depot version and then get back to your original version.
+>
+        :PW print -q
+        :w
+        :undo
+<
+Also see |perforce-command-mode-specifier| for alternatives to using this
+command.
+
+                                            *perforce-toggle-checkout-prompt*
+                                            *:PFToggleCkOut*
+This command can be used to disable/enable the automatic checkout prompt while
+editing the readonly files. This is useful while you are in a read-only vim
+(started with -R option), so even the files that are already checked out also
+appear as read-only files, in which case, you don't want to see the checkout
+prompt when you accidentally start modifying a file (or for that matter even
+when you deliberately modify a file).
+
+                                            *perforce-last-message*
+                                            *:PFLastMessage*
+Prints the last given message again.
+
+==============================================================================
+
+                                            *perforce-special-commands*
+
+                                            *:<pfitem>*
+You can use the special tag <pfitem> on the command-line to mean the current
+list item. This works very close to how |:<cword>| etc. work. The command-line
+parser would replace this with the value of the current item (which is dependent
+on the type of list view) at runtime. This is useful to create your own
+mappings/commands over what the plugin provides.
+
+                                            *perforce-special-mappings*
+There are some special mapping created for the command-line usage.
+
+While you are in a list view (such as list of labels), you can get the name of
+the current label on to the command-line by just typing <Ctrl-X><Ctrl-I>. This
+is useful to quickly and accurately execute commands on the items that have
+long names.
+
+On the same lines as the E command (|perforce-edit-alternative-file|), there
+is another command-line mapping created for inserting the name of an
+alternate file right at the command-line. You can do this by typing
+<Ctrl-X><Ctrl-P>. You will be prompted to enter the name of the alternative
+codeline.
+==============================================================================
+
+                                            *perforce-utils*
+These are available only when you install the perforce/perforceutils.vim plugin
+as described in the |perforce-installation| section.
+
+                                            *perforce-diff-mode*
+                                            *perforce-diff-hyperlink*
+                                            *:PDiffLink* *:PDiffPLink*
+Executing various commands such as |PDiff| and |PDescribe| produce output in the
+form of perforce diff (very similar to GNU diff output). The plugin provides two
+commands to make it easier to navigate from the diff output to the original
+source file like a hyperlink. The location of the original source file and the
+line number are extracted from the diff output (supports the default, context
+and unified formats). To open the source file and take the cursor to correct
+location, use :PDiffLink command or press "O". To open the source file and
+position the correct location in the preview window, use :PDiffPLink or press
+<CR>. These commands are defined for only those windows that contain perforce
+diff output.
+
+Note that the commands can be executed on both the old and new source lines, and
+the plugin either opens the appropriate file on the local filesystem or
+"print"s the correct version from Perforce to position the cursor. When diff
+refers to a depot file and the corresponding local file is already open in Vim
+and has the same revision as of the depot file that the diff refers to, the
+plugin opens the local file instead.
+
+Note these commands are capable of handling regular GNU diff output formats too,
+so you can use it on diff outputs generated using the "diff" command alone.
+
+                                            *:PFDiffLink*
+                                            *:PFDiffPLink*
+These commands provide the same functionality that |PDiffLink| and |PDiffPLink|
+provide in a diff windows, except that you can run them in any buffer that has
+diff style output. Mostly useful if you are viewing diff obtained in a patch.
+
+                                            *perforce-show-conflicts*
+                                            *:PFShowConflicts*
+This command is useful while resolving conflicts using an interactive
+"p4 resolve" command. When you choose the "e" option to edit files, perforce
+generates a single file containing changes from ORIGINAL, THEIRS and YOURS. It
+is usually hard (especially when the conflicting region is large) to figure out
+what others have changed and how to resolve them. Using a visual merge tool
+usually helps, but this commands provides an alternative by allowing you to use
+the |diff-mode| features in Vim. Once p4 invokes Vim as the EDITOR using a
+tempfile as the argument, you can run this command to generate three vertical
+windows each containing changes from ORIGINAL, THEIRS or YOURS only, and invokes
+the |diff-options| on them. Edit the YOURS file as usual and use the |:diffget|
+command from within YOURS or the |:diffput| command from the other two windows
+to move diff regions into the YOURS file, and finally write the changes back to
+the original temp file using the |:write| command.
+
+                                            *perforce-selectbuf-ftplugin*
+                                            *perforce-selectbuf-integration*
+The perforce plugin now comes with ftplugin that adds some perforce commands to
+the SelectBuf buffer browser. If you have the SelectBuf plugin installed, you
+don't need to do anything special to take advantage of this. When you are
+viewing the buffer list, you can execute the following commands directly on the
+current buffer in the list, or the current selection of buffers:
+
+        P4 Command      Map ~
+        add             <Leader>pfa
+        sync            <Leader>pfg
+        edit            <Leader>pfe
+        delete          <Leader>pft
+        revert          <Leader>pfr
+        submit          <Leader>pfs
+        lock            <Leader>pfl
+        unlock          <Leader>pfu
+        diff            <Leader>pfd
+        diff2           <Leader>pf2
+
+I also recommend also installing multiselect.vim plugin that you can download
+from www.vim.org that allows you to select multiple buffers that are
+non-adjacent to do operations on them. This allows you to e.g., submit a few
+files together that are spread out far from each other in the buffer list.
+==============================================================================
+
+                                            *perforce-API*
+The plugin comes with an experimental API that you can use to extend the
+functionality and provide some integration. Please send in your feedback to
+improve the API. You should also look at the perforce/perforcemenu.vim and
+perforce/perforcebugrep.vim for examples.
+>
+        " Return the value of the variable in the script context (so add
+        "   appropriate prefix).
+        " Ex:
+        "   let curClient = perforce#PFGet('s:p4Client')
+        String perforce#PFGet(String var)
+
+        " Set the value of the specified variable in the script context, to the
+        "   value given.
+        " Ex:
+        "   call perforce#PFSet('s:p4Client', 'xxx')
+        void perforce#PFSet(String var, String val)
+
+        " Call the specified function in the script context with the arguments
+        "   passed and return the result. Pass appropriate number of arguments
+        "   based on the function that you are calling.
+        " Ex:
+        "   echo perforce#PFCall('s:PFIF', '0', '4', 'info')
+        "   let client = perforce#PFCall('s:GetSettingValue', 'Client')
+        String perforce#PFCall(String func, ...)
+
+        " Evaluate the given expression in the script context and return the
+        "   result. The expression can be any Vim expression that is valid on
+        "   RHS of a variable assignment.
+        " Ex:
+        "   let client = perforce#PFEval('s:p4Client')
+        "   let client = perforce#PFEval('s:GetSettingValue("Client")')
+        String perforce#PFEval(String expr)
+<
+==============================================================================
+
+                                            *perforce-tips*
+- If you are new to Perforce, try the help browser using the |PH| command. You
+  can easily move back and forth in the help history using <BS> and <Tab> keys.
+
+- The :W and :WQ commands also accept arguments that are passed as they are to
+  the external p4 command. If you forgot to specify '-r' option to PSubmit,
+  you can still specify it to the :W or :WQ command.
+
+- How to quickly open the current file from a different codeline?
+>
+    :E <codeline>
+<
+- How to quickly and easily find and open a file, say x.y, which you know is
+  somewhere under the current directory?
+>
+    :PF files .../x.y   - List the files that match x.y in the codeline. This
+                          opens a new window with all the files that match x.y.
+                          You can move cursor to the file-line that you want to
+                          open.
+    O                   - Open the file that is displayed under the cursor.
+    ^Wo                 - Close all other windows (see |CTRL-W_o|).
+<
+  This technique can also be used with other wildcards that perforce supports.
+  E.g, you can find all the shell scripts that are checked in to a branch by the
+  following command (assuming they all have .sh extension):
+>
+>
+    :PF files //depot/branch/.../*.sh
+<
+- How to quickly and easily find and launch a file in its associated
+  application (needs configuration on non-windows platforms)?
+>
+    :PF files .../x.y   - List the files that match x.y in the codeline. This
+                          opens a new window with all the files that match x.y.
+                          You can move cursor to the file-line that you want to
+                          open.
+    A                   - LAunch the file.
+<
+- How to easily reach to a file that you know is currently checked out?
+>
+    :PO                 - This will create a new window with all the opened
+                          files. You can move cursor to the file-line that you
+                          want to open.
+    O                   - Open the file that is displayed under the cursor.
+    ^Wo                 - Close all other windows.
+<
+- You can temporarily disable the p4DefaultListSize (by default set to 100)
+  while running some list commands by using the -m -1 arguments, to see all
+  the results.
+>
+    :PChanges -s pending -m -1
+<
+- The plugin defines some long normal mode mappings, which could be hard to type
+  without making errors or pausing for a brief moment. To type in such long
+  mappings comfortably, you can download and install the execmap.vim plugin from
+  www.vim.org.
+- You can create aliases for most used command combinations using the Vim
+  |:command| feature (from your vimrc). E.g. the following gives my pending
+  change lists.
+>
+    :command! PendingChanges :PF changes -s pending -u hkrishna -m -1 <args>
+<
+- To quickly go to the lines that you have modified in the current file, open
+  the diff window against the depot, scroll/find the line that you are
+  interested in and use |perforce-diff-mode| features.
+>
+    :PD
+    /FIXME
+    O
+<
+- To quickly start over with the depot version, without needing to execute
+  "revert" followed by an "edit", use the |PW| command.
+>
+    :PW print -q
+
+- To insert the output of any perforce command at the current location, first
+  open a blank line and run the command using |PW.
+>
+    o<Esc>
+    :.PW describe -s 100
+<
+- Set "p4CurDirExpr" to the following:
+>
+    let g:p4CurDirExpr = "(isdirectory(expand('%')) ? substitute(expand('%:p'),
+            \ '\\\\$', '', '') : '')"
+<
+  to have the commands run from the directory that you are currently viewing,
+  instead of the current directory of Vim.
+
+- If your colleague sends you diff for review, you can make use of :PFDiffLink
+  and :PFDiffPLink commands to make it easier to reach the "before" file. In
+  addition, if your colleague's dev folder is accessible by you in the same m/c
+  (typically for a UNIX server), you should be able to look at the "after"
+  changes in context. Even if the dev folder is accessible only over the
+  network, you can convert the local paths in the diff to the network paths
+  (E.g., you could convert "c:\dev" to "\\tom\dev"), and browse the changes
+  comfortably.
+
+- Do you know that :PFDiffLink and :PFDiffPLink commands can be used on regular
+  "diff" command output too?
+
+- To quickly search for change descriptions, you can print the list of changes
+  matching a given restriction, with their descriptions and use Vim to search
+  for the pattern. You can then describe the change for more information. Ex: >
+
+    :PChanges -l //depot/branch/src/server/...
+    /socket
+<
+- Use VDiff if you want to revert only parts of your changes.
+                                            *perforce-explore-changed-lines*
+- Here is a technique I often use to track who and when someone made a
+  particular change. The technique assumes you have a branch which includes all
+  the releases (typically called "release" or "main"). You would first get the
+  annotations as below: >
+
+    :PF annotate -a &main&depot
+<
+  Locate the line that has been changed (you might find multiple lines due to
+  reformatting) and identify the version. Run the below command to identify the
+  change (can be executed from the annotate window): >
+
+    :PF filelog -i
+<
+  This gives you the change number and integration history for that version.
+  Sometimes this is not enough to find the origin branch, so you can continue to
+  execute "annotate" and "filelog" commands until you find the original branch
+  and change number.
+
+==============================================================================
+
+                                            *perforce-limitations*
+    - Interactive resolves can't be done using the plugin. You can however use
+      auto resolves by passing options such as -as to the 'resolve' command. See
+      "PH resolve" for help on auto-resolves. Also take a look at the
+      |PFShowConflicts| command.
+    - The plugin can work with only one depot at any time, but you can easily
+      switch between different depots by changing the |p4Depot| setting through
+      the |PFSettings| command.
+    - When executing commands that take a lot of time, such as syncing on the
+      entire branch, Vim waits for the command to complete and exit before
+      the plugin can display the result. So until Vim becomes more capable in
+      executing external commands in this regard, I recommend not to run such
+      commands using the plugin.
+    - Since 'q' is mapped to quit the perforce windows, it is hard to record
+      macros that involve dealing with perforce windows. A workaround is to
+      create a new mapping to the "q" command and use that to start and stop
+      recording instead, something like this:
+>
+        nnoremap <F12> q
+<
+                                            *perforce-troubleshooting*
+    - If none of the perforce operations work for you, then make sure you set
+      your |p4CmdPath| setting correctly. You can run PFS command and select
+      CmdPath setting to see what the current value is. On windows, if you have
+      back-slashes in the path, then make sure your 'shell' setting can honor
+      them. The 'shellslash' setting is also important if you use a UNIX-like
+      shells on windows. IF all seems to be well, then please report the problem
+      to me with your 'shell' setting and OS details.
+    - If you get E485 errors occassionally or most of the time, and your shell
+      related settings seem to be fine, then point your $TMP and $TEMP
+      environmental variables to some path that is shorter ("/tmp" instead of
+      "C:/DOCUME~1/HARI/LOCALS~1/Temp").
+    - If the online perforce help is not working (ie., you are reading this by
+      directly opening the file, instead of by typing :h
+      perforce-troubleshooting :), then make sure you ran |:helpt| command.
+    - If you are not getting automatic checkout prompt when you modify a
+      read-only file for the first time (and everything else seems to work
+      fine), then make sure you set your |p4ClientRoot| property correctly. The
+      plugin ignores any files that are not under your root from giving this
+      prompt.
+    - If vdiff and vdiff2 commands don't work for you, make sure the vimdiff
+      itself works for you. Try running the following command on any two files:
+      >
+            gvim -d file1 file2
+<
+      If the above command doesn't produce any diff though they are different,
+      or gives any error messages, then first go through the help on |vimdiff|
+      to get the standalone diff working.
+    - While editing perforce specifications from commandline, if you don't see
+      the perforce syntax or cursor is not positioned at a convenient position,
+      then make sure you added perforce filetype as described in
+      |perforce-filetype|.
+    - If |perforce-ruler| doesn't work for you, make sure you have 'ruler'
+      option set. Also make sure you didn't disable |p4EnableRuler| setting. It
+      is also possible that another plugin is overwriting the 'rulerformat'
+      setting (instead of appending to it, as done by the perforce plugin) after
+      the perforce plugin configures it. Also, if you are in the 'paste' mode,
+      Vim automatically disables ruler, so make sure you don't currently have
+      'paste' option set.
+    - If you observe a noticiable delay in Vim startup time after you installed
+      perforce plugin, it may be because, the plugin is trying to obtain the
+      value of |p4ClientRoot| setting by executing the "PF info" command. You
+      can avoid this by setting this property yourself in your vimrc.
+    - If piping a spec manually to a perforce command such as 'change' or
+      'submit' using ++p option is not working, make sure the command accepts a
+      '-i' option to read the spec from stdin and that you are passing in this
+      option.
+    - If you get a weird invalid option error, or if the command behaves
+      weirdly, make sure you don't have a typo in the command-name. The
+      command-line parser recognizes only the known perforce commands, which
+      makes an incorrect command name a global option, making it an invalid
+      syntax. E.g., if you mistype "opened" as "open", you get an error that
+      "-u" is an invalid option.
+
+                                            *perforce-version-changes*
+These are just a summary of the changes done in the current and previous
+versions. Though I have done a good attempt to list all, I could have very well
+missed some changes.
+
+                                            *perforce-changes-4.1*
+    - Fixed broken handling of <SHOW DIFF> in describe windows. But it is better
+      than before, as you can now describe multiple changelists and show diffs
+      selectively.
+    - For newer perforce servers, <Enter> on a pending change (in changelist)
+      showed the file list twice. Removed special handling for this, which means
+      for older perforce servers, you will see no file list.
+    - Force a file status update on auto checkout.
+    - File status handling has in general been improved.
+        - Now executing command on multiple files that result in changing the
+          file statuses (such as add, edit, revert etc.) will correctly result
+          in their file statuses getting reset.
+        - While create a new changelist or submitting a change, the Files:
+          section is examined and the file statuses for all of them will be
+          reset. This also works for most of the cases of modifying a changelist
+          to remove/add files.
+        - This will also solve a long standing issue that reload during submit
+          doesn't update its file status.
+    - All windows are getting navigatation commands mapped (like in help window)
+    - Workaround for one of the E788 errors (originating from the plugin) during
+      the auto-checkout. This part of the code has been cleaned up and
+      simplified. During the auto-checkout, if there are other users editing the
+      same file, it now results in the plugin echoing the output as a
+      |WarningMsg|. If you missed to read the output (because you pressed
+      <Enter> in advance), you can see it again using the |PFLastMessage|
+      command. The other E788 originating from Vim code can't be
+      fixed/workedaround, it has to be fixed by Bram.
+    - Fixed broken submit from changelist.
+    - When you create changelists, you can now safely undo to make any further
+      changes, and save them. This also works for submissions (to edit
+      description only), though you may have to remove the Files section before
+      saving the change description.
+
+                                            *perforce-changes-4.0*
+    - Using Vim7 features, so it is no longer backwards compatible with older
+      Vim releases. All the logic using multvals has been changed to take
+      advantage of the Vim7 Lists, so it should be a lot more cleaner and
+      flexible.
+    - No longer depends on multvals plugin.
+    - It is now autoloaded on demand, which means it will help your vim session
+      load faster. Read the impact on the installation due to this change,
+      |perforce-installation|.
+    - A new Cancel option for checkout prompt, see
+      |perforce-automatic-checkout|. The default for checkout prompt is now
+      "Cancel".
+    - The perforce/perforcemenu.vim needs to be loaded from your vimrc if you
+      want menu to be enabled. See |perforce-installation|.
+    - The plugin no longer removes the global user setting variables but you
+      still need to call |:PFInitialize| for effect of some settings to
+      propogate further. This should have no user visible impact (except in rare
+      cases).  This will only make it easier to deal with settings. You can
+      still use |:PFSettings| command conveniently for its prompting or
+      completion features.
+    - Setting a preset to the g:p4DefaultPreset directly now works fine.
+    - Most settings can now be overridden at the buffer/window/tab level.
+    - PFRefreshActivePane doesn't work well on the diff windows (especially when
+      the ++c option is used).
+
+                                            *perforce-changes-3.2*
+    - Fixed PVDiff to work with two filenames. The problem was only with PVDiff
+      command, as "PF vdiff" worked fine.
+    - PFDiffOff command is a lot more flexible now, see |PFDiffOff|.
+    - New command PPasswd for changing passwords.
+    - Don't confirm revert if -a or -n option is passed.
+    - Avoid accidentally loosing existing buffers while opening new ones from
+      diff and other windows.
+    - Recognize additional p4 commands as valid.
+    - You can now pass multiple codeline modifiers, see
+      |perforce-alternative-codeline-modifier|.
+    - Misc. tuneups for peforce diff hyperlinking feature.
+    - Misc. bugfixes in the menu.
+
+                                            *perforce-changes-3.1*
+
+    - This version introduces the concept of overriding settints at the
+      buffer/window level (an extension of the existing support for
+      b:p4Options). Makes it easier to work with multiple clients from a single
+      vim instance. Currently only the p4Client/p4Port/p4User/clientRoot can be
+      set at buffer/window level.
+    - Now view mappings are maintained separately for each client. This allows
+      us to easily work with multiple clients at once. Also see
+      |perforce-buffer-local-options|.
+    - For diff hyperlinking, avoid refreshing the depot file if it already
+      visible.
+    - Now supports <pfitem> tag to mean the current list item. See |:<pfite>|
+    - New :PExec command to make it easier to execute exeternal perforce
+      commands directly, when plugin can't do what you want. See |PExec|.
+    - PFDiffLink and PFDiffVLink commands couldn't handle "diff -r" output.
+    - If the current directory is not same as the directory of file being
+      resolved PFShowConflicts didn't work.
+    - PItemOpen in describe window now opens the local file, as PItemDescribe
+      can be used to open the depot file.
+    - Misc. bug fixes:
+        - Negative revisions are not working any more. E.g., PP #-1
+        - PW is not using the custom completion, so revision specifier (#1)
+          still needs to be escaped.
+        - While rerunning a command that opens up a new buffer (such as PD),
+          unexpected warning messages about matching an existing buffer.
+          Instead, it should silently refresh the output.
+        - Diff hyperlinking, prints the depot file everytime, this causes
+          unnecessary delays.
+        - PFRefreshActivePane would fail if there are filename special
+          characters in the command.
+    - PF command now implements a special completion mode to complete both the
+      perforce command as well as files. Now you no longer need to protect the
+      revision specifier (#<revision) as long as it appears at the end of the
+      argument.
+
+                                            *perforce-changes-3.0*
+    - Discard the diff output if P4DIFF env. var. is set (Denis Perelyubskiy).
+    - There is an experimental API to allow some modularization of the plugin.
+      See |perforce-API|. There are plugin modules available under perforce
+      directory that take advantage of this.
+    - New PFBugReport command to generate "perforcebugrep.txt" file. This is
+      implemented as a new module perforcebugrep.vim using the above API.
+    - The menu creation is now separated as a new module that is executed on
+      demand. Other than giving some modularity, this effectively reduces the
+      resources consumed by the plugin, especially when the menus are disabled.
+    - New settings and features that allow dynamic switching of perforce client
+      settings (Mark Brophy). See |perforce-dynamic-client|.
+    - The default options don't get saved with the perforce windows (Mark
+      Brophy).
+    - IsFileUnderDepot() should ignore case for windows (Mark Brophy).
+    - Some enhancements to the "diff-hyperlink" feature, see |PFDiffLink|.
+    - The plugin now translates the depot paths to local paths and vice versa
+      accurately by reading the client specification. This is an experimental
+      feature and so will very likely have bugs in it. While reporting bugs,
+      please include the "View" section in your client specification and the
+      path. See |p4UseClientViewMap| and |PFUpdateViews|.
+    - For consistency and to avoid potential conflict with the actual perforce
+      commands, most of the plugin commands that are not associated with any
+      external perforce command are prefixed with "PF". This involves renaming
+      of the following commands. If you would like to continue to use the old
+      command, you can add your own commands with the old names that in turn
+      call the new commands.
+            PWipeoutBufs          -> PFWipeoutBufs
+            PDiffOff              -> PFDiffOff
+            PToggleCkOut          -> PFToggleCkOut
+            PRefreshFileStatus    -> PFRefreshFileStatus
+            PRefreshActivePane    -> PFRefreshActivePane
+            PSwitch               -> PFSwitch
+            PSwitchPortClientUser -> PFSwitchPortClientUser
+            PLastMessage          -> PFLastMessage
+            PBugReport            -> PFBugReport
+    - :PFSettings command now optionally takes the name of the setting (as
+      displayed in the interactive session) and the value. The command also
+      supports completion, so you can type in a partial setting name and let Vim
+      complete it for you.
+    - I have changed the way the perforce client related settings are done.
+      Instead of using three different settings, "p4Port", "p4Client" and
+      "p4User", I have introduced a single setting for all the three called
+      |p4DefaultPreset|. The old settings are no longer recognized and these
+      will not appear when |PFSettings| is run. However, you can use |PSwitch|
+      and |PSwitchPortClientUser| commands to change to an arbitrary client at
+      runtime. Other than |p4DefaultPreset|, there are two new settings,
+      |p4CurPresetExpr| and |p4CurDirExpr|. Also, to be consistent, the
+      p4Password setting is no longer supported. Use "P4PASSWORD" environmental
+      variable for the same effect, or just let the plugin prompt you for one
+      when required.
+    - New command |PFileEdit| in filelist view.
+    - New plugin perforce/perforceutils.vim. Adds a useful |PFShowConflicts|
+      command. See |perforce-utils|. The |perforce-diff-hyperlink| feature is
+      also moved into this module with some enhancements.
+    - For consistency, some built-in options have been changed. Now all the
+      built-in options should be prefixed with "++". The options prefixed with a
+      single "+" are reserved for passing options to the external commands. The
+      following options have been modified to accommodate this:
+            Old option  New option  Scope ~
+            +y          ++y         PF, PWipeoutBufs
+            +c          ++c         PDiff
+    - New diff mode to execute external GNU diff command to generate the diff
+      output. See |perforce-external-diff|.
+    - New commands on filelist view, PFileLaunch, PFileLog. PFilePrint has been
+      enhanced to print previous version if the head action is "delete" and
+      avoid printing binary files.
+    - Many misc. bug fixes and enhancements and general toning down of the code.
+    - A new integration with SelectBuf plugin. If you install SelectBuf, you can
+      execute a bunch of commands right from the buffer list. See
+      |perforce-selectbuf-integration|.
+    - The default value for 'bufhidden' setting in the perforce result buffers
+      is now set to "wipe". This works much better than the earlier approach to
+      wiping out buffers as they get unloaded, and gives better control to
+      users. Consequently, the g:p4HideOnBufHidden option is now replaced with
+      the g:p4BufHidden option.
+    - The plugin no longer handles all the FileChangedShell events, instead only
+      the events generated during the execution of the perforce commands are
+      captured to refresh file-status. This is so that the default Vim mechanism
+      is least impacted. To manually refresh the ruler see
+      |perforce-refresh-file-status|.
+    - New :PChangesDiff command in changes window.
+    - Fixed the argument parser to recognize context size in the diff flags
+      (such as "-du10"), didn't actually know that you could pass context to the
+      diff flags. Also, the |perforce-default-diff-format| option has been
+      changed from "-dd" to simply "-d".
+    - All the perforce commands now implement a custom completion that completes
+      arguments in a context sensive manner. They can also complete depot paths
+      by running the "dirs" and "files" commands. In addition, |PHelp| supports
+      help topic completion, |PFSettings| supports setting name completion and
+      |PFSwitch| commands supports preset completion.
+
+                                            *perforce-changes-2.0*
+    - Renamed g:p4CodelineRoot to g:p4ClientRoot.
+    - Fixed a problem with choosing a default username on cygwin.
+    - Added support for showing ruler with the file status from "Tom Slee",
+      Perforce plugin with some enhancements.
+    - Added support to obtain the clientRoot from the perforce server, if it
+      is not already defined.
+    - More robust error handling. Now there is very less chance (or none) of
+      messing up the current window.
+    - Fixed to use setlocal instead of set command for changing some settings.
+    - Filelog also honors the defaultListSize option.
+    - Better formatting options for the form windows.
+    - The default option for checkout file dialog is changed from "Yes" to
+      "No". Use the |p4CheckOutDefault| option to get the old behavior.
+    - On Windows, allow execution of commands containing filename special
+      characters by replacing them with a [x] sequence. They are mapped as,
+>
+          '*' -> [S], 
+          ':' -> [C],
+          '?' -> [Q],
+          '"' -> [D],
+          '<' -> [L],
+          '>' -> [G],
+          '|' -> [P],
+<
+    - Now you can use -ve revisions to indicate previous revisions from the
+      head. You can also use branch specifiers to mean the same file from a
+      different branch. Also these enhanced revision specifiers are now
+      acceptable anywhere.
+    - Extended diff to take "++c" argument to specify change number. See
+      |perforce-pending-change-diff|.
+    - Added vdiff and vdiff2 commands. Added p4UseVimDiff
+      option. See |perforce-vim-diff|.
+    - Added PFileChange command for the filelist window.
+    - You can now pass "++y" option to revert to skip the prompt.
+    - New command |PFSettings| to interactively change the settings of a
+      session.
+    - The script now has a more robust and compact architecture, which actually
+      helped reducing the size of the plugin even after adding many more
+      features. I have also consolidated all the logic into one method described
+      by a set of metadata variables. Adding new features in the future should
+      be easier.
+    - The opened list is now better than ever. You can use it to quickly reach
+      to a file that you have already checked out of perforce. See
+      |perforce-filelist|
+    - You now have a way to preserve the perforce windows from getting wipedout
+      as soon as they are hidden. This feature can be used if you are intending
+      to keep them opened for a long time (such as "opened" list windows).
+    - You can now change the name of the depot from the default "depot". This is
+      useful if you have multiple depots in your system.
+    - I have extended the command syntax with the
+      |perforce-command-mode-specifier| for the more demanding users.
+    - The "change" command now takes perforce filename patterns to filter out
+      the initial list of files that should be included in the change. The
+      "submit" command already does this. See |perforce-changelist|.
+    - You can now press "q" to quit in read-only perforce windows (David
+      Fishburn).
+    - Improved the handling of back-slashes and spaces in filenames.
+    - The vim built-in :w and :wq commands work exactly like the :W and :WQ
+      commands respectively. For "submit", they now prompt for confirmation,
+      which can be suppressed by passing a "-y" option.
+    - Now the specification windows are regular buffers. For reasons on why this
+      is much better than the earlier approach, read towards the end of
+      |perforce-forms|.
+    - The plugin now uses try/finally blocks to avoid leaking any changes done
+      to global settings in case of unexpected errors.
+    - The submit command now detects partial errors that results in an
+      automatic changelist creation, and modify the template appropriately. This
+      also works while creating a new changelist, so that after saving the
+      changelist, you can just undo and continue making further changes.
+      See |perforce-submit|.
+    - Hyperlink the diff window to the source. Pressing O or <CR> on a line
+      takes you to the source line. See |perforce-diff-mode|.
+    - Fixed some bugs with passing special characters and whitespace to shell.
+    - A dummy option "-dd" to mean the default diff format. See
+      |perforce-default-diff-format|
+    - A new ftplugin for perforce forms which can be made to work even while
+      starting forms from p4 directly. See |perforce-ftplugin|
+    - This help file itself is new.
+
+                                            *perforce-todo*
+                                            *perforce-known-issues*
+Not in any particular order:
+    - PChangesDescribeCurrentItem doesn't work for pending changelists from
+      other clients.
+    - A deleted file is showing up as unopened.
+    - Consider #none also as revision in the syntax highlighting.
+    - I don't think the p4Depot setting is being handled correctly. We need to
+      investigate how depots created using "p4 depot" are used.
+    - There is a Syntax highlighting for: "<file>#1 - added as <file>". How is
+      this message generated?
+    - When you open a spec window with perforce wildcard patterns as arguments
+      (such as "P4 submit .../*") saving works as long as you don't change the
+      current working directory of Vim after creating the spec window, otherwise
+      because of some weird behavior in Vim, you get an E212.
+    - You can't login using the plugin.
+    - <pfitem> should be handled at a higher level for it to be more useful.
+    - During the auto-checkout, Vim will give error E788 if the ftplugin uses
+      :compiler command. This is a known issue with Vim7.0 release, and might
+      get fixed in a future patch.
+    - When PFSwitch fails because the perforce server is not up, you are forced
+      to switch to another setting and come back to it to select it again.
+    - When reverting files from files view, if you select No for the prompt, it
+      still refreshes the window.
+
+                                            *perforce-wishlist*
+Here is a list of changes that I think will be useful to do, in no particular
+order:
+    - PChangeSubmit etc. should have menu entries in change menu.
+    - Sort change lists and show those that are by the current client and
+      others separately.
+    - The "nmap <buffer>" output can probably be used to generate a simple help.
+    - A command to rename files (Raj). Invoke integrate and delete internally,
+      for convenience.
+    - It will be nice if the change number is automatically remembered.
+      Also, we should be able to set a change number which should be
+      automatically applied to all the edits, deletes etc.
+    - How can we support interactive resolves? Will it be worth doing it?
+    - In filelist view, allow visual select on the files to be operated upon
+      (for revert etc.).
+    - I should be able to parse the output of p4 resolve using this command:
+        sh -c "while true; do echo s ;done" | p4 resolve
+    - How can we avoid prompting for checkout when the current vim session is
+      in view mode (-R option)? For now just use PFToggleCkOut command in such
+      sessions.
+    - The script now has knowledge of client-view settings. There may still be
+      places that assume that the branch name and local directory name are same.
+    - The menus can be further improved.
+    - The list specific menus should be disabled unless you are in that
+      window.
+    - Backup/Restore commands for opened files will be useful. For now, just use
+      the included shell scripts.
+    - A simple p4win style explorer will be helpful for quickly browsing the
+      depot.
+    - Negative revisions for dates also? Is it possible using vim functions?
+    - Check for unsaved buffers during submit. Requires us to look into the
+      buffer list.
+    - There should be an option to show/hide deleted files in the filelists
+      (PFiles).
+    - The PPasswd can't be used when either the old or new password is empty.
+    - There should be an option to have a single perforce-log window where all
+      the output gets appended, instead of opening new windows for each command.
+    - We should be able to pass file patterns to be used as the View while
+      creating a new label command.
+    - We should have a feature to diff2 in labels and changes views when started
+      with a filename as an argument. Also diff from changes view.
+    - A command to refresh only the files that are in a label. Works well for
+      lables containing only a partial list of files.
+    - Supporting backquotes could be useful when the shell is unixy.
+    - In list views (and filelog view), we should be able to map the mouse
+      presses such a way that single mouse click results in selecting the entire
+      line and mouse drag automatically selects the entire line. We will then
+      need to make sure all the list view local commands will work with visual
+      mode.
+    - If the current buffer is a directory (i.e. opened with the vim
+      filebrowser), it would be nice if the plugin could simply append '...'
+      to the relative path, so something like PSync would make perforce sync
+      all files under the current directory (Mark). In otherwords, it would make
+      sense to append '...' to the directory name whenever a command that
+      defaults to current buffer is executed on a directory buffer.
+    - How about using v:dying to determine if the vim session is crashing and
+      preserve the spec buffers?
+    - Executing "admin" command shouldn't open up a new window.
+    - Better support for "monitor" command.
+    - There should be an option to position the current line in the diff (if
+      exists) (like view current line in the diff).
+    - While viewing a directory, it will be nice if the file completion
+      happens relative to the directory that is being viewed, rather than the
+      working directory of Vim. We probably should have an option to turn it
+      off.
+    - It is possible to have a command that starts p4win with options such as
+      -s.
+    - vdiff should print the have version not head version, unless this
+      information is for some reason not available.
+    - While doing custom expansion for files (:PF command), the spaces in the
+      filenames should be escaped.
+    - For diff hyper linking, there should be a way to always open the depot
+      file (even for the context lines).
+    - In DiffLink, detect the column position also. Also add a way to jump the
+      diff region containing the current line.
+    - There should be a way to force deletion from the users list (-f option).
+    - Need a "blame" built-in command to produce annotated output with change
+      numbers in them.
+
+                                            *perforce-bugreporting*
+Please read the entire plugin online help before you report any bugs, as it will
+help clear up scenarios which may not indeed be a bug. In addition,
+    - Refer the p4 user manual and online help to be clear about the right
+      behavior.
+    - Check if it is already mentioned in the |perforce-limitations| or
+      |perforce-known-issues| sections.
+    - Run :PFBugReport command to generate "perforcebugrep.txt" file in the
+      current directory and attach that with your email. Before sending this
+      out, check to make sure it doesn't contain any confidential information!
+
+Please send your reports to hari_vim at yahoo dot com.
+
+                                            *perforce-acknowledgements*
+- Tom Slee (tslee at ianywhere dot com) for his idea of creating a status
+  bar with the p4 fstat information (see
+  http://www.vim.org/script.php?script_id=167).
+- Leo L. Schwab (leo dot schwab at openwave dot com) for reporting problems and
+  helping me with debugging them.
+- David Fishburn (fishburn at ianywhere dot com) for his idea with mapping the
+  'q' key to quit non-editable perforce windows, and reporting various bugs.
+- Mark Brophy (mbrophy at esmertec dot com) for his ideas with using P4CONFIG
+  and others that allow dynamic configuration.
+- Various others for sending bugs, patches, ideas and feedback. Some of them
+  are:
+    - Denis Perelyubskiy (denisp at CS dot UCLA dot EDU)
+    - Kevin McCarthy (tunacat at yahoo dot com)
+    - Paul Wright (paul at noctua dot org dot uk)
+    - Reva Revadigar (reva dot revadigar at autodesk dot com)
+    - Peter Hutkins (PHUTKINS at altera dot com)
+    - Brett Humphreys (bretth at aiinet dot com)
+    - Craig Emery (craig dot emery at ntlworld dot com)
+
+ vim6:tw=80:ts=8:ft=help:ai:sw=4:et
