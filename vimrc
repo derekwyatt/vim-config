@@ -287,6 +287,14 @@ let loaded_matchparen = 1
 set nocursorline
 set nocursorcolumn
 
+if has("mac")
+  let g:main_font = "Menlo\\ Regular:h11"
+  let g:small_font = "Menlo\\ Regular:h2"
+else
+  let g:main_font = "Monospace\\ 9"
+  let g:small_font = "Monospace\\ 2"
+endif
+
 "-----------------------------------------------------------------------------
 " Perforce Stuff
 "-----------------------------------------------------------------------------
@@ -538,7 +546,7 @@ function! ToggleMinimap()
         let s:lastLine = line("w$")
 
         " make font small
-        set guifont=Monospace\ 2
+        exe "set guifont=" . g:small_font
         " highlight lines which were visible
         let s:lines = ""
         for i in range(s:firstLine, s:lastLine)
@@ -554,7 +562,7 @@ function! ToggleMinimap()
         nmap <s-j> 10j
         nmap <s-k> 10k
     else
-        set guifont=Monospace\ 9
+        exe "set guifont=" . g:main_font
         hi clear Visible
         nunmap <s-j>
         nunmap <s-k>
@@ -644,7 +652,8 @@ iab Fone      Phone
 " Set up the window colors and size
 "-----------------------------------------------------------------------------
 if has("gui_running")
-  set guifont=Monospace\ 9
+  exe "set guifont=" . g:main_font
+  set background=dark
   colorscheme solarized
   if !exists("g:vimrcloaded")
       winpos 0 0
