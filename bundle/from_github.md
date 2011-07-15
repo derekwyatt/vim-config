@@ -14,3 +14,4 @@
 * **EasyMotion**:   `git clone https://github.com/vim-scripts/EasyMotion.git vim-easymotion`
 * **NERDTree**:     `git clone https://github.com/scrooloose/nerdtree.git vim-nerdtree`
 * **TwitVim**:      `git clone https://github.com/vim-scripts/TwitVim.git vim-twitvim`
+* **ActionScript**: `git clone * https://github.com/jeroenbourgois/vim-actionscript.git vim-actionscript`

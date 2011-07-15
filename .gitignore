@@ -1,3 +1,4 @@
+vim-actionscript
 vim-solarized
 vim-fugitive
 vim-fswitch
@@ -13,3 +14,4 @@ vim-l9
 vim-nerdtree
 vim-surround
 vim-gnupg
+*.swp

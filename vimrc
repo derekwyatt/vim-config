@@ -2,13 +2,6 @@
 " Global Stuff
 "-----------------------------------------------------------------------------
 
-" Add xptemplate global personal directory value
-if has("unix")
-  let g:xptemplate_personal_dir = '~/.vim/xpt-personal'
-else
-  let g:xptemplate_personal_dir = $VIM . '/vimfiles/xpt-personal'
-endif
-
 " Turn this damn thing off
 let g:EclimXmlValidate = 1
 
@@ -16,6 +9,11 @@ let g:EclimXmlValidate = 1
 filetype off 
 call pathogen#runtime_append_all_bundles()
 call pathogen#helptags()
+
+" Add xptemplate global personal directory value
+if has("unix")
+  set runtimepath+=~/.vim/xpt-personal
+endif
 
 " Set filetype stuff to on
 filetype on
