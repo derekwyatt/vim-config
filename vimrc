@@ -2,9 +2,6 @@
 " Global Stuff
 "-----------------------------------------------------------------------------
 
-" Turn this damn thing off
-let g:EclimXmlValidate = 1
-
 " Get pathogen up and running
 filetype off 
 call pathogen#runtime_append_all_bundles()
@@ -150,9 +147,6 @@ set clipboard+=unnamed
 set autoread
 
 set grepprg=grep\ -nH\ $*
-
-" Sokoban stuff
-let g:SokobanLevelDirectory = $VIM . "/vimfiles/VimSokoban/"
 
 " dictionary for english words
 " I don't actually use this much at all and it makes my life difficult in general
@@ -395,13 +389,14 @@ augroup END
 "-----------------------------------------------------------------------------
 " VimSokoban settings
 "-----------------------------------------------------------------------------
-let g:SokobanLevelDirectory = $VIM . "/vimfiles/bundle/vim-sokoban/VimSokoban/"
+" Sokoban stuff
+let g:SokobanLevelDirectory = "/home/dwyatt/.vim/bundle/vim-sokoban/VimSokoban/"
 
 "-----------------------------------------------------------------------------
 " FuzzyFinder Settings
 "-----------------------------------------------------------------------------
 let g:fuf_file_exclude = '\v\~$|\.(o|exe|dll|bak|class|meta|lock|orig|jar|swp)$|/test/data\.|(^|[/\\])\.(hg|git|bzr)($|[/\\])'
-nmap <silent> ,fv :FufFile ~/git/vimruntime/vimfiles/<cr>
+nmap <silent> ,fv :FufFile ~/.vim/<cr>
 nmap <silent> ,fb :FufBuffer<cr>
 nmap <silent> ,ff :FufFile<cr>
 nmap <silent> ,fc :FufMruCmd<cr>
