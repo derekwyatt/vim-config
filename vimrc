@@ -268,6 +268,9 @@ nmap ,bd :BD<cr>
 " Use CTRL-E to replace the original ',' mapping
 nnoremap <C-E> ,
 
+" Alright... let's try this out
+imap jj <esc>
+
 " Syntax coloring lines that are too long just slows down the world
 set synmaxcol=2048
 
