@@ -52,6 +52,11 @@ function! s:f.getPackageLine(...)
     endif
 endfunction
 
+XPT app hint=object\ Main\ extends\ App\ {...}
+object `Main^ extends App {
+  `cursor^
+}
+
 XPT file hint=Standard\ Scala\ source\ file
 //
 // `getFilenameWithPackage()^
