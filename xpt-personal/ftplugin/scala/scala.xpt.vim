@@ -20,9 +20,14 @@ endfunction
 
 function! s:f.getPackageForFile(...)
     let dir = expand('%:p:h')
-    let idx = stridx(dir, 'src/main/scala')
+    let needle = 'src/main/scala'
+    let idx = stridx(dir, needle)
+    if idx == -1
+        let needle = 'src/test/scala'
+        let idx = stridx(dir, needle)
+    endif
     if idx != -1
-        let subdir = strpart(dir, idx + strlen('src/main/scala') + 1)
+        let subdir = strpart(dir, idx + strlen(needle) + 1)
         let package = substitute(subdir, '/', '.', 'g')
         return package
     else
@@ -92,6 +97,20 @@ XPT match hint=Creates\ a\ pattern\ matching\ sequence
     `...^case `matchTo^ => `statement^
     `...^
 }
+
+XPT specfile hint=Creates\ a\ new\ specs2\ file
+import org.specs2.mutable._
+
+class `TestClass^Spec extends Specification {
+  "`TestClass^" should { //{1
+    `cursor^
+  } //}1
+}
+
+XPT spec hint=Creates\ a\ new\ specs2\ test
+"`spec^" in { //{2
+  `cursor^
+} //}2
 
 XPT wst hint=Creates\ a\ new\ WordSpec\ test
 "`spec^" in { //{2
