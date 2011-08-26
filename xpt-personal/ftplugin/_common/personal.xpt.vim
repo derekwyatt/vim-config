@@ -6,6 +6,20 @@
 " You can also set personal variables with 'g:xptemplate_vars' in your .vimrc.
 XPTemplate priority=personal
 
+function! BinaryToHex(binvalue, eolchar, commchar)
+	let b = a:binvalue
+	let dec = 0
+	let c = 0
+	while b != 0
+		let r = b % 10
+		let b = b / 10
+		if r != 0
+			let dec = dec + pow(2, c)
+		endif
+		let c = c + 1
+	endwhile
+	return printf("0x%X%s %s %s", substitute(string(dec), '..$', "", ""), a:eolchar, a:commchar, a:binvalue)
+endfunction
 
 XPTvar $author       Derek Wyatt
 XPTvar $email        derek@derekwyatt.org
@@ -50,9 +64,15 @@ XPTvar $SPcmd      ' '
 " a ** = ** b
 XPTvar $SPop       ' '
 
+XPTvar $CommChar    '//'
+XPTvar $EOLChar    ''
+
 XPT " wrap=phrase hint="..."
 "`phrase^"
 
 XPT ' wrap=phrase hint='...'
 '`phrase^'
 
+XPT bin2hex wrap=binary hint=Convers\ binary\ to\ Hex
+XSET binary|post=BinaryToHex(V(), $EOLChar, $CommChar)
+`binary^
