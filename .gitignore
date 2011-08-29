@@ -16,5 +16,11 @@ vim-surround
 vim-gnupg
 vim-blogit
 vim-gundo
+vim-async
+vim-ensime
+vim-json
+vim-signs
+vim-mwutils
+vim-completion
 *.swp
 passwords.vim

@@ -17,3 +17,8 @@
 * **ActionScript**: `git clone https://github.com/jeroenbourgois/vim-actionscript.git vim-actionscript`
 * **Blogit**:       `git clone https://github.com/vim-scripts/blogit.vim.git vim-blogit`
 * **Gundo**:        `git clone https://github.com/sjl/gundo.vim.git vim-gundo`
+* **Async**:        `git clone https://github.com/MarcWeber/vim-addon-async.git vim-async`
+* **JSON**:         `git clone https://github.com/vim-scripts/vim-addon-json-encoding.git vim-json`
+* **Signs**:        `git clone https://github.com/MarcWeber/vim-addon-signs.git vim-signs`
+* **MWUtils**:      `git clone https://github.com/MarcWeber/vim-addon-mw-utils.git vim-mwutils`
+* **Completion**:   `git clone https://github.com/MarcWeber/vim-addon-completion.git vim-completion`

@@ -148,6 +148,11 @@ set autoread
 
 set grepprg=grep\ -nH\ $*
 
+" Trying out the line numbering thing... never liked it, but that doesn't mean
+" I shouldn't give it another go :)
+set number
+set relativenumber
+
 " dictionary for english words
 " I don't actually use this much at all and it makes my life difficult in general
 "set dictionary=$VIM/words.txt
