@@ -15,5 +15,6 @@ vim-nerdtree
 vim-surround
 vim-gnupg
 vim-blogit
+vim-gundo
 *.swp
 passwords.vim

@@ -16,3 +16,4 @@
 * **TwitVim**:      `git clone https://github.com/vim-scripts/TwitVim.git vim-twitvim`
 * **ActionScript**: `git clone https://github.com/jeroenbourgois/vim-actionscript.git vim-actionscript`
 * **Blogit**:       `git clone https://github.com/vim-scripts/blogit.vim.git vim-blogit`
+* **Gundo**:        `git clone https://github.com/sjl/gundo.vim.git vim-gundo`
