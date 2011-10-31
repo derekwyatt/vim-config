@@ -6,14 +6,23 @@ XPTinclude
 XPT tt wrap=text hint=\\texttt{...}
 \texttt{`text^}`cursor^
 
+XPT s hint=\\section{...}
+% `title^ {{{1
+\section{`title^}
+\label{sec:`label^}
+`cursor^
+
 XPT ss hint=\\subsection{...}
-\subsection{`^}`cursor^
+% - `title^ {{{1
+\subsection{`title^}
+\label{sec:`label^}
+`cursor^
 
 XPT sss hint=\\subsubsection{...}
-\subsubsection{`^}`cursor^
-
-XPT s hint=\\section{...}
-\section{`^}`cursor^
+% -- `title^ {{{1
+\subsubsection{`title^}
+\label{sec:`label^}
+`cursor^
 
 XPT code hint=\\begin{lstlisting}...\\end{lstlisting}
 \begin{lstlisting}
@@ -46,3 +55,23 @@ XPT description hint=\\begin{description}...\\end{description}
 
 XPT i hint=\\item
 \item `cursor^
+
+XPT table hint=\\begin{tabular}...\\end{tabular}
+\begin{center}
+\begin{tabular}{`columnspec^}
+`^
+\end{tabular}
+\end{center}
+
+XPT figure hint=\\begin{figure*}...\\end{figure*}
+\begin{figure*}
+\centering
+\includegraphics[scale=0.5, viewport = 0 0 0 0]{target/`name^.pdf}
+\caption{`cursor^}
+\label{fig:`name^}
+\end{figure*}
+
+XPT eqnarray hint=\\begin{eqnarray*}...\\end{eqnarray*}
+\begin{eqnarray*}
+`cursor^
+\end{eqnarray*}

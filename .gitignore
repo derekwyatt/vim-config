@@ -22,5 +22,7 @@ vim-json
 vim-signs
 vim-mwutils
 vim-completion
+vim-javascript
+vim-conque
 *.swp
 passwords.vim

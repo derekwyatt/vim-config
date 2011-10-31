@@ -1,3 +1,9 @@
+"
+" Derek Wyatt's Vim Configuration
+"
+" It's got stuff in it.
+"
+
 "-----------------------------------------------------------------------------
 " Global Stuff
 "-----------------------------------------------------------------------------
@@ -437,6 +443,20 @@ nmap <silent> ,ff :FufFile<cr>
 nmap <silent> ,fc :FufMruCmd<cr>
 nmap <silent> ,fm :FufMruFile<cr>
 nmap <silent> ,fp :FufFile ~/git/*<cr>
+
+"-----------------------------------------------------------------------------
+" Gundo Settings
+"-----------------------------------------------------------------------------
+nmap <c-F5> :GundoToggle<cr>
+
+"-----------------------------------------------------------------------------
+" Conque Settings
+"-----------------------------------------------------------------------------
+let g:ConqueTerm_FastMode = 1
+let g:ConqueTerm_ReadUnfocused = 1
+let g:ConqueTerm_InsertOnEnter = 1
+let g:ConqueTerm_PromptRegex = '^-->'
+let g:ConqueTerm_TERM = 'xterm'
 
 "-----------------------------------------------------------------------------
 " Functions
