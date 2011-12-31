@@ -23,5 +23,7 @@ vim-signs
 vim-mwutils
 vim-completion
 vim-orgmode
+vim-javascript
+vim-conque
 *.swp
 passwords.vim

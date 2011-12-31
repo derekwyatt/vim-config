@@ -1,3 +1,9 @@
+"
+" Derek Wyatt's Vim Configuration
+"
+" It's got stuff in it.
+"
+
 "-----------------------------------------------------------------------------
 " Global Stuff
 "-----------------------------------------------------------------------------
@@ -23,6 +29,9 @@ set shiftwidth=4
 set softtabstop=4
 set expandtab
 set autoindent
+
+" Printing options
+set printoptions=header:0,duplex:long,paper:letter
 
 " set the search scan to wrap lines
 set wrapscan
@@ -276,6 +285,30 @@ nnoremap <C-E> ,
 " Alright... let's try this out
 imap jj <esc>
 
+" Clear the text using a motion / text object and then move the character to the
+" next word
+nmap <silent> ,C :set opfunc=ClearText<CR>g@
+vmap <silent> ,C :<C-U>call ClearText(visual(), 1)<CR>
+
+function! ClearText(type, ...)
+	let sel_save = &selection
+	let &selection = "inclusive"
+	let reg_save = @@
+	if a:0 " Invoked from Visual mode, use '< and '> marks
+		silent exe "normal! '<" . a:type . "'>r w"
+	elseif a:type == 'line'
+		silent exe "normal! '[V']r w"
+	elseif a:type == 'line'
+		silent exe "normal! '[V']r w"
+    elseif a:type == 'block'
+      silent exe "normal! `[\<C-V>`]r w"
+    else
+      silent exe "normal! `[v`]r w"
+    endif
+    let &selection = sel_save
+    let @@ = reg_save
+endfunction
+
 " Syntax coloring lines that are too long just slows down the world
 set synmaxcol=2048
 
@@ -410,6 +443,20 @@ nmap <silent> ,ff :FufFile<cr>
 nmap <silent> ,fc :FufMruCmd<cr>
 nmap <silent> ,fm :FufMruFile<cr>
 nmap <silent> ,fp :FufFile ~/git/*<cr>
+
+"-----------------------------------------------------------------------------
+" Gundo Settings
+"-----------------------------------------------------------------------------
+nmap <c-F5> :GundoToggle<cr>
+
+"-----------------------------------------------------------------------------
+" Conque Settings
+"-----------------------------------------------------------------------------
+let g:ConqueTerm_FastMode = 1
+let g:ConqueTerm_ReadUnfocused = 1
+let g:ConqueTerm_InsertOnEnter = 1
+let g:ConqueTerm_PromptRegex = '^-->'
+let g:ConqueTerm_TERM = 'xterm'
 
 "-----------------------------------------------------------------------------
 " Functions
