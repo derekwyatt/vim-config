@@ -22,3 +22,4 @@
 * **Signs**:        `git clone https://github.com/MarcWeber/vim-addon-signs.git vim-signs`
 * **MWUtils**:      `git clone https://github.com/MarcWeber/vim-addon-mw-utils.git vim-mwutils`
 * **Completion**:   `git clone https://github.com/MarcWeber/vim-addon-completion.git vim-completion`
+* **OrgMode**:      `git clone https://github.com/jceb/vim-orgmode.git vim-orgmode`

@@ -288,7 +288,7 @@ set nocursorline
 set nocursorcolumn
 
 if has("mac")
-  let g:main_font = "Menlo\\ Regular:h11"
+  let g:main_font = "Menlo\\ Regular:h13"
   let g:small_font = "Menlo\\ Regular:h2"
 else
   let g:main_font = "Monospace\\ 9"

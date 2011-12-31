@@ -22,5 +22,6 @@ vim-json
 vim-signs
 vim-mwutils
 vim-completion
+vim-orgmode
 *.swp
 passwords.vim
