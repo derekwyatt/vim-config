@@ -22,14 +22,14 @@ function! InsertNameSpace(beginOrEnd)
         let nsdecl = join(nsnames, ' { namespace ')
         let nsdecl = 'namespace '.nsdecl.' {'
         if a:beginOrEnd == 0
-            let nsstring = nsdecl . "\n\n"
+            let nsstring = nsdecl
         else
             for i in nsnames
                 let nsstring = nsstring.'} '
             endfor
-            let nsstring = "\n".nsstring.'// end of namespace '.join(nsnames, '::')
+            let nsstring =  nsstring . '// end of namespace '.join(nsnames, '::')
         endif
-        let nsstring = "\n" . nsstring
+        let nsstring = nsstring
     endif
 
     return nsstring
@@ -60,16 +60,17 @@ endfunction
 
 function! GetNSFNameDefine()
     let dir = expand('%:p:h')
+    let ext = toupper(expand('%:e'))
     let idx = stridx(dir, 'include')
     if idx != -1
         let subdir = strpart(dir, idx + strlen('include') + 1)
         let define = substitute(subdir, '/', '_', 'g')
-        let define = define ."_".expand('%:t:r')."_h"
+        let define = define ."_".expand('%:t:r')."_" . ext
         let define = toupper(define)
         let define = substitute(define, '^_\+', '', '')
         return define
     else
-        return toupper(expand('%:t:r'))."_H"
+        return toupper(expand('%:t:r'))."_" . ext
     endif
 endfunction
 
@@ -221,30 +222,29 @@ XPT imp hint=specific\ C++\ implementation\ file
 //
 // `getNamespaceFilename()^
 //
-// Copyright (c) `year()^ Derek Wyatt
+// Copyright (c) `year()^ Research In Motion
 //
 
-#include <`getHeaderForCurrentSourceFile()^>
-`insertNamespaceBegin()^`returnSkeletonsFromPrototypes()^`cursor^`insertNamespaceEnd()^
+#include "`getHeaderForCurrentSourceFile()^"
+
+`insertNamespaceBegin()^
+
+`returnSkeletonsFromPrototypes()^`cursor^
+`insertNamespaceEnd()^
 
 
 XPT h hint=specific\ C++\ header\ file
 //
 // `getNamespaceFilename()^
 //
-// Copyright (c) `year()^ Derek Wyatt
+// Copyright (c) `year()^ Research In Motion
 //
 
-#ifndef __`getNamespaceFilenameDefine()^__
-#define __`getNamespaceFilenameDefine()^__
+#ifndef `getNamespaceFilenameDefine()^
+#define `getNamespaceFilenameDefine()^
 
-// The boost libraries don't compile well at warning level 4.
-// No big surprise here... boost pushes the limits of compilers
-// in the extreme.  Warning level 3 is clean.
-#pragma warning(push, 3)
-#include <boost/tr1/memory.hpp>
-#pragma warning(pop)
 `insertNamespaceBegin()^
+
 /**
  * @brief `classDescription^
  */
@@ -265,9 +265,9 @@ public:
 private:
 };
 
-typedef std::tr1::shared_ptr<`fileRoot()^> `fileRoot()^Ptr;
 `insertNamespaceEnd()^
-#endif // __`getNamespaceFilenameDefine()^__
+
+#endif // `getNamespaceFilenameDefine()^
 
 
 XPT functor hint=Functor\ definition

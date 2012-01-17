@@ -75,3 +75,44 @@ XPT eqnarray hint=\\begin{eqnarray*}...\\end{eqnarray*}
 \begin{eqnarray*}
 `cursor^
 \end{eqnarray*}
+
+XPT doc hint=Two\ column\ article\ document
+% Configuration Preamble {{{1
+\documentclass[letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{listings}
+\usepackage[pdftex]{graphicx}
+\usepackage{multicol}
+\usepackage{fullpage}
+\usepackage{enumerate}
+\DeclareGraphicsExtensions{.eps,.pdf,.png}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{float}
+
+% Title {{{1
+\title{`title^}
+\author{Derek Wyatt (dwyatt@rim.com)}
+\date{\today}
+\begin{document}
+\maketitle
+
+% Abstract {{{1
+\begin{abstract}
+\end{abstract}
+
+% Table of Contents {{{1
+\tableofcontents
+\setcounter{tocdepth}{3}
+\begin{center}
+\line(1,0){400}
+\end{center}
+
+% Document {{{1
+\begin{multicols}{2}
+`cursor^
+\end{multicols}
+\end{document}
+% vim:sw=2 ft=tex fdl=0 fdm=marker:
+

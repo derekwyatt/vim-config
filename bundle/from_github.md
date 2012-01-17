@@ -24,3 +24,4 @@
 * **Completion**:   `git clone https://github.com/MarcWeber/vim-addon-completion.git vim-completion`
 * **JavaScript**:   `git clone https://github.com/pangloss/vim-javascript.git vim-javascript`
 * **Conque**:       `git clone https://github.com/rson/vim-conque.git vim-conque`
+* **Jade**:         `git clone https://github.com/vim-scripts/jade.vim.git vim-jade`

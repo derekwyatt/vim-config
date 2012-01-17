@@ -92,6 +92,11 @@ case object `objectName^
 XPT case hint=Creates\ a\ case\ statement
 case `matchAgainst^ =>
 
+XPT wrapin wrap=code hint=Wraps\ in\ a\ block
+`prefix^ {
+	`code^
+}
+
 XPT match hint=Creates\ a\ pattern\ matching\ sequence
 `target^ match {
     `...^case `matchTo^ => `statement^

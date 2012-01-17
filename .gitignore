@@ -24,5 +24,7 @@ vim-mwutils
 vim-completion
 vim-javascript
 vim-conque
+vim-jade
 *.swp
+.netrwhist
 passwords.vim

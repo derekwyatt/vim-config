@@ -448,8 +448,8 @@ nnoremap <buffer> <silent> ,fs :FufFile <c-r>=GetSrcDirForFuzzyFinder('%:p:h')<c
 " ProtoDef Settings
 " See http://www.vim.org/scripts/script.php?script_id=2624
 "
-let g:protodefprotogetter = expand($VIM) . '/pullproto.pl'
-let g:protodefctagsexe = '/ctags57/ctags.exe'
+"let g:protodefprotogetter = expand($VIM) . '/pullproto.pl'
+let g:protodefctagsexe = '/usr/bin/ctags'
 
 augroup local_ftplugin_cpp
     au!

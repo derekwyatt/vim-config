@@ -24,9 +24,9 @@ filetype plugin on
 filetype indent on
 
 " Tabstops are 4 spaces
-set tabstop=4
-set shiftwidth=4
-set softtabstop=4
+set tabstop=2
+set shiftwidth=2
+set softtabstop=2
 set expandtab
 set autoindent
 
@@ -289,6 +289,35 @@ imap jj <esc>
 " next word
 nmap <silent> ,C :set opfunc=ClearText<CR>g@
 vmap <silent> ,C :<C-U>call ClearText(visual(), 1)<CR>
+
+" Make the current file executable
+nmap ,x :w<cr>:!chmod 755 %<cr>:e<cr>
+
+" Digraphs
+" Alpha
+imap <c-l><c-a> <c-k>a*
+" Beta
+imap <c-l><c-b> <c-k>b*
+" Gamma
+imap <c-l><c-g> <c-k>g*
+" Delta
+imap <c-l><c-d> <c-k>d*
+" Epslion
+imap <c-l><c-e> <c-k>e*
+" Lambda
+imap <c-l><c-l> <c-k>l*
+" Eta
+imap <c-l><c-y> <c-k>y*
+" Theta
+imap <c-l><c-h> <c-k>h*
+" Mu
+imap <c-l><c-m> <c-k>m*
+" Rho
+imap <c-l><c-r> <c-k>r*
+" Pi
+imap <c-l><c-p> <c-k>p*
+" Phi
+imap <c-l><c-f> <c-k>f*
 
 function! ClearText(type, ...)
 	let sel_save = &selection
