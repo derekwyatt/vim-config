@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cat from_github.md | grep 'git clone' | sed 's/.*`\(.*\)`.*$/\1/' | while read f
+do
+    d=$(echo $f | cut -f4 -d' ')
+    if [[ ! -d "$d" ]]; then
+        eval $f
+    fi
+done

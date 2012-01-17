@@ -461,8 +461,8 @@ augroup local_ftplugin_cpp
     au BufWinEnter,BufEnter *.h,*.cpp :lcd %:h
     " Settings for the FSwitch plugin
     " See http://www.vim.org/scripts/script.php?script_id=2590
-    au BufEnter *.cpp let b:fswitchlocs = 'reg:/src/include/,reg:|src|include/**|,../include'
-    au BufEnter *.h let b:fswitchlocs = 'reg:/include/src/,reg:|include/.*|src|,reg:|include/.*||,../src'
-    au BufEnter *.h let b:fswitchdst = 'cpp'
+    "au BufEnter *.cpp let b:fswitchlocs = 'reg:/src/include/,reg:|src|include/**|,../include'
+    "au BufEnter *.h let b:fswitchlocs = 'reg:/include/src/,reg:|include/.*|src|,reg:|include/.*||,../src'
+    "au BufEnter *.h let b:fswitchdst = 'cpp'
 augroup END
 
