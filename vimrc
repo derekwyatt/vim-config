@@ -270,7 +270,8 @@ nmap <silent> gw :s/\(\%#\w\+\)\(\_W\+\)\(\w\+\)/\3\2\1/<CR>`'
 nmap <silent> <F3> :call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
 
 " Underline the current line with '='
-nmap <silent> ,ul :t.\|s/./=/g\|:nohls<cr>
+nmap <silent> ,u= :t.\|s/./=/g\|:nohls<cr>
+nmap <silent> ,u- :t.\|s/./-/g\|:nohls<cr>
 
 " Shrink the current window to fit the number of lines in the buffer.  Useful
 " for those buffers that are only a few lines
@@ -412,6 +413,14 @@ let NERDTreeIgnore=[ '\.ncb$', '\.suo$', '\.vcproj\.RIMNET', '\.obj$',
                    \ '\.ilk$', '^BuildLog.htm$', '\.pdb$', '\.idb$',
                    \ '\.embed\.manifest$', '\.embed\.manifest.res$',
                    \ '\.intermediate\.manifest$', '^mt.dep$' ]
+
+"-----------------------------------------------------------------------------
+" GPG Stuff
+"-----------------------------------------------------------------------------
+if has("mac")
+    let g:GPGExecutable = "gpg2"
+    let g:GPGUseAgent = 0
+endif
 
 "-----------------------------------------------------------------------------
 " FSwitch mappings

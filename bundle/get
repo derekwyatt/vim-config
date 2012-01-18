@@ -1,9 +1,16 @@
 #!/bin/bash
 
-cat from_github.md | grep 'git clone' | sed 's/.*`\(.*\)`.*$/\1/' | while read f
+pluglist=
+if [[ $# == 0 ]]; then
+    pluglist="$(grep '\*\*[^\*]*\*\*' from_github.md | sed 's/^....\([^:]*\)..:.*$/\1/')"
+else
+    pluglist="$@"
+fi
+for f in $pluglist
 do
-    d=$(echo $f | cut -f4 -d' ')
+    clone="$(grep $f from_github.md | sed 's/.*`\(.*\)`.*$/\1/')"
+    d=$(echo $clone | cut -f4 -d' ')
     if [[ ! -d "$d" ]]; then
-        eval $f
+        eval $clone
     fi
 done
