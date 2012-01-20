@@ -26,6 +26,7 @@ vim-orgmode
 vim-javascript
 vim-conque
 vim-jade
+vim-sbt
 *.swp
 .netrwhist
 passwords.vim
