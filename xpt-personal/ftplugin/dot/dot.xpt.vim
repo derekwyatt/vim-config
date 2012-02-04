@@ -8,12 +8,15 @@ let s:f = g:XPTfuncs()
 XPT digraph hint=new\ directed\ graph
 digraph `GraphName^ {
   rankdir=LR;
+	fontname=Calibri;
+	node [fontname=Calibri];
+	edge [fontname=Calibri];
   node [shape=point, style=invis];
   edge [style=invis];
   L1 -> L2 -> L3 -> L4 -> L5 -> L6;
 
   node [shape=Mrecord style=filled];
-  node [fillcolor="steelblue"];
+  node [fillcolor=steelblue fontcolor=white];
   `cursor^
 
   edge [style=solid];
