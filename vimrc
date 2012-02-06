@@ -475,6 +475,9 @@ let g:SokobanLevelDirectory = "/home/dwyatt/.vim/bundle/vim-sokoban/VimSokoban/"
 " FuzzyFinder Settings
 "-----------------------------------------------------------------------------
 let g:fuf_file_exclude = '\v\~$|\.(o|exe|dll|bak|class|meta|lock|orig|jar|swp)$|/test/data\.|(^|[/\\])\.(hg|git|bzr)($|[/\\])'
+let g:fuf_splitPathMatching = 0
+let g:fuf_maxMenuWidth = 110
+let g:fuf_timeFormat = ''
 nmap <silent> ,fv :FufFile ~/.vim/<cr>
 nmap <silent> ,fb :FufBuffer<cr>
 nmap <silent> ,ff :FufFile<cr>
