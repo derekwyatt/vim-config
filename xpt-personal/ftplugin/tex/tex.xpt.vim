@@ -6,28 +6,41 @@ XPTinclude
 XPT tt wrap=text hint=\\texttt{...}
 \texttt{`text^}`cursor^
 
-XPT s hint=\\section{...}
-% `title^ {{{1
+XPT s wrap=title hint=\\section{...}
+% `title^ <<<1
 \section{`title^}
 \label{sec:`label^}
 `cursor^
 
-XPT ss hint=\\subsection{...}
-% - `title^ {{{1
+XPT ss wrap=title hint=\\subsection{...}
+% - `title^ <<<1
 \subsection{`title^}
 \label{sec:`label^}
 `cursor^
 
-XPT sss hint=\\subsubsection{...}
-% -- `title^ {{{1
+XPT sss wrap=title hint=\\subsubsection{...}
+% -- `title^ <<<1
 \subsubsection{`title^}
 \label{sec:`label^}
 `cursor^
+
+XPT begin hint=\\begin{}...\\end{}
+\begin{`layout^}
+`cursor^
+\end{`layout^}
+
+XPT verbatim hint=\\begin{verbatim}...\\end{verbatim}
+\begin{verbatim}
+`cursor^
+\end{verbatim}
 
 XPT code hint=\\begin{lstlisting}...\\end{lstlisting}
 \begin{lstlisting}
 `cursor^
 \end{lstlisting}
+
+XPT ic hint=\\lstinline{code}
+\lstinline{`code^}`cursor^
 
 XPT fn hint=\\footnote{...}
 \footnote{`^}`cursor^
@@ -77,7 +90,7 @@ XPT eqnarray hint=\\begin{eqnarray*}...\\end{eqnarray*}
 \end{eqnarray*}
 
 XPT doc hint=Two\ column\ article\ document
-% Configuration Preamble {{{1
+% Configuration Preamble <<<1
 \documentclass[letterpaper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -91,28 +104,32 @@ XPT doc hint=Two\ column\ article\ document
 \usepackage{amsmath,amsthm,amssymb}
 \usepackage{float}
 
-% Title {{{1
+% Title <<<1
 \title{`title^}
 \author{Derek Wyatt (dwyatt@rim.com)}
 \date{\today}
 \begin{document}
 \maketitle
 
-% Abstract {{{1
+% Abstract <<<1
 \begin{abstract}
 \end{abstract}
 
-% Table of Contents {{{1
+% Table of Contents <<<1
 \tableofcontents
 \setcounter{tocdepth}{3}
 \begin{center}
 \line(1,0){400}
 \end{center}
 
-% Document {{{1
+% Document <<<1
 \begin{multicols}{2}
 `cursor^
 \end{multicols}
 \end{document}
 % vim:sw=2 ft=tex fdl=0 fdm=marker:
 
+XPT minted wrap=code hint=\\minted{...}
+\begin{minted}[frame=lines, framesep=2mm]{`scala^}
+`code^
+\end{minted}
