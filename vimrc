@@ -286,6 +286,9 @@ nnoremap <C-E> ,
 " Alright... let's try this out
 imap jj <esc>
 
+" I like jj - Let's try something else fun
+imap ,fn <c-r>=expand('%:t:r')<cr>
+
 " Clear the text using a motion / text object and then move the character to the
 " next word
 nmap <silent> ,C :set opfunc=ClearText<CR>g@
