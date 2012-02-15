@@ -26,6 +26,10 @@ function! s:f.getPackageForFile(...)
         let needle = 'src/test/scala'
         let idx = stridx(dir, needle)
     endif
+    if idx == -1
+        let needle = 'src/multi-jvm/scala'
+        let idx = stridx(dir, needle)
+    endif
     if idx != -1
         let subdir = strpart(dir, idx + strlen(needle) + 1)
         let package = substitute(subdir, '/', '.', 'g')
