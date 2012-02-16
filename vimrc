@@ -489,16 +489,6 @@ nmap <silent> ,fm :FufMruFile<cr>
 nmap <silent> ,fp :FufFile ~/git/*<cr>
 
 "-----------------------------------------------------------------------------
-" Ctrl-P Settings
-"-----------------------------------------------------------------------------
-let g:loaded_ctrlp = 1
-"nmap <silent> ,fb :CtrlPBuffer<cr>
-"nmap <silent> ,ff :CtrlP<cr>
-"let g:ctrlp_custom_ignore = '\.git$\|\.hg$\|\.svn$|\.swp$|\.swo$|^.*\.class$'
-"let g:ctrlp_match_window_bottom = 0
-"let g:ctrlp_open_new_file = 'r'
-
-"-----------------------------------------------------------------------------
 " Gundo Settings
 "-----------------------------------------------------------------------------
 nmap <c-F5> :GundoToggle<cr>
