@@ -6,5 +6,5 @@ setlocal fdl=0
 setlocal fdm=marker
 setlocal fmr=<<<,>>>
 
-imap jj <esc>:w<cr>
-imap jw <c-o>:w<cr>
+imap <buffer> jj <esc>:w<cr>
+imap <buffer> jw <c-o>:w<cr>

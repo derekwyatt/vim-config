@@ -6,22 +6,32 @@ XPTinclude
 XPT tt wrap=text hint=\\texttt{...}
 \texttt{`text^}`cursor^
 
-XPT s wrap=title hint=\\section{...}
+XPT chapter wrap=title hint=\\chapter{...}
 % `title^ <<<1
+\chapter{`title^}
+\label{sec:`label^}
+`cursor^
+
+XPT s wrap=title hint=\\section{...}
+% - `title^ <<<1
 \section{`title^}
 \label{sec:`label^}
 `cursor^
 
 XPT ss wrap=title hint=\\subsection{...}
-% - `title^ <<<1
+% -- `title^ <<<1
 \subsection{`title^}
 \label{sec:`label^}
 `cursor^
 
 XPT sss wrap=title hint=\\subsubsection{...}
-% -- `title^ <<<1
+% --- `title^ <<<1
 \subsubsection{`title^}
 \label{sec:`label^}
+`cursor^
+
+XPT heading wrap=title hint=\\subsubsection*{...}
+\subsubsection{`title^}
 `cursor^
 
 XPT begin hint=\\begin{}...\\end{}
