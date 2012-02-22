@@ -43,6 +43,43 @@ function! s:f.classname(...)
   return expand('%:t:r')
 endfunction
 
+function! s:f.multijvmObject(...)
+  return substitute(s:f.classname(), 'Spec$', 'MultiJvmSpec', '')
+endfunction
+
+function! s:f.multijvmBase(...)
+  return substitute(s:f.classname(), 'Spec$', 'Base', '')
+endfunction
+
+function! s:f.classNameFromSpec(...)
+  return substitute(s:f.classname(), 'Spec$', '', '')
+endfunction
+
+function! s:f.multiJvmNode(num, ...)
+  let className = substitute(s:f.classname(), 'Spec$', 'MultiJvmNode', '') . a:num
+  let class = join(['class ' . className . ' extends AkkaRemoteSpec(' . s:f.multijvmObject() . '.nodeConfigs(' . (a:num - 1). '))',
+                  \ '                          with ImplicitSender',
+                  \ '                          with ' . s:f.multijvmBase() . ' {',
+                  \ '  import ' . s:f.multijvmObject() . '._',
+                  \ '  import ' . s:f.classNameFromSpec() . '._',
+                  \ '  val nodes = NrOfNodes',
+                  \ '',
+                  \ '  "' . s:f.classNameFromSpec() . '" should { //{1',
+                  \ '  } //}1',
+                  \ '}'], "\n")
+  return class
+endfunction
+
+function! s:f.multiJvmNodes(num, ...)
+  let n = 1
+  let s = ''
+  while n <= a:num
+    let s = s . s:f.multiJvmNode(n) . "\n"
+    let n = n + 1
+  endwhile
+  return s
+endfunction
+
 function! s:f.getFilenameWithPackage(...)
     let package = s:f.getPackageForFile()
     if strlen(package) == 0
@@ -57,7 +94,7 @@ function! s:f.getPackageLine(...)
     if strlen(package) == 0
         return ''
     else
-        return "\npackage " . package . "\n"
+        return "package " . package
     endif
 endfunction
 
@@ -186,3 +223,33 @@ lazy val `depName^ = "`package^" % "`name^" % "`version^" % "`type^"
 XPT package hint=package\ for\ this\ file
 `getPackageLine()^
 
+XPT multijvm hint=Multi\ JVM\ Test\ for\ Scala
+`getPackageLine()^
+
+import akka.remote.{AkkaRemoteSpec, AbstractRemoteActorMultiJvmSpec}
+import akka.testkit.{TestKit, ImplicitSender}
+import com.typesafe.config.{Config, ConfigFactory}
+import org.scalatest.{WordSpec, BeforeAndAfterAll}
+import org.scalatest.matchers.MustMatchers
+
+object `multijvmObject()^ extends AbstractRemoteActorMultiJvmSpec { //{2
+  override def NrOfNodes = `numberOfNodes^
+  def commonConfig = ConfigFactory.parseString("""
+     akka.actor.provider = "akka.remote.RemoteActorRefProvider",
+     akka.remote.transport = "akka.remote.netty.NettyRemoteTransport"
+    """) 
+} //{2
+
+trait `multijvmBase()^ extends WordSpec //{2
+                              with BeforeAndAfterAll
+                              with MustMatchers {
+  override def beforeAll(configMap: Map[String, Any]) {
+  }
+  override def afterAll(configMap: Map[String, Any]) {
+  }
+} //{2
+
+`expandNodes...^
+XSETm expandNodes...|post
+`multiJvmNodes(R("numberOfNodes"))^
+XSETm END
