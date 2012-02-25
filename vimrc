@@ -661,7 +661,9 @@ function! ToggleMinimap()
 endfunction
 
 command! ToggleMinimap call ToggleMinimap()
-nnoremap <space> :ToggleMinimap<CR>
+
+" I /literally/ never use this and it's pissing me off
+" nnoremap <space> :ToggleMinimap<CR>
 
 "-----------------------------------------------------------------------------
 " Commands

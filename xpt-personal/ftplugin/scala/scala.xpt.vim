@@ -223,6 +223,25 @@ lazy val `depName^ = "`package^" % "`name^" % "`version^" % "`type^"
 XPT package hint=package\ for\ this\ file
 `getPackageLine()^
 
+XPT akkatest hint=Test\ file\ for\ Akka\ code
+`getPackageLine()^
+
+import akka.actor.ActorSystem
+import akka.testkit.{TestKit, ImplicitSender}
+import org.scalatest.WordSpec
+import org.scalatest.matchers.MustMatchers
+
+class `classname()^(_system: ActorSystem) extends TestKit(_system)
+           with ImplicitSender
+           with WordSpec
+           with MustMatchers {
+  def this() = this(ActorSystem("`classname()^"))
+
+  "`classNameFromSpec()^" should { //{1
+    `cursor^
+  } //}1
+}
+
 XPT multijvm hint=Multi\ JVM\ Test\ for\ Scala
 `getPackageLine()^
 
