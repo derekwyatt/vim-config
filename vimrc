@@ -740,6 +740,8 @@ iab seperate  separate
 iab Seperate  Separate
 iab fone      phone
 iab Fone      Phone
+iab Seureth   Suereth
+iab seureth   suereth
 
 "-----------------------------------------------------------------------------
 " Set up the window colors and size
