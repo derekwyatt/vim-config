@@ -57,12 +57,12 @@ XPT fn hint=\\footnote{...}
 
 XPT insertCodeFile hint=Inserts\ an\ entire\ code\ file
 \begin{lstlisting}[frame=b,caption=`caption^]
-INCLUDE_SOURCE_FILE{src/`location^.scala}
+INCLUDE_SOURCE_FILE{`branch^:`location^.scala}
 \end{lstlisting}
 
 XPT insertCodeSection hint=Inserts\ a\ section\ from\ a\ code\ file
 \begin{lstlisting}[frame=b,numbers=left,caption=`caption^]
-INCLUDE_SOURCE_FILE_SECTION{src/`location^.scala,`section^}
+INCLUDE_SOURCE_FILE_SECTION{`branch^:`location^.scala,`section^}
 \end{lstlisting}
 
 XPT e wrap=text hint=\\emph

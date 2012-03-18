@@ -3,10 +3,9 @@ XPTemplate priority=personal
 XPTinclude
     \ _common/personal
 
-let s:f = g:XPTfuncs()
-
 XPT digraph hint=new\ directed\ graph
-digraph `GraphName^ {
+XSET graphname=expand('%:t:r')
+digraph `graphname^ {
   rankdir=LR;
 	fontname=Calibri;
 	node [fontname=Calibri];

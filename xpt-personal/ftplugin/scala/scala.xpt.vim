@@ -272,3 +272,8 @@ trait `multijvmBase()^ extends WordSpec //{2
 XSETm expandNodes...|post
 `multiJvmNodes(R("numberOfNodes"))^
 XSETm END
+
+XPT bookblock wrap=code hint=Wraps\ a\ block\ of\ code\ in\ BEGIN/END
+// FILE_SECTION_BEGIN{`name^}
+`code^
+// FILE_SECTION_END{`name^}
