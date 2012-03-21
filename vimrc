@@ -748,7 +748,11 @@ iab seureth   suereth
 "-----------------------------------------------------------------------------
 if has("gui_running")
   exe "set guifont=" . g:main_font
-  set background=dark
+  if hostname() == "dqw-linux"
+    set background=light
+  else
+    set background=dark
+  endif
   colorscheme solarized
   if !exists("g:vimrcloaded")
       winpos 0 0
