@@ -712,36 +712,42 @@ augroup END
 " Fix constant spelling mistakes
 "-----------------------------------------------------------------------------
 
-iab teh       the
-iab Teh       The
-iab taht      that
-iab Taht      That
-iab alos      also
-iab Alos      Also
-iab aslo      also
-iab Aslo      Also
-iab becuase   because
-iab Becuase   Because
-iab bianry    binary
-iab Bianry    Binary
-iab bianries  binaries
-iab Bianries  Binaries
-iab charcter  character
-iab Charcter  Character
-iab charcters characters
-iab Charcters Characters
-iab exmaple   example
-iab Exmaple   Example
-iab exmaples  examples
-iab Exmaples  Examples
-iab shoudl    should
-iab Shoudl    Should
-iab seperate  separate
-iab Seperate  Separate
-iab fone      phone
-iab Fone      Phone
-iab Seureth   Suereth
-iab seureth   suereth
+iab Acheive    Achieve
+iab acheive    achieve
+iab Alos       Also
+iab alos       also
+iab Aslo       Also
+iab aslo       also
+iab Becuase    Because
+iab becuase    because
+iab Bianries   Binaries
+iab bianries   binaries
+iab Bianry     Binary
+iab bianry     binary
+iab Charcter   Character
+iab charcter   character
+iab Charcters  Characters
+iab charcters  characters
+iab Exmaple    Example
+iab exmaple    example
+iab Exmaples   Examples
+iab exmaples   examples
+iab Fone       Phone
+iab fone       phone
+iab Lifecycle  Life-cycle
+iab lifecycle  life-cycle
+iab Lifecycles Life-cycles
+iab lifecycles life-cycles
+iab Seperate   Separate
+iab seperate   separate
+iab Seureth    Suereth
+iab seureth    suereth
+iab Shoudl     Should
+iab shoudl     should
+iab Taht       That
+iab taht       that
+iab Teh        The
+iab teh        the
 
 "-----------------------------------------------------------------------------
 " Set up the window colors and size

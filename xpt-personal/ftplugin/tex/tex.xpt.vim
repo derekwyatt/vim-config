@@ -104,6 +104,14 @@ XPT figure hint=\\begin{figure*}...\\end{figure*}
 \label{fig:`name^S(SV('\([a-z]\)\([A-Z]\)', '\1_\l\2', 'g'), '[A-Z]', '\l&', 'g')^}
 \end{figure*}
 
+XPT image hint=\\begin{figure*}...\\end{figure*}
+\begin{figure*}[h]
+\centering
+\includegraphics[scale=2.0]{IMAGES_DIR/`name^.png}
+\caption{`cursor^}
+\label{fig:`name^S(SV('\([a-z]\)\([A-Z]\)', '\1_\l\2', 'g'), '[A-Z]', '\l&', 'g')^}
+\end{figure*}
+
 XPT eqnarray hint=\\begin{eqnarray*}...\\end{eqnarray*}
 \begin{eqnarray*}
 `cursor^
