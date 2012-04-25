@@ -228,14 +228,18 @@ XPT akkatest hint=Test\ file\ for\ Akka\ code
 
 import akka.actor.ActorSystem
 import akka.testkit.{TestKit, ImplicitSender}
-import org.scalatest.WordSpec
+import org.scalatest.{WordSpec, BeforeAndAfterAll}
 import org.scalatest.matchers.MustMatchers
 
 class `classname()^(_system: ActorSystem) extends TestKit(_system)
            with ImplicitSender
            with WordSpec
+           with BeforeAndAfterAll
            with MustMatchers {
   def this() = this(ActorSystem("`classname()^"))
+  override def afterAll() {
+    system.shutdown()
+  }
 
   "`classNameFromSpec()^" should { //{1
     `cursor^
