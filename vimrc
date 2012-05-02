@@ -125,9 +125,6 @@ set key=
 " Make the command-line completion better
 set wildmenu
 
-" Make it easier to complete buffers, open files, etc...
-set wildignorecase
-
 " Same as default except that I remove the 'u' option
 set complete=.,w,b,t
 
