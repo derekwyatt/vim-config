@@ -133,6 +133,19 @@ case object `objectName^
 XPT case hint=Creates\ a\ case\ statement
 case `matchAgainst^ =>
 
+XPT specfile hint=Creates\ a\ new\ Specs2\ test\ file
+`getPackageLine()^
+
+import org.specs2.mutable._
+
+class `classname()^ extends Specification {
+  "`classNameFromSpec()^" should { //{1
+    "`spec^" in { //{2
+      `cursor^
+    } //}2
+  } //}1
+}
+
 XPT wrapin wrap=code hint=Wraps\ in\ a\ block
 `prefix^ {
 	`code^
@@ -142,15 +155,6 @@ XPT match hint=Creates\ a\ pattern\ matching\ sequence
 `target^ match {
     `...^case `matchTo^ => `statement^
     `...^
-}
-
-XPT specfile hint=Creates\ a\ new\ specs2\ file
-import org.specs2.mutable._
-
-class `TestClass^Spec extends Specification {
-  "`TestClass^" should { //{1
-    `cursor^
-  } //}1
 }
 
 XPT spec hint=Creates\ a\ new\ specs2\ test
