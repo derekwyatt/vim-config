@@ -20,23 +20,23 @@ endfunction
 
 function! s:f.getPackageForFile(...)
     let dir = expand('%:p:h')
-    let needle = 'src/main/scala'
-    let idx = stridx(dir, needle)
-    if idx == -1
-        let needle = 'src/test/scala'
-        let idx = stridx(dir, needle)
-    endif
-    if idx == -1
-        let needle = 'src/multi-jvm/scala'
-        let idx = stridx(dir, needle)
-    endif
-    if idx != -1
-        let subdir = strpart(dir, idx + strlen(needle) + 1)
+    let regexes = [
+                \   [ '/src/main/scala',      '/src/main/scala' ],
+                \   [ '/src/test/scala',      '/src/test/scala' ],
+                \   [ '/src/multi-jvm/scala', '/src/multi-jvm/scala' ],
+                \   [ '/app/model/scala',     '/app/model/scala' ],
+                \   [ '/app/controllers',     '/app' ],
+                \   [ '/test/scala',          '/test/scala' ]
+                \ ]
+    for e in regexes
+      let idx = match(dir, e[0])
+      if idx != -1
+        let subdir = strpart(dir, idx + strlen(e[1]) + 1)
         let package = substitute(subdir, '/', '.', 'g')
         return package
-    else
-        return ''
-    endif
+      endif
+    endfor
+    return ''
 endfunction
 
 function! s:f.classname(...)

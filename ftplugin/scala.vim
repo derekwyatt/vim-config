@@ -9,11 +9,17 @@ if !exists("*s:CodeOrTestFile")
   function! s:CodeOrTestFile(precmd)
   	let current = expand('%:p')
   	let other = current
-  	if current =~ "/main/"
+  	if current =~ "/src/main/"
   		let other = substitute(current, "/main/", "/test/", "")
   		let other = substitute(other, ".scala$", "Spec.scala", "")
-  	elseif current =~ "/test/"
+  	elseif current =~ "/src/test/"
   		let other = substitute(current, "/test/", "/main/", "")
+  		let other = substitute(other, "Spec.scala$", ".scala", "")
+    elseif current =~ "/app/model/"
+  		let other = substitute(current, "/app/model/", "/test/", "")
+  		let other = substitute(other, ".scala$", "Spec.scala", "")
+  	elseif current =~ "/test/"
+  		let other = substitute(current, "/test/", "/app/model/", "")
   		let other = substitute(other, "Spec.scala$", ".scala", "")
   	endif
     if &switchbuf =~ "^use"
