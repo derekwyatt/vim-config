@@ -18,6 +18,12 @@ if !exists("*s:CodeOrTestFile")
     elseif current =~ "/app/model/"
   		let other = substitute(current, "/app/model/", "/test/", "")
   		let other = substitute(other, ".scala$", "Spec.scala", "")
+    elseif current =~ "/app/controllers/"
+  		let other = substitute(current, "/app/", "/test/scala/", "")
+  		let other = substitute(other, ".scala$", "Spec.scala", "")
+  	elseif current =~ "/test/scala/controllers/"
+  		let other = substitute(current, "/test/scala/", "/app/", "")
+  		let other = substitute(other, "Spec.scala$", ".scala", "")
   	elseif current =~ "/test/"
   		let other = substitute(current, "/test/", "/app/model/", "")
   		let other = substitute(other, "Spec.scala$", ".scala", "")

@@ -133,6 +133,23 @@ case object `objectName^
 XPT case hint=Creates\ a\ case\ statement
 case `matchAgainst^ =>
 
+XPT akkamain hint=Creates\ a\ simple\ Akka\ App\ for\ PoC
+import akka.actor._
+
+class MyActor extends Actor {
+    def receive = {
+      case _ =>
+    }
+}
+
+object Main {
+    val sys = ActorSystem()
+    def main(args: Array[String]) {
+        val a = sys.actorOf(Props[MyActor], "MyActor")
+        `cursor^
+    }
+}
+
 XPT specfile hint=Creates\ a\ new\ Specs2\ test\ file
 `getPackageLine()^
 
@@ -167,12 +184,12 @@ XPT wst hint=Creates\ a\ new\ WordSpec\ test
   `cursor^
 } //}2
 
-XPT wordspecgroup hint=Creates\ a\ new\ WordSpec\ test\ group
+XPT groupwordspec hint=Creates\ a\ new\ WordSpec\ test\ group
 "`spec^" should { //{1
   `cursor^
 } //}1
 
-XPT wordspecfile hint=Creates\ a\ new\ WordSpec\ test\ file
+XPT filewordspec hint=Creates\ a\ new\ WordSpec\ test\ file
 import org.scalatest.{WordSpec, BeforeAndAfterEach, BeforeAndAfterAll}
 import org.scalatest.matchers.MustMatchers
 
