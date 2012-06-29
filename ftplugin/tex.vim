@@ -5,9 +5,9 @@ setlocal spell
 setlocal fdl=0
 setlocal fdm=marker
 setlocal fmr=<<<,>>>
-setlocal iskeyword+=_
 
 imap <buffer> jj <esc>:w<cr>
 imap <buffer> jw <c-o>:w<cr>
+imap <buffer> ;;; \\ldots
 
-imap ... \\ldots
+let g:tex_isk="48-57,a-z,A-Z,192-255,_"
