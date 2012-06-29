@@ -15,19 +15,19 @@ XPT chapter wrap=title hint=\\chapter{...}
 XPT s wrap=title hint=\\section{...}
 % - `title^ <<<1
 \section{`title^}
-\label{sec:`title^S(SV(' ', '_', 'g'), '\([A-Z]\)', '\l\1', 'g')^}
+\label{sec:`title^S(S(SV(' ', '_', 'g'), ',%"!\.', '', 'g'), '\([A-Z]\)', '\l\1', 'g')^}
 `cursor^
 
 XPT ss wrap=title hint=\\subsection{...}
 % -- `title^ <<<1
 \subsection{`title^}
-\label{sec:`title^S(SV(' ', '_', 'g'), '\([A-Z]\)', '\l\1', 'g')^}
+\label{sec:`title^S(S(SV(' ', '_', 'g'), ',%"!\.', '', 'g'), '\([A-Z]\)', '\l\1', 'g')^}
 `cursor^
 
 XPT sss wrap=title hint=\\subsubsection{...}
 % --- `title^ <<<1
 \subsubsection{`title^}
-\label{sec:`title^S(SV(' ', '_', 'g'), '\([A-Z]\)', '\l\1', 'g')^}
+\label{sec:`title^S(S(SV(' ', '_', 'g'), ',%"!\.', '', 'g'), '\([A-Z]\)', '\l\1', 'g')^}
 `cursor^
 
 XPT heading wrap=title hint=\\subsubsection*{...}
@@ -49,8 +49,8 @@ XPT code hint=\\begin{lstlisting}...\\end{lstlisting}
 `cursor^
 \end{lstlisting}
 
-XPT ic hint=\\lstinline{code}
-\lstinline{`code^}`cursor^
+XPT ic wrap=code hint=\\lstinline{code}
+\icode{`code^}`cursor^
 
 XPT fn hint=\\footnote{...}
 \footnote{`^}`cursor^
@@ -161,3 +161,8 @@ XPT minted wrap=code hint=\\minted{...}
 \begin{minted}[frame=lines, framesep=2mm]{`scala^}
 `code^
 \end{minted}
+
+XPT line hint=A\ horizontal\ line
+\begin{center}
+\line(1, 0){350}
+\end{center}
