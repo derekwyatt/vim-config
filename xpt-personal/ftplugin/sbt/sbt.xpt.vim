@@ -17,5 +17,9 @@ scalaVersion := "`2.9.1^"
 `^
 
 XPT mod hint=New\ module\ for\ dependency
-`groupId^ % `artifactId^ % `revision^
+"`groupId^" % "`artifactId^" % "`revision^"
 
+XPT dep hint=libraryDependencies\ ++=\ Seq\(...\)
+libraryDependencies ++= Seq(
+  "`groupId^" % "`artifactId^" % "`revision^"
+)
