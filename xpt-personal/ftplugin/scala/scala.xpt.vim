@@ -252,19 +252,19 @@ import akka.testkit.{TestKit, ImplicitSender}
 import org.scalatest.{WordSpec, BeforeAndAfterAll}
 import org.scalatest.matchers.MustMatchers
 
-class `classname()^(_system: ActorSystem) extends TestKit(_system)
+class `classname()^ extends TestKit(ActorSystem("`classname()^"))
            with ImplicitSender
            with WordSpec
            with BeforeAndAfterAll
            with MustMatchers {
-  def this() = this(ActorSystem("`classname()^"))
-  override def afterAll() {
-    system.shutdown()
-  }
 
-  "`classNameFromSpec()^" should { //{1
-    `cursor^
-  } //}1
+    override def afterAll() {
+      system.shutdown()
+    }
+
+    "`classNameFromSpec()^" should { //{1
+      `cursor^
+    } //}1
 }
 
 XPT multijvm hint=Multi\ JVM\ Test\ for\ Scala
