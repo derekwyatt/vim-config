@@ -29,6 +29,7 @@ vim-jade
 vim-sbt
 vim-ctrlp
 vim-powerline
+vim-command-t
 *.swp
 .netrwhist
 passwords.vim

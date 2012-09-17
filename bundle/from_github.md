@@ -26,3 +26,4 @@
 * **Conque**:       `git clone https://github.com/rson/vim-conque.git vim-conque`
 * **Jade**:         `git clone https://github.com/vim-scripts/jade.vim.git vim-jade`
 * **SBT**:          `git clone https://github.com/derekwyatt/vim-sbt.git vim-sbt`
+* **Command-T**:    `git clone https://github.com/wincent/Command-T.git vim-command-t`

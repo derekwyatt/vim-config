@@ -281,6 +281,7 @@ nnoremap <C-E> ,
 
 " Alright... let's try this out
 imap jj <esc>
+cmap jj <esc>
 
 " I like jj - Let's try something else fun
 imap ,fn <c-r>=expand('%:t:r')<cr>
@@ -478,11 +479,17 @@ let g:fuf_splitPathMatching = 0
 let g:fuf_maxMenuWidth = 110
 let g:fuf_timeFormat = ''
 nmap <silent> ,fv :FufFile ~/.vim/<cr>
-nmap <silent> ,fb :FufBuffer<cr>
-nmap <silent> ,ff :FufFile<cr>
 nmap <silent> ,fc :FufMruCmd<cr>
 nmap <silent> ,fm :FufMruFile<cr>
-nmap <silent> ,fp :FufFile ~/git/*<cr>
+
+"-----------------------------------------------------------------------------
+" CommandT Settings
+"-----------------------------------------------------------------------------
+set wildignore+=*.o,*.class,.git,.svn
+let g:CommandTMatchWindowAtTop = 1
+nmap <silent> ,fb :CommandTBuffer<cr>
+nmap <silent> ,ff :CommandT<cr>
+nmap <silent> ,fp :CommandT ~/primal/platform<cr>
 
 "-----------------------------------------------------------------------------
 " Gundo Settings
