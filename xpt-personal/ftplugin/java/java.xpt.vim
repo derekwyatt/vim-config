@@ -90,3 +90,24 @@ XPT package hint=package\ for\ this\ file
 
 XPT p hint=System.out.println\(...\)
 System.out.println(`cursor^);
+
+XPT void hint=void\ method
+public void `methodName^(`args^) {
+    `cursor^
+}
+
+XPT msgif hint=if\ (message\ instanceof\ ...)
+if (message instanceof `classname^) {
+    `classname^ `m^ = (`classname^)message;
+    `cursor^
+}
+
+XPT actor hint=Untyped\ Actor
+public class `classname()^ extends UntypedActor {
+    public void onReceive(Object message) throws Exception {
+        if (message instanceof `classname^) {
+            `classname^ `m^ = (`classname^)message;
+            `cursor^
+        }
+    }
+}
