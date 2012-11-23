@@ -354,7 +354,7 @@ if has("mac")
   let g:main_font = "Anonymous\\ Pro:h16"
   let g:small_font = "Anonymous\\ Pro:h2"
 else
-  let g:main_font = "DejaVu\\ Sans\\ Mono\\ 10"
+  let g:main_font = "DejaVu\\ Sans\\ Mono\\ 9"
   let g:small_font = "DejaVu\\ Sans\\ Mono\\ 2"
 endif
 
@@ -474,8 +474,8 @@ let g:SokobanLevelDirectory = "/home/dwyatt/.vim/bundle/vim-sokoban/VimSokoban/"
 "-----------------------------------------------------------------------------
 " FuzzyFinder Settings
 "-----------------------------------------------------------------------------
-let g:fuf_file_exclude = '\v\~$|\.(o|exe|dll|bak|class|meta|lock|orig|jar|swp)$|/test/data\.|(^|[/\\])\.(hg|git|bzr)($|[/\\])'
-let g:fuf_splitPathMatching = 0
+let g:fuf_file_exclude = '\v\~$|\.(o|exe|dll|bak|class|meta|lock|orig|jar|swp)$|/test/data\.|(^|[/\\])\.(svn|hg|git|bzr)($|[/\\])'
+let g:fuf_splitPathMatching = 1
 let g:fuf_maxMenuWidth = 110
 let g:fuf_timeFormat = ''
 nmap <silent> ,fv :FufFile ~/.vim/<cr>
@@ -483,13 +483,37 @@ nmap <silent> ,fc :FufMruCmd<cr>
 nmap <silent> ,fm :FufMruFile<cr>
 
 "-----------------------------------------------------------------------------
-" CommandT Settings
+" FuzzyFinder Settings
 "-----------------------------------------------------------------------------
+function! GetParentOfSourceDirectory()
+  let fwd = expand('%:p:h')
+  let srcparent = substitute(fwd, '/[^/]*/src/.*', '', '')
+  return srcparent
+endfunction
+
 set wildignore+=*.o,*.class,.git,.svn
 let g:CommandTMatchWindowAtTop = 1
-nmap <silent> ,fb :CommandTBuffer<cr>
-nmap <silent> ,ff :CommandT<cr>
-nmap <silent> ,fp :CommandT ~/primal/platform<cr>
+nmap <silent> ,fb :FufBuffer<cr>
+nmap <silent> ,ff :FufFile<cr>
+nmap <silent> ,fp :FufFile ~/primal/platform/trunk/**/<cr>
+nmap <silent> ,fB :FufFile ~/primal/platform/branches/async-synth-engine-wip/**/<cr>
+nmap <silent> ,fs :exec ":FufFile " . GetParentOfSourceDirectory() . "/**/"<cr>
+
+"-----------------------------------------------------------------------------
+" SVN Helpers
+"-----------------------------------------------------------------------------
+function! VCSDiffMore(from)
+  let f = expand('%:p')
+  let revisions = split(system("svn log " . f . " | grep '^r[0-9][0-9]*'"), '\n')
+  let revisions = map(revisions, 'substitute(v:val, "r\\(\\d\\+\\) .*$", "\\1", "")')
+  exec ":VCSVimDiff " . revisions[a:from]
+endfunction
+nmap ,dd :call VCSDiffMore(0)<cr>
+"function! ShowSVNRevisions()
+"  let f = expand('%:p')
+"  let revisions = system("svn log " . f)
+"  let buffer = bufnr('%')
+"endfunction
 
 "-----------------------------------------------------------------------------
 " Gundo Settings
