@@ -33,3 +33,4 @@ vim-command-t
 *.swp
 .netrwhist
 passwords.vim
+tags
