@@ -27,3 +27,8 @@
 * **Jade**:         `git clone https://github.com/vim-scripts/jade.vim.git vim-jade`
 * **SBT**:          `git clone https://github.com/derekwyatt/vim-sbt.git vim-sbt`
 * **Command-T**:    `git clone https://github.com/wincent/Command-T.git vim-command-t`
+* **Vimside**:      `git clone https://github.com/megaannum/vimside.git vim-vimside`
+* **VimProc**:      `git clone https://github.com/Shougo/vimproc.git vim-vimproc`
+* **VimShell**:     `git clone https://github.com/Shougo/vimshell.git vim-vimshell`
+* **Self**:         `git clone https://github.com/megaannum/self.git vim-self`
+* **Forms**:        `git clone https://github.com/megaannum/forms.git vim-forms`
