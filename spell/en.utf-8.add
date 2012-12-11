@@ -180,3 +180,6 @@ sendOff
 alterOff
 flatMap
 foreach
+TelnetServer
+Iteratees
+Iteratee
