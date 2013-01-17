@@ -2,6 +2,7 @@ ensime
 vim-actionscript
 vim-async
 vim-blogit
+vim-bufkill
 vim-command-t
 vim-completion
 vim-conque
