@@ -3,6 +3,16 @@ XPTemplate priority=personal
 XPTinclude
     \ _common/personal
 
+let s:f = g:XPTfuncs()
+
+function s:f.bookBranches()
+  return split(system("git --git-dir=/Users/quinn/Dropbox/book/src/.git --work-tree=/Users/quinn/Dropbox/book/src branch -a | cut -c3-"))
+endfunction
+
+function s:f.bookSrcFiles()
+  return split(system("cd /Users/quinn/Dropbox/book/src; find main test -name \*.scala -o -name \*.conf -o -name \*.java"))
+endfunction
+
 XPT tt wrap=text hint=\\texttt{...}
 \texttt{`text^}`cursor^
 
@@ -56,13 +66,16 @@ XPT fn hint=\\footnote{...}
 \footnote{`^}`cursor^
 
 XPT insertCodeFile hint=Inserts\ an\ entire\ code\ file
-\begin{lstlisting}[frame=b,caption=`caption^]
-INCLUDE_SOURCE_FILE{`branch^:`location^.scala}
+XSET branch|def=bookBranches()
+\begin{lstlisting}
+INCLUDE_SOURCE_FILE{`branch^:`location^}
 \end{lstlisting}
 
 XPT insertCodeSection hint=Inserts\ a\ section\ from\ a\ code\ file
-\begin{lstlisting}[frame=b,numbers=left,caption=`caption^]
-INCLUDE_SOURCE_FILE_SECTION{`branch^:`location^.scala,`section^}
+XSET branch|def=bookBranches()
+XSET location|def=bookSrcFiles()
+\begin{lstlisting}
+INCLUDE_SOURCE_FILE_SECTION{`branch^:`location^,`section^}
 \end{lstlisting}
 
 XPT e wrap=text hint=\\emph

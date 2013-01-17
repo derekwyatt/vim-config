@@ -4,6 +4,7 @@ XPTemplate priority=personal
 XPTinclude
     \ _common/personal
     \ _common/java
+    \ _printf/c.like
 
 XPTvar $BRif ' '
 XPTvar $BRloop ' '
@@ -111,3 +112,41 @@ public class `classname()^ extends UntypedActor {
         }
     }
 }
+
+XPT singleton hint=Canonical\ Singleton
+/**
+ * `classname()^
+ */
+public class `classname()^ {
+    /**
+     * The "Bill Pugh" solution:
+     * http://en.wikipedia.org/wiki/Singleton_pattern#The_solution_of_Bill_Pugh
+     */
+    private static class `classname()^Holder {
+        public static final `classname()^ instance = new `classname()^();
+    }
+
+    /**
+     * Constructor
+     */
+    private `classname()^() {
+        `cursor^
+    }
+
+    /**
+     * Retrieves the single instance of the `classname()^.
+     *
+     * @return The single instance of `classname()^.
+     */
+    public static `classname()^ getInstance() {
+        return `classname()^Holder.instance;
+    }
+}
+
+XPT _printfElts hidden 
+XSET elts|pre=Echo('')
+XSET elts=c_printf_elts( R( 'pattern' ), ',' )
+"`pattern^"`elts^
+
+XPT sformat hint=String.format\(""...\)
+String.format(`:_printfElts:^)
