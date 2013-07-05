@@ -43,9 +43,9 @@ set noignorecase
 " set the forward slash to be the slash of note.  Backslashes suck
 set shellslash
 if has("unix")
-    set shell=bash
+  set shell=bash
 else
-    set shell=ksh.exe
+  set shell=ksh.exe
 endif
 
 " Make command line two lines high
@@ -250,24 +250,13 @@ nmap <silent> <C-i> 10zh
 " Add a GUID to the current line
 imap <C-J>d <C-r>=substitute(system("uuidgen"), '.$', '', 'g')<CR>
 
-" Search the current file for what's currently in the search register and display matches
-nmap <silent> ,gs :vimgrep /<C-r>// %<CR>:ccl<CR>:cwin<CR><C-W>J:nohls<CR>
-
-" Search the current file for the word under the cursor and display matches
-nmap <silent> ,gw :vimgrep /<C-r><C-w>/ %<CR>:ccl<CR>:cwin<CR><C-W>J:nohls<CR>
-
-" Search the current file for the WORD under the cursor and display matches
-nmap <silent> ,gW :vimgrep /<C-r><C-a>/ %<CR>:ccl<CR>:cwin<CR><C-W>J:nohls<CR>
-
-" Swap two words
-nmap <silent> gw :s/\(\%#\w\+\)\(\_W\+\)\(\w\+\)/\3\2\1/<CR>`'
-
 " Toggle fullscreen mode
 nmap <silent> <F3> :call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
 
 " Underline the current line with '='
 nmap <silent> ,u= :t.\|s/./=/g\|:nohls<cr>
 nmap <silent> ,u- :t.\|s/./-/g\|:nohls<cr>
+nmap <silent> ,u~ :t.\|s/./\\~/g\|:nohls<cr>
 
 " Shrink the current window to fit the number of lines in the buffer.  Useful
 " for those buffers that are only a few lines
@@ -359,42 +348,19 @@ else
 endif
 
 "-----------------------------------------------------------------------------
-" Perforce Stuff
+" Fugitive
 "-----------------------------------------------------------------------------
-let g:p4DefaultDiffOptions = '-dwb'
-let g:p4EnableRuler = 1
-let g:p4EnableMenu = 0
-let g:p4EnableActiveStatus = 0
-let g:p4OptimizeActiveStatus = 1
-let g:p4EnableFileChangedShell = 0
-let g:p4DefaultListSize = 1000
-let g:p4UseVimDiff2 = 1
-let g:p4UseVimDiff = 1
-let g:p4Autoread = -1
-let g:p4PromptToCheckout = 0
-let g:no_plugin_maps = 1
-let g:loaded_perforcemenu = 1
+" Thanks to Drew Neil
+autocmd User fugitive
+  \ if fugitive#buffer().type() =~# '^\%(tree\|blob\)$' |
+  \  noremap <buffer> .. :edit %:h<cr> |
+  \ endif
+autocmd BufReadPost fugitive://* set bufhidden=delete
 
-nmap <silent> ,co :PO<CR>
-if has("unix")
-    nmap <silent> ,ce :execute ":!p4 edit " . resolve(expand("%:p")) . "&"<CR>
-    nmap <silent> ,cr :execute ":!p4 revert " . resolve(expand("%:p")) . "&"<CR>
-    nmap <silent> ,ca :execute ":!p4 add " . resolve(expand("%:p")) . "&"<CR>
-else
-    nmap <silent> ,ce :!start p4 edit %:p<CR>
-    nmap <silent> ,cr :!start p4 revert %:p<CR>
-    nmap <silent> ,ca :!start p4 add %:p<CR>
-endif
-nmap <silent> ,cf :PFilelog<CR>
-nmap <silent> ,cD :'a,.PFilelogDiff<CR>
-nmap <silent> ,zz :nmap <buffer><CR>
-command! DiffPre :PD2 #-1 #-0
-command! PendingChanges :PF changes -s pending -u dwyatt -m -l <args>
-command! MyChanges :PF changes -u dwyatt -m -l <args>
-
-" Initial path seeding
-set path=
-set tags=
+nmap ,gs :Gstatus<cr>
+nmap ,ge :Gedit<cr>
+nmap ,gw :Gwrite<cr>
+nmap ,gr :Gread<cr>
 
 "-----------------------------------------------------------------------------
 " NERD Tree Plugin Settings
@@ -474,7 +440,7 @@ let g:SokobanLevelDirectory = "/home/dwyatt/.vim/bundle/vim-sokoban/VimSokoban/"
 "-----------------------------------------------------------------------------
 " FuzzyFinder Settings
 "-----------------------------------------------------------------------------
-let g:fuf_file_exclude = '\v\~$|\.(o|exe|dll|bak|class|meta|lock|orig|jar|swp)$|/test/data\.|(^|[/\\])\.(svn|hg|git|bzr)($|[/\\])'
+let g:fuf_file_exclude .= '|/$|/target/'
 let g:fuf_splitPathMatching = 1
 let g:fuf_maxMenuWidth = 110
 let g:fuf_timeFormat = ''
@@ -482,22 +448,35 @@ nmap <silent> ,fv :FufFile ~/.vim/<cr>
 nmap <silent> ,fc :FufMruCmd<cr>
 nmap <silent> ,fm :FufMruFile<cr>
 
-"-----------------------------------------------------------------------------
-" FuzzyFinder Settings
-"-----------------------------------------------------------------------------
 function! GetParentOfSourceDirectory()
   let fwd = expand('%:p:h')
   let srcparent = substitute(fwd, '/[^/]*/src/.*', '', '')
   return srcparent
 endfunction
 
+function! GetProjectRoot(from)
+  let dir = split(a:from, "/")
+  let found = 0
+  while found == 0 && len(dir) != 0
+    let tempdir = "/" . join(dir, "/")
+    if filereadable(tempdir . "/.fuf.project.root")
+      return tempdir
+    endif
+    let dir = dir[0:-2]
+  endwhile
+  echoerr "Unable to locate project root (can't find .fuf.project.root file)"
+  return ""
+endfunction
+
 set wildignore+=*.o,*.class,.git,.svn
 let g:CommandTMatchWindowAtTop = 1
+let g:make_scala_fuf_mappings = 0
 nmap <silent> ,fb :FufBuffer<cr>
-nmap <silent> ,ff :FufFile<cr>
+nmap <silent> ,ff :let targetFufDirectory=expand('%:p:h')<cr>:cd <c-r>=GetProjectRoot(expand('%:p:h'))<cr><cr>:FufFile <c-r>=targetFufDirectory<cr>/**/<cr>
 nmap <silent> ,fp :FufFile ~/primal/platform/trunk/**/<cr>
 nmap <silent> ,fB :FufFile ~/primal/platform/branches/async-synth-engine-wip/**/<cr>
 nmap <silent> ,fs :exec ":FufFile " . GetParentOfSourceDirectory() . "/**/"<cr>
+nmap <silent> ,fr :cd <c-r>=GetProjectRoot(expand('%:p:h'))<cr><cr>:FufFile **/<cr>
 
 "-----------------------------------------------------------------------------
 " SVN Helpers
@@ -533,32 +512,32 @@ let g:ConqueTerm_TERM = 'xterm'
 " Functions
 "-----------------------------------------------------------------------------
 if !exists('g:bufferJumpList')
-    let g:bufferJumpList = {}
+  let g:bufferJumpList = {}
 endif
 
 function! MarkBufferInJumpList(bufstr, letter)
-    let g:bufferJumpList[a:letter] = a:bufstr
+  let g:bufferJumpList[a:letter] = a:bufstr
 endfunction
 
 function! JumpToBufferInJumpList(letter)
-    if has_key(g:bufferJumpList, a:letter)
-        exe ":buffer " . g:bufferJumpList[a:letter]
-    else
-        echoerr a:letter . " isn't mapped to any existing buffer"
-    endif
+  if has_key(g:bufferJumpList, a:letter)
+    exe ":buffer " . g:bufferJumpList[a:letter]
+  else
+    echoerr a:letter . " isn't mapped to any existing buffer"
+  endif
 endfunction
 
 function! ListJumpToBuffers()
-    for key in keys(g:bufferJumpList)
-        echo key . " = " . g:bufferJumpList[key]
-    endfor
+  for key in keys(g:bufferJumpList)
+    echo key . " = " . g:bufferJumpList[key]
+  endfor
 endfunction
 
 function! IndentToNextBraceInLineAbove()
-    :normal 0wk
-    :normal "vyf(
-    let @v = substitute(@v, '.', ' ', 'g')
-    :normal j"vPl
+  :normal 0wk
+  :normal "vyf(
+  let @v = substitute(@v, '.', ' ', 'g')
+  :normal j"vPl
 endfunction
 
 nmap <silent> ,ii :call IndentToNextBraceInLineAbove()<cr>
@@ -580,112 +559,112 @@ nmap <silent> ,jbg :call JumpToBufferInJumpList('g')<cr>
 nmap <silent> ,ljb :call ListJumpToBuffers()<cr>
 
 function! DiffCurrentFileAgainstAnother(snipoff, replacewith)
-    let currentFile = expand('%:p')
-    let otherfile = substitute(currentFile, "^" . a:snipoff, a:replacewith, '')
-    only
-    execute "vertical diffsplit " . otherfile
+  let currentFile = expand('%:p')
+  let otherfile = substitute(currentFile, "^" . a:snipoff, a:replacewith, '')
+  only
+  execute "vertical diffsplit " . otherfile
 endfunction
 
 command! -nargs=+ DiffCurrent call DiffCurrentFileAgainstAnother(<f-args>)
 
 function! RunSystemCall(systemcall)
-    let output = system(a:systemcall)
-    let output = substitute(output, "\n", '', 'g')
-    return output
+  let output = system(a:systemcall)
+  let output = substitute(output, "\n", '', 'g')
+  return output
 endfunction
 
 function! HighlightAllOfWord(onoff)
-    if a:onoff == 1
-        :augroup highlight_all
-            :au!
-            :au CursorMoved * silent! exe printf('match Search /\<%s\>/', expand('<cword>'))
-        :augroup END
-    else
-        :au! highlight_all
-        match none /\<%s\>/
-    endif
+  if a:onoff == 1
+    :augroup highlight_all
+    :au!
+    :au CursorMoved * silent! exe printf('match Search /\<%s\>/', expand('<cword>'))
+    :augroup END
+  else
+    :au! highlight_all
+    match none /\<%s\>/
+  endif
 endfunction
 
 :nmap ,ha :call HighlightAllOfWord(1)<cr>
 :nmap ,hA :call HighlightAllOfWord(0)<cr>
 
 function! LengthenCWD()
-	let cwd = getcwd()
-    if cwd == '/'
-        return
-    endif
-	let lengthend = substitute(cwd, '/[^/]*$', '', '')
-    if lengthend == ''
-        let lengthend = '/'
-    endif
-    if cwd != lengthend
-	    exec ":lcd " . lengthend
-	endif
+  let cwd = getcwd()
+  if cwd == '/'
+    return
+  endif
+  let lengthend = substitute(cwd, '/[^/]*$', '', '')
+  if lengthend == ''
+    let lengthend = '/'
+  endif
+  if cwd != lengthend
+    exec ":lcd " . lengthend
+  endif
 endfunction
 
 :nmap ,ld :call LengthenCWD()<cr>
 
 function! ShortenCWD()
-	let cwd = split(getcwd(), '/')
-	let filedir = split(expand("%:p:h"), '/')
-    let i = 0
-    let newdir = ""
-    while i < len(filedir)
-        let newdir = newdir . "/" . filedir[i]
-        if len(cwd) == i || filedir[i] != cwd[i]
-            break
-        endif
-        let i = i + 1
-    endwhile
-    exec ":lcd /" . newdir
+  let cwd = split(getcwd(), '/')
+  let filedir = split(expand("%:p:h"), '/')
+  let i = 0
+  let newdir = ""
+  while i < len(filedir)
+    let newdir = newdir . "/" . filedir[i]
+    if len(cwd) == i || filedir[i] != cwd[i]
+      break
+    endif
+    let i = i + 1
+  endwhile
+  exec ":lcd /" . newdir
 endfunction
 
 :nmap ,sd :call ShortenCWD()<cr>
 
 function! RedirToYankRegisterF(cmd, ...)
-    let cmd = a:cmd . " " . join(a:000, " ")
-    redir @*>
-    exe cmd
-    redir END
+  let cmd = a:cmd . " " . join(a:000, " ")
+  redir @*>
+  exe cmd
+  redir END
 endfunction
 
 command! -complete=command -nargs=+ RedirToYankRegister 
-  \ silent! call RedirToYankRegisterF(<f-args>)
+      \ silent! call RedirToYankRegisterF(<f-args>)
 
 function! ToggleMinimap()
-    if exists("s:isMini") && s:isMini == 0
-        let s:isMini = 1
-    else
-        let s:isMini = 0
-    end
+  if exists("s:isMini") && s:isMini == 0
+    let s:isMini = 1
+  else
+    let s:isMini = 0
+  end
 
-    if (s:isMini == 0)
-        " save current visible lines
-        let s:firstLine = line("w0")
-        let s:lastLine = line("w$")
+  if (s:isMini == 0)
+    " save current visible lines
+    let s:firstLine = line("w0")
+    let s:lastLine = line("w$")
 
-        " make font small
-        exe "set guifont=" . g:small_font
-        " highlight lines which were visible
-        let s:lines = ""
-        for i in range(s:firstLine, s:lastLine)
-            let s:lines = s:lines . "\\%" . i . "l"
+    " make font small
+    exe "set guifont=" . g:small_font
+    " highlight lines which were visible
+    let s:lines = ""
+    for i in range(s:firstLine, s:lastLine)
+      let s:lines = s:lines . "\\%" . i . "l"
 
-            if i < s:lastLine
-                let s:lines = s:lines . "\\|"
-            endif
-        endfor
+      if i < s:lastLine
+        let s:lines = s:lines . "\\|"
+      endif
+    endfor
 
-        exe 'match Visible /' . s:lines . '/'
-        hi Visible guibg=lightblue guifg=black term=bold
-        nmap <s-j> 10j
-        nmap <s-k> 10k
-    else
-        exe "set guifont=" . g:main_font
-        hi clear Visible
-        nunmap <s-j>
-        nunmap <s-k>
-    endif
+    exe 'match Visible /' . s:lines . '/'
+    hi Visible guibg=lightblue guifg=black term=bold
+    nmap <s-j> 10j
+    nmap <s-k> 10k
+  else
+    exe "set guifont=" . g:main_font
+    hi clear Visible
+    nunmap <s-j>
+    nunmap <s-k>
+  endif
 endfunction
 
 command! ToggleMinimap call ToggleMinimap()
@@ -697,20 +676,20 @@ command! ToggleMinimap call ToggleMinimap()
 " Commands
 "-----------------------------------------------------------------------------
 function! FreemindToListF()
-    setl filetype=
-    silent! :%s/^\(\s*\).*TEXT="\([^"]*\)".*$/\1- \2/
-    silent! :g/^\s*</d
-    silent! :%s/&quot;/"/g
-    silent! :%s/&apos;/\'/g
-    silent! g/^-/s/- //
-    silent! g/^\w/t.|s/./=/g
-    silent! g/^\s*-/normal O
-    silent! normal 3GgqG
-    silent! %s/^\s\{4}\zs-/o/
-    silent! %s/^\s\{12}\zs-/+/
-    silent! %s/^\s\{16}\zs-/*/
-    silent! %s/^\s\{20}\zs-/#/
-    silent! normal gg
+  setl filetype=
+  silent! :%s/^\(\s*\).*TEXT="\([^"]*\)".*$/\1- \2/
+  silent! :g/^\s*</d
+  silent! :%s/&quot;/"/g
+  silent! :%s/&apos;/\'/g
+  silent! g/^-/s/- //
+  silent! g/^\w/t.|s/./=/g
+  silent! g/^\s*-/normal O
+  silent! normal 3GgqG
+  silent! %s/^\s\{4}\zs-/o/
+  silent! %s/^\s\{12}\zs-/+/
+  silent! %s/^\s\{16}\zs-/*/
+  silent! %s/^\s\{20}\zs-/#/
+  silent! normal gg
 endfunction
 
 command! FreemindToList call FreemindToListF()
@@ -719,9 +698,9 @@ command! FreemindToList call FreemindToListF()
 " Auto commands
 "-----------------------------------------------------------------------------
 augroup derek_xsd
-    au!
-    au BufEnter *.xsd,*.wsdl,*.xml setl tabstop=4 shiftwidth=4
-    au BufEnter *.xsd,*.wsdl,*.xml setl formatoptions=crq textwidth=120 colorcolumn=120
+  au!
+  au BufEnter *.xsd,*.wsdl,*.xml setl tabstop=4 shiftwidth=4
+  au BufEnter *.xsd,*.wsdl,*.xml setl formatoptions=crq textwidth=120 colorcolumn=120
 augroup END
 
 augroup Binary
@@ -782,20 +761,20 @@ iab teh        the
 "-----------------------------------------------------------------------------
 if has("gui_running")
   exe "set guifont=" . g:main_font
-  if hostname() == "dqw-linux"
-    set background=light
-  else
-    set background=dark
-  endif
-  colorscheme solarized
+  "if hostname() == "dqw-linux"
+  "  set background=light
+  "else
+  "  set background=dark
+  "endif
+  colorscheme xoria256
   if !exists("g:vimrcloaded")
-      winpos 0 0
-      if !&diff
-          winsize 130 120
-      else
-          winsize 227 120
-      endif
-      let g:vimrcloaded = 1
+    winpos 0 0
+    if !&diff
+      winsize 130 120
+    else
+      winsize 227 120
+    endif
+    let g:vimrcloaded = 1
   endif
 endif
 :nohls

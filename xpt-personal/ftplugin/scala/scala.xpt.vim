@@ -100,7 +100,7 @@ endfunction
 
 XPT app hint=object\ Main\ extends\ App\ {...}
 object `Main^ extends App {
-  `cursor^
+    `cursor^
 }
 
 XPT file hint=Standard\ Scala\ source\ file
@@ -138,7 +138,7 @@ import akka.actor._
 
 class MyActor extends Actor {
     def receive = {
-      case _ =>
+        case _ =>
     }
 }
 
@@ -156,16 +156,16 @@ XPT specfile hint=Creates\ a\ new\ Specs2\ test\ file
 import org.specs2.mutable._
 
 class `classname()^ extends Specification {
-  "`classNameFromSpec()^" should { //{1
-    "`spec^" in { //{2
-      `cursor^
-    } //}2
-  } //}1
+    "`classNameFromSpec()^" should { //{1
+        "`spec^" in { //{2
+            `cursor^
+        } //}2
+    } //}1
 }
 
 XPT wrapin wrap=code hint=Wraps\ in\ a\ block
 `prefix^ {
-	`code^
+    `code^
 }
 
 XPT match hint=Creates\ a\ pattern\ matching\ sequence
@@ -176,50 +176,55 @@ XPT match hint=Creates\ a\ pattern\ matching\ sequence
 
 XPT spec hint=Creates\ a\ new\ specs2\ test
 "`spec^" in { //{2
-  `cursor^
+    `cursor^
 } //}2
 
 XPT wst hint=Creates\ a\ new\ WordSpec\ test
 "`spec^" in { //{2
-  `cursor^
+    `cursor^
 } //}2
 
 XPT groupwordspec hint=Creates\ a\ new\ WordSpec\ test\ group
 "`spec^" should { //{1
-  `cursor^
+    `cursor^
 } //}1
 
 XPT filewordspec hint=Creates\ a\ new\ WordSpec\ test\ file
+`getPackageLine()^
+
 import org.scalatest.{WordSpec, BeforeAndAfterEach, BeforeAndAfterAll}
 import org.scalatest.matchers.MustMatchers
 
 class `classname()^ extends WordSpec
-                     with BeforeAndAfterAll
-                     with BeforeAndAfterEach
-                     with MustMatchers {
-  `cursor^
+                    with BeforeAndAfterAll
+                    with BeforeAndAfterEach
+                    with MustMatchers {
+    "`classNameFromSpec()^" should { //{1
+        `cursor^
+    } //}1
 }
+// vim:fdl=1:
 
 XPT eorp hint=envOrNone.orElse.propOrNone
 envOrNone("`Variable^").orElse(propOrNone("`property^"))
 
 XPT rcv hint=Akka\ Receive\ def
 def `receive^: Receive = {
-  `cursor^
+    `cursor^
 }
 
 XPT actor hint=Akka\ Actor\ class
 class `ActorName^ extends Actor {
-  def receive = {
-      `cursor^
-  }
+    def receive = {
+        `cursor^
+    }
 }
 
 XPT aactor hint=Anonymous\ Akka\ Actor
 actorOf(new Actor {
-  def receive = {
-      `cursor^
-  }
+    def receive = {
+        `cursor^
+    }
 })
 
 XPT akkaimp hint=Common\ Akka\ Imports
@@ -247,23 +252,23 @@ XPT package hint=package\ for\ this\ file
 XPT akkatest hint=Test\ file\ for\ Akka\ code
 `getPackageLine()^
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Props, Actor, ActorRef}
 import akka.testkit.{TestKit, ImplicitSender}
 import org.scalatest.{WordSpec, BeforeAndAfterAll}
 import org.scalatest.matchers.MustMatchers
 
 class `classname()^ extends TestKit(ActorSystem("`classname()^"))
-           with ImplicitSender
-           with WordSpec
-           with BeforeAndAfterAll
-           with MustMatchers {
+            with ImplicitSender
+            with WordSpec
+            with BeforeAndAfterAll
+            with MustMatchers {
 
     override def afterAll() {
-      system.shutdown()
+        system.shutdown()
     }
 
     "`classNameFromSpec()^" should { //{1
-      `cursor^
+        `cursor^
     } //}1
 }
 
@@ -277,20 +282,20 @@ import org.scalatest.{WordSpec, BeforeAndAfterAll}
 import org.scalatest.matchers.MustMatchers
 
 object `multijvmObject()^ extends AbstractRemoteActorMultiJvmSpec { //{2
-  override def NrOfNodes = `numberOfNodes^
-  def commonConfig = ConfigFactory.parseString("""
-     akka.actor.provider = "akka.remote.RemoteActorRefProvider",
-     akka.remote.transport = "akka.remote.netty.NettyRemoteTransport"
+    override def NrOfNodes = `numberOfNodes^
+    def commonConfig = ConfigFactory.parseString("""
+        akka.actor.provider = "akka.remote.RemoteActorRefProvider",
+        akka.remote.transport = "akka.remote.netty.NettyRemoteTransport"
     """) 
 } //{2
 
 trait `multijvmBase()^ extends WordSpec //{2
-                              with BeforeAndAfterAll
-                              with MustMatchers {
-  override def beforeAll(configMap: Map[String, Any]) {
-  }
-  override def afterAll(configMap: Map[String, Any]) {
-  }
+                                with BeforeAndAfterAll
+                                with MustMatchers {
+    override def beforeAll(configMap: Map[String, Any]) {
+    }
+    override def afterAll(configMap: Map[String, Any]) {
+    }
 } //{2
 
 `expandNodes...^
@@ -302,3 +307,19 @@ XPT bookblock wrap=code hint=Wraps\ a\ block\ of\ code\ in\ BEGIN/END
 // FILE_SECTION_BEGIN{`name^}
 `code^
 // FILE_SECTION_END{`name^}
+
+XPT mod hint=New\ module\ for\ dependency
+"`groupId^" % "`artifactId^" % "`revision^"
+
+XPT dep hint=libraryDependencies\ ++=\ Seq\(...\)
+libraryDependencies ++= Seq(
+    "`groupId^" % "`artifactId^" % "`revision^"
+)
+
+XPT aspectMessage hint=Primal\ Aspect\ Message\ Type
+case class `messageName^(`...^`attrName^: `type^`...^) extends ToJsonConvertable {
+    def convertToJson: JsValue = `messageName^.jsf.write(this)
+}
+object `messageName^ extends JsValueUnapply`num^[`messageName^, `types^] {
+    val jsfHelper = jsonFormat`num^(`messageName^.apply)
+}
