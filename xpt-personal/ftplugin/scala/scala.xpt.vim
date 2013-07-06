@@ -190,6 +190,8 @@ XPT groupwordspec hint=Creates\ a\ new\ WordSpec\ test\ group
 } //}1
 
 XPT filewordspec hint=Creates\ a\ new\ WordSpec\ test\ file
+`getPackageLine()^
+
 import org.scalatest.{WordSpec, BeforeAndAfterEach, BeforeAndAfterAll}
 import org.scalatest.matchers.MustMatchers
 
@@ -197,7 +199,10 @@ class `classname()^ extends WordSpec
                      with BeforeAndAfterAll
                      with BeforeAndAfterEach
                      with MustMatchers {
-  `cursor^
+
+    "`classNameFromSpec()^" should { //{1
+      `cursor^
+    } //}1
 }
 
 XPT eorp hint=envOrNone.orElse.propOrNone
