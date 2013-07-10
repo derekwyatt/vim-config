@@ -440,9 +440,9 @@ function! GetSrcDirForFuzzyFinder(from)
     return GetDirForFuzzyFinder(from, 'src/')
 endfunction
 
-nnoremap <buffer> <silent> ,ft :FufFile <c-r>=GetTestDirForFuzzyFinder('%:p:h')<cr><cr>
-nnoremap <buffer> <silent> ,fi :FufFile <c-r>=GetIncludeDirForFuzzyFinder('%:p:h')<cr><cr>
-nnoremap <buffer> <silent> ,fs :FufFile <c-r>=GetSrcDirForFuzzyFinder('%:p:h')<cr><cr>
+"nnoremap <buffer> <silent> ,ft :FufFile <c-r>=GetTestDirForFuzzyFinder('%:p:h')<cr><cr>
+"nnoremap <buffer> <silent> ,fi :FufFile <c-r>=GetIncludeDirForFuzzyFinder('%:p:h')<cr><cr>
+"nnoremap <buffer> <silent> ,fs :FufFile <c-r>=GetSrcDirForFuzzyFinder('%:p:h')<cr><cr>
 
 "
 " ProtoDef Settings

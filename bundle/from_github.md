@@ -1,5 +1,6 @@
 # Stuff pulled from GitHub
 
+* **AutoTags**:      `git clone https://github.com/vim-scripts/autotags.git vim-autotags`
 * **Blogit**:        `git clone https://github.com/vim-scripts/blogit.vim.git vim-blogit`
 * **BufKill**:       `git clone https://github.com/vim-scripts/bufkill.vim.git vim-bufkill`
 * **Completion**:    `git clone https://github.com/MarcWeber/vim-addon-completion.git vim-completion`

@@ -340,7 +340,7 @@ set nocursorline
 set nocursorcolumn
 
 if has("mac")
-  let g:main_font = "Anonymous\\ Pro:h16"
+  let g:main_font = "Anonymous\\ Pro:h12"
   let g:small_font = "Anonymous\\ Pro:h2"
 else
   let g:main_font = "DejaVu\\ Sans\\ Mono\\ 9"
@@ -472,9 +472,8 @@ set wildignore+=*.o,*.class,.git,.svn
 let g:CommandTMatchWindowAtTop = 1
 let g:make_scala_fuf_mappings = 0
 nmap <silent> ,fb :FufBuffer<cr>
+nmap <silent> ,ft :FufTag<cr>
 nmap <silent> ,ff :let targetFufDirectory=expand('%:p:h')<cr>:cd <c-r>=GetProjectRoot(expand('%:p:h'))<cr><cr>:FufFile <c-r>=targetFufDirectory<cr>/**/<cr>
-nmap <silent> ,fp :FufFile ~/primal/platform/trunk/**/<cr>
-nmap <silent> ,fB :FufFile ~/primal/platform/branches/async-synth-engine-wip/**/<cr>
 nmap <silent> ,fs :exec ":FufFile " . GetParentOfSourceDirectory() . "/**/"<cr>
 nmap <silent> ,fr :cd <c-r>=GetProjectRoot(expand('%:p:h'))<cr><cr>:FufFile **/<cr>
 
@@ -493,6 +492,15 @@ nmap ,dd :call VCSDiffMore(0)<cr>
 "  let revisions = system("svn log " . f)
 "  let buffer = bufnr('%')
 "endfunction
+
+"-----------------------------------------------------------------------------
+" Autotags Settings
+"-----------------------------------------------------------------------------
+let g:autotags_no_global = 0
+let g:autotags_ctags_opts = "--exclude=target --exclude=vendor"
+let g:autotags_ctags_languages = "+Scala,+Java,+Vim"
+let g:autotags_ctags_langmap = "Scala:.scala,Java:.java,Vim:.vim,JavaScript:.js"
+let g:autotags_ctags_global_include = ""
 
 "-----------------------------------------------------------------------------
 " Gundo Settings
