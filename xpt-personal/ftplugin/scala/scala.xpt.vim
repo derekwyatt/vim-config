@@ -324,3 +324,9 @@ case class `messageName^(`...^`attrName^: `type^`...^) extends ToJsonConvertable
 object `messageName^ extends JsValueUnapply`num^[`messageName^, `types^] {
     val jsfHelper = jsonFormat`num^(`messageName^.apply)
 }
+
+XPT be hint=x\ must\ be\ \(y\)
+`object^ must be (`target^)
+
+XPT notbe hint=x\ must\ not\ be\ \(y\)
+`object^ must not be (`target^)

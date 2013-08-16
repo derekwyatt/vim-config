@@ -389,6 +389,13 @@ if has("mac")
 endif
 
 "-----------------------------------------------------------------------------
+" L9 mappings
+"-----------------------------------------------------------------------------
+" L9 creates an 'interesting' set of error formats when quickfix is engaged
+" This mapping cleans it up
+nmap <silent> ,eu :sign unplace *<cr>
+
+"-----------------------------------------------------------------------------
 " FSwitch mappings
 "-----------------------------------------------------------------------------
 nmap <silent> ,of :FSHere<CR>
@@ -440,7 +447,7 @@ let g:SokobanLevelDirectory = "/home/dwyatt/.vim/bundle/vim-sokoban/VimSokoban/"
 "-----------------------------------------------------------------------------
 " FuzzyFinder Settings
 "-----------------------------------------------------------------------------
-let g:fuf_file_exclude .= '|/$|/target/'
+"let g:fuf_file_exclude .= '|/$|/target/'
 let g:fuf_splitPathMatching = 1
 let g:fuf_maxMenuWidth = 110
 let g:fuf_timeFormat = ''
