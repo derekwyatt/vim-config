@@ -13,14 +13,10 @@
 * **GNUPG**:         `git clone https://github.com/vim-scripts/gnupg.vim.git vim-gnupg`
 * **Gundo**:         `git clone https://github.com/sjl/gundo.vim.git vim-gundo`
 * **JSON**:          `git clone https://github.com/vim-scripts/vim-addon-json-encoding.git vim-json`
-* **Jade**:          `git clone https://github.com/vim-scripts/jade.vim.git vim-jade`
-* **JavaScript**:    `git clone https://github.com/pangloss/vim-javascript.git vim-javascript`
 * **Jellybeans**:    `git clone https://github.com/nanotech/jellybeans.vim.git vim-jellybeans`
 * **L9**:            `git clone https://github.com/vim-scripts/L9.git vim-l9`
 * **MWUtils**:       `git clone https://github.com/MarcWeber/vim-addon-mw-utils.git vim-mwutils`
 * **NERDTree**:      `git clone https://github.com/scrooloose/nerdtree.git vim-nerdtree`
-* **Neocomplcache**: `git clone https://github.com/Shougo/neocomplcache.git vim-neocomplcache`
-* **OrgMode**:       `git clone https://github.com/jceb/vim-orgmode.git vim-orgmode`
 * **Protodef**:      `git clone https://github.com/derekwyatt/vim-protodef.git vim-protodef`
 * **SBT**:           `git clone https://github.com/derekwyatt/vim-sbt.git vim-sbt`
 * **Scala**:         `git clone https://github.com/derekwyatt/vim-scala.git vim-scala`
@@ -32,5 +28,4 @@
 * **Unimpaired**:    `git clone https://github.com/tpope/vim-unimpaired.git vim-unimpaired`
 * **VimProc**:       `git clone https://github.com/Shougo/vimproc.git vim-vimproc`
 * **VimShell**:      `git clone https://github.com/Shougo/vimshell.git vim-vimshell`
-* **Vimside**:       `git clone https://github.com/derekwyatt/vimside.git vim-vimside`
 * **XPTemplate**:    `git clone https://github.com/drmingdrmer/xptemplate.git vim-xptemplate`

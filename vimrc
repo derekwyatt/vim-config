@@ -447,7 +447,6 @@ let g:SokobanLevelDirectory = "/home/dwyatt/.vim/bundle/vim-sokoban/VimSokoban/"
 "-----------------------------------------------------------------------------
 " FuzzyFinder Settings
 "-----------------------------------------------------------------------------
-"let g:fuf_file_exclude .= '|/$|/target/'
 let g:fuf_splitPathMatching = 1
 let g:fuf_maxMenuWidth = 110
 let g:fuf_timeFormat = ''
@@ -494,11 +493,6 @@ function! VCSDiffMore(from)
   exec ":VCSVimDiff " . revisions[a:from]
 endfunction
 nmap ,dd :call VCSDiffMore(0)<cr>
-"function! ShowSVNRevisions()
-"  let f = expand('%:p')
-"  let revisions = system("svn log " . f)
-"  let buffer = bufnr('%')
-"endfunction
 
 "-----------------------------------------------------------------------------
 " Autotags Settings
