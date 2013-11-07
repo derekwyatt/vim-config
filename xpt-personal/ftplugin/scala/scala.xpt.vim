@@ -98,10 +98,12 @@ function! s:f.getPackageLine(...)
     endif
 endfunction
 
-XPT app hint=object\ Main\ extends\ App\ {...}
-object `Main^ extends App {
-    `cursor^
-}
+function! s:f.getCurrentDir(...)
+  return expand('%:p:h:t')
+endfunction
+
+XPT impakka hint=Imports\ basic\ akka\ stuff
+import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 
 XPT file hint=Standard\ Scala\ source\ file
 //
@@ -117,6 +119,11 @@ object `objectName^ {
     def main(args: Array[String]) {
         `cursor^
     }
+}
+
+XPT app hint=Creates\ an\ "App"\ object
+object `classname()^ extends App {
+    `cursor^
 }
 
 XPT afun hint=Creates\ an\ anonymous\ function
@@ -192,16 +199,11 @@ XPT groupwordspec hint=Creates\ a\ new\ WordSpec\ test\ group
 XPT filewordspec hint=Creates\ a\ new\ WordSpec\ test\ file
 `getPackageLine()^
 
-import org.scalatest.{WordSpec, BeforeAndAfterEach, BeforeAndAfterAll}
-import org.scalatest.matchers.MustMatchers
+import org.scalatest.{WordSpec, Matchers}
 
-class `classname()^ extends WordSpec
-                     with BeforeAndAfterAll
-                     with BeforeAndAfterEach
-                     with MustMatchers {
-
+class `classname()^ extends WordSpec with Matchers {
     "`classNameFromSpec()^" should { //{1
-      `cursor^
+        `cursor^
     } //}1
 }
 // vim:fdl=1:
@@ -215,7 +217,7 @@ def `receive^: Receive = {
 }
 
 XPT actor hint=Akka\ Actor\ class
-class `ActorName^ extends Actor {
+class `ActorName^ extends Actor with ActorLogging {
     def receive = {
         `cursor^
     }
@@ -310,23 +312,24 @@ XPT bookblock wrap=code hint=Wraps\ a\ block\ of\ code\ in\ BEGIN/END
 // FILE_SECTION_END{`name^}
 
 XPT mod hint=New\ module\ for\ dependency
-"`groupId^" % "`artifactId^" % "`revision^"
-
-XPT dep hint=libraryDependencies\ ++=\ Seq\(...\)
-libraryDependencies ++= Seq(
-    "`groupId^" % "`artifactId^" % "`revision^"
-)
-
-XPT aspectMessage hint=Primal\ Aspect\ Message\ Type
-case class `messageName^(`...^`attrName^: `type^`...^) extends ToJsonConvertable {
-    def convertToJson: JsValue = `messageName^.jsf.write(this)
-}
-object `messageName^ extends JsValueUnapply`num^[`messageName^, `types^] {
-    val jsfHelper = jsonFormat`num^(`messageName^.apply)
-}
+"`groupId^" `%%^ "`artifactId^" % "`revision^"
 
 XPT be hint=x\ must\ be\ \(y\)
 `object^ must be (`target^)
 
 XPT notbe hint=x\ must\ not\ be\ \(y\)
 `object^ must not be (`target^)
+
+XPT sbt hint=Creates\ a\ new\ build.sbt\ file
+XSET name|def=getCurrentDir()
+name := "`name^"
+
+version := "`0.1^"
+
+scalaVersion := "`2.10.3^"
+`^
+
+XPT dep hint=libraryDependencies\ :=\ Seq\(...\)
+libraryDependencies := Seq(
+    "`groupId^" % "`artifactId^" % "`revision^"
+)
