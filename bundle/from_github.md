@@ -16,6 +16,7 @@
 * **JSON**:           `git clone https://github.com/vim-scripts/vim-addon-json-encoding.git vim-json`
 * **Jellybeans**:     `git clone https://github.com/nanotech/jellybeans.vim.git vim-jellybeans`
 * **L9**:             `git clone https://github.com/vim-scripts/L9.git vim-l9`
+* **MetaFuz:          `git clone https://github.com/derekwyatt/vim-metafuz.git vim-metafuz`
 * **MWUtils**:        `git clone https://github.com/MarcWeber/vim-addon-mw-utils.git vim-mwutils`
 * **NERDTree**:       `git clone https://github.com/scrooloose/nerdtree.git vim-nerdtree`
 * **Protodef**:       `git clone https://github.com/derekwyatt/vim-protodef.git vim-protodef`

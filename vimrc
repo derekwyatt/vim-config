@@ -165,6 +165,9 @@ set relativenumber
 " Let the syntax highlighting for Java files allow cpp keywords
 let java_allow_cpp_keywords = 1
 
+" I don't want to have the default keymappings for my scala plugin evaluated
+let g:scala_use_default_keymappings = 0
+
 " System default for mappings is now the "," character
 let mapleader = ","
 
@@ -454,34 +457,9 @@ nmap <silent> ,fv :FufFile ~/.vim/<cr>
 nmap <silent> ,fc :FufMruCmd<cr>
 nmap <silent> ,fm :FufMruFile<cr>
 
-function! GetParentOfSourceDirectory()
-  let fwd = expand('%:p:h')
-  let srcparent = substitute(fwd, '/[^/]*/src/.*', '', '')
-  return srcparent
-endfunction
-
-function! GetProjectRoot(from)
-  let dir = split(a:from, "/")
-  let found = 0
-  while found == 0 && len(dir) != 0
-    let tempdir = "/" . join(dir, "/")
-    if filereadable(tempdir . "/.fuf.project.root")
-      return tempdir
-    endif
-    let dir = dir[0:-2]
-  endwhile
-  echoerr "Unable to locate project root (can't find .fuf.project.root file)"
-  return ""
-endfunction
-
 set wildignore+=*.o,*.class,.git,.svn
 let g:CommandTMatchWindowAtTop = 1
 let g:make_scala_fuf_mappings = 0
-nmap <silent> ,fb :FufBuffer<cr>
-nmap <silent> ,ft :FufTag<cr>
-nmap <silent> ,ff :let targetFufDirectory=expand('%:p:h')<cr>:cd <c-r>=GetProjectRoot(expand('%:p:h'))<cr><cr>:FufFile <c-r>=targetFufDirectory<cr>/**/<cr>
-nmap <silent> ,fs :exec ":FufFile " . GetParentOfSourceDirectory() . "/**/"<cr>
-nmap <silent> ,fr :cd <c-r>=GetProjectRoot(expand('%:p:h'))<cr><cr>:FufFile **/<cr>
 
 "-----------------------------------------------------------------------------
 " SVN Helpers
