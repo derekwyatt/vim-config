@@ -5,6 +5,7 @@
 * **BufKill**:        `git clone https://github.com/vim-scripts/bufkill.vim.git vim-bufkill`
 * **Completion**:     `git clone https://github.com/MarcWeber/vim-addon-completion.git vim-completion`
 * **ConfluenceWiki**: `git clone https://github.com/vim-scripts/confluencewiki.vim.git vim-confluence`
+* **CtrlP**:          `git clone https://github.com/kien/ctrlp.vim.git vim-ctrlp`
 * **EasyMotion**:     `git clone https://github.com/vim-scripts/EasyMotion.git vim-easymotion`
 * **EasyAlign**:      `git clone https://github.com/vim-scripts/vim-easy-align.git vim-easyalign`
 * **FSwitch**:        `git clone https://github.com/derekwyatt/vim-fswitch.git vim-fswitch`
