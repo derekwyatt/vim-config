@@ -158,6 +158,9 @@ set grepprg=grep\ -nH\ $*
 " I shouldn't give it another go :)
 set relativenumber
 
+" Types of files to ignore when autocompleting things
+set wildignore+=*.o,*.class,*.git,*.svn
+
 " dictionary for english words
 " I don't actually use this much at all and it makes my life difficult in general
 "set dictionary=$VIM/words.txt
@@ -457,9 +460,22 @@ nmap <silent> ,fv :FufFile ~/.vim/<cr>
 nmap <silent> ,fc :FufMruCmd<cr>
 nmap <silent> ,fm :FufMruFile<cr>
 
-set wildignore+=*.o,*.class,.git,.svn
 let g:CommandTMatchWindowAtTop = 1
 let g:make_scala_fuf_mappings = 0
+
+"-----------------------------------------------------------------------------
+" CtrlP Settings
+"-----------------------------------------------------------------------------
+let g:ctrlp_switch_buffer = 'E'
+let g:ctrlp_tabpage_position = 'c'
+let g:ctrlp_working_path_mode = 'rc'
+let g:ctrlp_root_markers = ['.project.root']
+let g:ctrlp_custom_ignore = '\v%(/\.%(git|hg|svn)|\.%(class|o)$|/target/)'
+let g:ctrlp_open_new_file = 'r'
+let g:ctrlp_open_multiple_files = '1ri'
+map ,fb :CtrlPBuffer<cr>
+map ,ff :CtrlP<cr>
+map ,fm :CtrlPMixed<cr>
 
 "-----------------------------------------------------------------------------
 " SVN Helpers
