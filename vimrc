@@ -473,8 +473,15 @@ let g:ctrlp_root_markers = ['.project.root']
 let g:ctrlp_custom_ignore = '\v%(/\.%(git|hg|svn)|\.%(class|o)$|/target/)'
 let g:ctrlp_open_new_file = 'r'
 let g:ctrlp_open_multiple_files = '1ri'
+let g:ctrlp_prompt_mappings = {
+  \ 'PrtSelectMove("j")':   ['<c-n>'],
+  \ 'PrtSelectMove("k")':   ['<c-p>'],
+  \ 'PrtHistory(-1)':       ['<c-j>', '<down>'],
+  \ 'PrtHistory(1)':        ['<c-i>', '<up>']
+\ }
 map ,fb :CtrlPBuffer<cr>
-map ,ff :CtrlP<cr>
+map ,ff :CtrlPFile<cr>
+map ,fr :CtrlP<cr>
 map ,fm :CtrlPMixed<cr>
 
 "-----------------------------------------------------------------------------
