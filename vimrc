@@ -480,7 +480,7 @@ let g:ctrlp_prompt_mappings = {
   \ 'PrtHistory(1)':        ['<c-i>', '<up>']
 \ }
 map ,fb :CtrlPBuffer<cr>
-map ,ff :CtrlPFile<cr>
+map ,ff :CtrlPCurFile<cr>
 map ,fr :CtrlP<cr>
 map ,fm :CtrlPMixed<cr>
 
