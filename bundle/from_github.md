@@ -1,23 +1,18 @@
 # Stuff pulled from GitHub
 
 * **AutoTags**:       `git clone https://github.com/vim-scripts/autotags.git vim-autotags`
-* **Blogit**:         `git clone https://github.com/vim-scripts/blogit.vim.git vim-blogit`
 * **BufKill**:        `git clone https://github.com/vim-scripts/bufkill.vim.git vim-bufkill`
 * **Completion**:     `git clone https://github.com/MarcWeber/vim-addon-completion.git vim-completion`
-* **ConfluenceWiki**: `git clone https://github.com/vim-scripts/confluencewiki.vim.git vim-confluence`
 * **CtrlP**:          `git clone https://github.com/kien/ctrlp.vim.git vim-ctrlp`
 * **EasyMotion**:     `git clone https://github.com/vim-scripts/EasyMotion.git vim-easymotion`
 * **EasyAlign**:      `git clone https://github.com/vim-scripts/vim-easy-align.git vim-easyalign`
 * **FSwitch**:        `git clone https://github.com/derekwyatt/vim-fswitch.git vim-fswitch`
 * **Forms**:          `git clone https://github.com/megaannum/forms.git vim-forms`
 * **Fugitive**:       `git clone https://github.com/tpope/vim-fugitive.git vim-fugitive`
-* **FuzzyFinder**:    `git clone https://github.com/vim-scripts/FuzzyFinder.git vim-fuzzyfinder`
 * **GNUPG**:          `git clone https://github.com/vim-scripts/gnupg.vim.git vim-gnupg`
 * **Gundo**:          `git clone https://github.com/sjl/gundo.vim.git vim-gundo`
-* **JSON**:           `git clone https://github.com/vim-scripts/vim-addon-json-encoding.git vim-json`
 * **Jellybeans**:     `git clone https://github.com/nanotech/jellybeans.vim.git vim-jellybeans`
-* **L9**:             `git clone https://github.com/vim-scripts/L9.git vim-l9`
-* **MetaFuz:          `git clone https://github.com/derekwyatt/vim-metafuz.git vim-metafuz`
+* **JSON**:           `git clone https://github.com/elzr/vim-json.git vim-json`
 * **MWUtils**:        `git clone https://github.com/MarcWeber/vim-addon-mw-utils.git vim-mwutils`
 * **NERDTree**:       `git clone https://github.com/scrooloose/nerdtree.git vim-nerdtree`
 * **Protodef**:       `git clone https://github.com/derekwyatt/vim-protodef.git vim-protodef`
