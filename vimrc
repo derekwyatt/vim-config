@@ -345,7 +345,10 @@ let loaded_matchparen = 1
 set nocursorline
 set nocursorcolumn
 
-if has("mac")
+if hostname() == "franklyn.local"
+  let g:main_font = "Anonymous\\ Pro:h18"
+  let g:small_font = "Anonymous\\ Pro:h2"
+elseif has("mac")
   let g:main_font = "Anonymous\\ Pro:h12"
   let g:small_font = "Anonymous\\ Pro:h2"
 else
@@ -771,11 +774,6 @@ iab teh        the
 "-----------------------------------------------------------------------------
 if has("gui_running")
   exe "set guifont=" . g:main_font
-  "if hostname() == "dqw-linux"
-  "  set background=light
-  "else
-  "  set background=dark
-  "endif
   colorscheme xoria256
   if !exists("g:vimrcloaded")
     winpos 0 0
