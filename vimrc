@@ -161,6 +161,11 @@ set relativenumber
 " Types of files to ignore when autocompleting things
 set wildignore+=*.o,*.class,*.git,*.svn
 
+" Various characters are "wider" than normal fixed width characters, but the
+" default setting of ambiwidth (single) squeezes them into "normal" width, which
+" sucks.  Setting it to double makes it awesome.
+set ambiwidth=double
+
 " dictionary for english words
 " I don't actually use this much at all and it makes my life difficult in general
 "set dictionary=$VIM/words.txt
