@@ -166,6 +166,11 @@ set wildignore+=*.o,*.class,*.git,*.svn
 " sucks.  Setting it to double makes it awesome.
 set ambiwidth=double
 
+" OK, so I'm gonna remove the VIM safety net for a while and see if kicks my ass
+set nobackup
+set nowritebackup
+set noswapfile
+
 " dictionary for english words
 " I don't actually use this much at all and it makes my life difficult in general
 "set dictionary=$VIM/words.txt

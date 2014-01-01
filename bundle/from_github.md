@@ -20,4 +20,5 @@
 * **Surround**:       `git clone https://github.com/tpope/vim-surround.git vim-surround`
 * **TwitVim**:        `git clone https://github.com/vim-scripts/TwitVim.git vim-twitvim`
 * **Unimpaired**:     `git clone https://github.com/tpope/vim-unimpaired.git vim-unimpaired`
+* **VisIncr**:        `git clone https://github.com/vim-scripts/VisIncr.git vim-visincr`
 * **XPTemplate**:     `git clone https://github.com/drmingdrmer/xptemplate.git vim-xptemplate`
