@@ -132,7 +132,7 @@ XPT afun hint=Creates\ an\ anonymous\ function
 }
 
 XPT cclass hint=Creates\ a\ case\ class
-case class `className^(`...^`val^ `attrName^: `type^`...^)
+case class `className^(`...^`attrName^: `type^`...^)
 
 XPT cobj hint=Creates\ a\ case\ object
 case object `objectName^

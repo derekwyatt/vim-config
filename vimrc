@@ -161,6 +161,16 @@ set relativenumber
 " Types of files to ignore when autocompleting things
 set wildignore+=*.o,*.class,*.git,*.svn
 
+" Various characters are "wider" than normal fixed width characters, but the
+" default setting of ambiwidth (single) squeezes them into "normal" width, which
+" sucks.  Setting it to double makes it awesome.
+set ambiwidth=double
+
+" OK, so I'm gonna remove the VIM safety net for a while and see if kicks my ass
+set nobackup
+set nowritebackup
+set noswapfile
+
 " dictionary for english words
 " I don't actually use this much at all and it makes my life difficult in general
 "set dictionary=$VIM/words.txt
@@ -345,7 +355,10 @@ let loaded_matchparen = 1
 set nocursorline
 set nocursorcolumn
 
-if has("mac")
+if hostname() == "franklyn.local"
+  let g:main_font = "Anonymous\\ Pro:h18"
+  let g:small_font = "Anonymous\\ Pro:h2"
+elseif has("mac")
   let g:main_font = "Anonymous\\ Pro:h12"
   let g:small_font = "Anonymous\\ Pro:h2"
 else
@@ -772,11 +785,6 @@ iab teh        the
 "-----------------------------------------------------------------------------
 if has("gui_running")
   exe "set guifont=" . g:main_font
-  "if hostname() == "dqw-linux"
-  "  set background=light
-  "else
-  "  set background=dark
-  "endif
   colorscheme xoria256
   if !exists("g:vimrcloaded")
     winpos 0 0
