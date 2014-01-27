@@ -23,6 +23,7 @@ function! s:f.getPackageForFile(...)
     let regexes = [
                 \   [ '/src/main/scala',      '/src/main/scala' ],
                 \   [ '/src/test/scala',      '/src/test/scala' ],
+                \   [ '/src/it/scala',        '/src/it/scala' ],
                 \   [ '/src/multi-jvm/scala', '/src/multi-jvm/scala' ],
                 \   [ '/app/model/scala',     '/app/model/scala' ],
                 \   [ '/app/controllers',     '/app' ],
@@ -257,14 +258,13 @@ XPT akkatest hint=Test\ file\ for\ Akka\ code
 
 import akka.actor.{ActorSystem, Props, Actor, ActorRef}
 import akka.testkit.{TestKit, ImplicitSender}
-import org.scalatest.{WordSpec, BeforeAndAfterAll}
-import org.scalatest.matchers.MustMatchers
+import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 
 class `classname()^ extends TestKit(ActorSystem("`classname()^"))
             with ImplicitSender
-            with WordSpec
+            with WordSpecLike
             with BeforeAndAfterAll
-            with MustMatchers {
+            with Matchers {
 
     override def afterAll() {
         system.shutdown()
@@ -331,5 +331,6 @@ scalaVersion := "`2.10.3^"
 
 XPT dep hint=libraryDependencies\ :=\ Seq\(...\)
 libraryDependencies := Seq(
-    "`groupId^" % "`artifactId^" % "`revision^"
+    "`groupId^" % "`artifactId^" % "`revision^",
+    "org.scalatest" %% "scalatest" % "2.0" % "test"
 )
