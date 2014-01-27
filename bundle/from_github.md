@@ -5,7 +5,6 @@
 * **Completion**:     `git clone https://github.com/MarcWeber/vim-addon-completion.git vim-completion`
 * **CtrlP**:          `git clone https://github.com/kien/ctrlp.vim.git vim-ctrlp`
 * **EasyMotion**:     `git clone https://github.com/vim-scripts/EasyMotion.git vim-easymotion`
-* **EasyAlign**:      `git clone https://github.com/vim-scripts/vim-easy-align.git vim-easyalign`
 * **FSwitch**:        `git clone https://github.com/derekwyatt/vim-fswitch.git vim-fswitch`
 * **Fugitive**:       `git clone https://github.com/tpope/vim-fugitive.git vim-fugitive`
 * **GNUPG**:          `git clone https://github.com/vim-scripts/gnupg.vim.git vim-gnupg`
@@ -18,6 +17,7 @@
 * **Scala**:          `git clone https://github.com/derekwyatt/vim-scala.git vim-scala`
 * **Solarized**:      `git clone https://github.com/altercation/vim-colors-solarized.git vim-solarized`
 * **Surround**:       `git clone https://github.com/tpope/vim-surround.git vim-surround`
+* **Tabular**:        `git clone https://github.com/godlygeek/tabular.git vim-tabular`
 * **TwitVim**:        `git clone https://github.com/vim-scripts/TwitVim.git vim-twitvim`
 * **Unimpaired**:     `git clone https://github.com/tpope/vim-unimpaired.git vim-unimpaired`
 * **VisIncr**:        `git clone https://github.com/vim-scripts/VisIncr.git vim-visincr`
