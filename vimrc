@@ -192,6 +192,7 @@ nmap <silent> ,p :set invpaste<CR>:set paste?<CR>
 
 " cd to the directory containing the file in the buffer
 nmap <silent> ,cd :lcd %:h<CR>
+nmap <silent> ,cr :lcd <c-r>=FindGitDirOrRoot()<cr><cr>
 nmap <silent> ,md :!mkdir -p %:p:h<CR>
 
 " Turn off that stupid highlight search
@@ -562,6 +563,16 @@ function! IndentToNextBraceInLineAbove()
   :normal "vyf(
   let @v = substitute(@v, '.', ' ', 'g')
   :normal j"vPl
+endfunction
+
+function! FindGitDirOrRoot()
+  let curdir = expand('%:p:h')
+  let gitdir = finddir('.git', curdir . ';')
+  if gitdir != ''
+    return substitute(gitdir, '\/\.git$', '', '')
+  else
+    return '/'
+  endif
 endfunction
 
 nmap <silent> ,ii :call IndentToNextBraceInLineAbove()<cr>

@@ -9,27 +9,31 @@ if !exists("*s:CodeOrTestFile")
   function! s:CodeOrTestFile(precmd)
   	let current = expand('%:p')
   	let other = current
+    let specExt = "Spec.scala"
+    if current =~ "/npl/"
+      let specExt = "Test.scala"
+    endif
   	if current =~ "/src/main/"
   		let other = substitute(current, "/main/", "/test/", "")
-  		let other = substitute(other, ".scala$", "Spec.scala", "")
+  		let other = substitute(other, ".scala$", specExt, "")
   	elseif current =~ "/src/test/"
   		let other = substitute(current, "/test/", "/main/", "")
-  		let other = substitute(other, "Spec.scala$", ".scala", "")
+  		let other = substitute(other, specExt . "$", ".scala", "")
   	elseif current =~ "/src/it/"
   		let other = substitute(current, "/it/", "/main/", "")
-  		let other = substitute(other, "Spec.scala$", ".scala", "")
+  		let other = substitute(other, specExt . "$", ".scala", "")
     elseif current =~ "/app/model/"
   		let other = substitute(current, "/app/model/", "/test/", "")
-  		let other = substitute(other, ".scala$", "Spec.scala", "")
+  		let other = substitute(other, ".scala$", specExt, "")
     elseif current =~ "/app/controllers/"
   		let other = substitute(current, "/app/", "/test/scala/", "")
-  		let other = substitute(other, ".scala$", "Spec.scala", "")
+  		let other = substitute(other, ".scala$", specExt, "")
   	elseif current =~ "/test/scala/controllers/"
   		let other = substitute(current, "/test/scala/", "/app/", "")
-  		let other = substitute(other, "Spec.scala$", ".scala", "")
+  		let other = substitute(other, specExt . "$", ".scala", "")
   	elseif current =~ "/test/"
   		let other = substitute(current, "/test/", "/app/model/", "")
-  		let other = substitute(other, "Spec.scala$", ".scala", "")
+  		let other = substitute(other, specExt . "$", ".scala", "")
   	endif
     if &switchbuf =~ "^use"
       let i = 1

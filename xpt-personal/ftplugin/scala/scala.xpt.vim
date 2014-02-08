@@ -65,8 +65,8 @@ function! s:f.multiJvmNode(num, ...)
                   \ '  import ' . s:f.classNameFromSpec() . '._',
                   \ '  val nodes = NrOfNodes',
                   \ '',
-                  \ '  "' . s:f.classNameFromSpec() . '" should { //{1',
-                  \ '  } //}1',
+                  \ '  "' . s:f.classNameFromSpec() . '" should {',
+                  \ '  }',
                   \ '}'], "\n")
   return class
 endfunction
@@ -164,11 +164,11 @@ XPT specfile hint=Creates\ a\ new\ Specs2\ test\ file
 import org.specs2.mutable._
 
 class `classname()^ extends Specification {
-    "`classNameFromSpec()^" should { //{1
-        "`spec^" in { //{2
+    "`classNameFromSpec()^" should {
+        "`spec^" in {
             `cursor^
-        } //}2
-    } //}1
+        }
+    }
 }
 
 XPT wrapin wrap=code hint=Wraps\ in\ a\ block
@@ -183,19 +183,19 @@ XPT match hint=Creates\ a\ pattern\ matching\ sequence
 }
 
 XPT spec hint=Creates\ a\ new\ specs2\ test
-"`spec^" in { //{2
+"`spec^" in {
     `cursor^
-} //}2
+}
 
 XPT wst hint=Creates\ a\ new\ WordSpec\ test
-"`spec^" in { //{2
+"`spec^" in {
     `cursor^
-} //}2
+}
 
 XPT groupwordspec hint=Creates\ a\ new\ WordSpec\ test\ group
-"`spec^" should { //{1
+"`spec^" should {
     `cursor^
-} //}1
+}
 
 XPT filewordspec hint=Creates\ a\ new\ WordSpec\ test\ file
 `getPackageLine()^
@@ -203,9 +203,9 @@ XPT filewordspec hint=Creates\ a\ new\ WordSpec\ test\ file
 import org.scalatest.{WordSpec, Matchers}
 
 class `classname()^ extends WordSpec with Matchers {
-    "`classNameFromSpec()^" should { //{1
+    "`classNameFromSpec()^" should {
         `cursor^
-    } //}1
+    }
 }
 // vim:fdl=1:
 
@@ -270,9 +270,9 @@ class `classname()^ extends TestKit(ActorSystem("`classname()^"))
         system.shutdown()
     }
 
-    "`classNameFromSpec()^" should { //{1
+    "`classNameFromSpec()^" should {
         `cursor^
-    } //}1
+    }
 }
 
 XPT multijvm hint=Multi\ JVM\ Test\ for\ Scala
@@ -284,22 +284,22 @@ import com.typesafe.config.{Config, ConfigFactory}
 import org.scalatest.{WordSpec, BeforeAndAfterAll}
 import org.scalatest.matchers.MustMatchers
 
-object `multijvmObject()^ extends AbstractRemoteActorMultiJvmSpec { //{2
+object `multijvmObject()^ extends AbstractRemoteActorMultiJvmSpec {
     override def NrOfNodes = `numberOfNodes^
     def commonConfig = ConfigFactory.parseString("""
         akka.actor.provider = "akka.remote.RemoteActorRefProvider",
         akka.remote.transport = "akka.remote.netty.NettyRemoteTransport"
     """) 
-} //{2
+}
 
-trait `multijvmBase()^ extends WordSpec //{2
+trait `multijvmBase()^ extends WordSpec
                                 with BeforeAndAfterAll
                                 with MustMatchers {
     override def beforeAll(configMap: Map[String, Any]) {
     }
     override def afterAll(configMap: Map[String, Any]) {
     }
-} //{2
+}
 
 `expandNodes...^
 XSETm expandNodes...|post
