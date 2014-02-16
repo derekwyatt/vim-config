@@ -409,11 +409,9 @@ if has("mac")
 endif
 
 "-----------------------------------------------------------------------------
-" L9 mappings
+" AG (SilverSearcher) Settings
 "-----------------------------------------------------------------------------
-" L9 creates an 'interesting' set of error formats when quickfix is engaged
-" This mapping cleans it up
-nmap <silent> ,eu :sign unplace *<cr>
+nmap ,sf :AgForFiletype 
 
 "-----------------------------------------------------------------------------
 " FSwitch mappings

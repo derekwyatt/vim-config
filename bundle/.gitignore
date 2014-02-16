@@ -1,6 +1,5 @@
 ensime
 vim-actionscript
-vim-ag
 vim-async
 vim-autotags
 vim-blogit
@@ -23,6 +22,7 @@ vim-javascript
 vim-jellybeans
 vim-json
 vim-l9
+vim-machine-specific
 vim-metafuz
 vim-mwutils
 vim-nerdtree
@@ -31,6 +31,7 @@ vim-powerline
 vim-protodef
 vim-rim
 vim-sbt
+vim-sbtquickfix
 vim-scala
 vim-self
 vim-signs
