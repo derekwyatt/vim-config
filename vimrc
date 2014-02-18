@@ -509,15 +509,6 @@ endfunction
 nmap ,dd :call VCSDiffMore(0)<cr>
 
 "-----------------------------------------------------------------------------
-" Autotags Settings
-"-----------------------------------------------------------------------------
-let g:autotags_no_global = 0
-let g:autotags_ctags_opts = "--exclude=target --exclude=vendor"
-let g:autotags_ctags_languages = "+Scala,+Java,+Vim"
-let g:autotags_ctags_langmap = "Scala:.scala,Java:.java,Vim:.vim,JavaScript:.js"
-let g:autotags_ctags_global_include = ""
-
-"-----------------------------------------------------------------------------
 " Gundo Settings
 "-----------------------------------------------------------------------------
 nmap <c-F5> :GundoToggle<cr>

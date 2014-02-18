@@ -9,6 +9,7 @@ vim-command-t
 vim-completion
 vim-conque
 vim-ctrlp
+vim-dfrankutil
 vim-easyalign
 vim-easymotion
 vim-ensime
@@ -18,6 +19,7 @@ vim-fugitive
 vim-fuzzyfinder
 vim-gnupg
 vim-gundo
+vim-indexer
 vim-jade
 vim-javascript
 vim-jellybeans
@@ -38,11 +40,12 @@ vim-self
 vim-signs
 vim-solarized
 vim-surround
+vim-tabular
 vim-twitvim
 vim-unimpaired
+vim-vimprj
 vim-vimproc
 vim-vimshell
 vim-vimside
 vim-visincr
-vim-tabular
 vim-xptemplate

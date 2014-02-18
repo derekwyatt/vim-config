@@ -56,6 +56,10 @@ function! s:f.classNameFromSpec(...)
   return substitute(s:f.classname(), 'Spec$', '', '')
 endfunction
 
+function! s:f.classNameFromTest(...)
+  return substitute(s:f.classname(), 'Test$', '', '')
+endfunction
+
 function! s:f.multiJvmNode(num, ...)
   let className = substitute(s:f.classname(), 'Spec$', 'MultiJvmNode', '') . a:num
   let class = join(['class ' . className . ' extends AkkaRemoteSpec(' . s:f.multijvmObject() . '.nodeConfigs(' . (a:num - 1). '))',
@@ -271,6 +275,18 @@ class `classname()^ extends TestKit(ActorSystem("`classname()^"))
     }
 
     "`classNameFromSpec()^" should {
+        `cursor^
+    }
+}
+
+XPT auviktest hint=Test\ file\ for\ Auvik\ code
+`getPackageLine()^
+
+import com.auvik.npl.common.AkkaTest
+
+class `classname()^ extends AkkaTest {
+
+    "`classNameFromTest()^" should "`do something^" in {
         `cursor^
     }
 }
