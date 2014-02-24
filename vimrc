@@ -201,9 +201,6 @@ nmap <silent> ,n :nohls<CR>
 " put the vim directives for my file editing settings in
 nmap <silent> ,vi ovim:set ts=2 sts=2 sw=2:<CR>vim600:fdm=marker fdl=1 fdc=0:<ESC>
 
-" Show all available VIM servers
-nmap <silent> ,ss :echo serverlist()<CR>
-
 " The following beast is something i didn't write... it will return the 
 " syntax highlighting group that the current "thing" under the cursor
 " belongs to -- very useful for figuring out what to change as far as 
@@ -413,6 +410,7 @@ endif
 "-----------------------------------------------------------------------------
 nmap ,sf :AgForCurrentFileDir 
 nmap ,sr :AgForProjectRoot 
+nmap ,se :AgForExtension 
 let g:ag_results_mapping = {
 \   'open_and_close': '<cr>',
 \   'open': 'o',
@@ -451,10 +449,6 @@ function! TwitVimMappings()
     nmap <buffer> 8 :ForwardTwitter<cr>
     nmap <buffer> 1 :PreviousTwitter<cr>
     nmap <buffer> 2 :NextTwitter<cr>
-    nmap <buffer> ,sf :SearchTwitter #scala OR #akka<cr>
-    nmap <buffer> ,ss :SearchTwitter #scala<cr>
-    nmap <buffer> ,sa :SearchTwitter #akka<cr>
-    nmap <buffer> ,sv :SearchTwitter #vim<cr>
 endfunction
 augroup derek_twitvim
     au!
