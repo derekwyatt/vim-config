@@ -411,7 +411,12 @@ endif
 "-----------------------------------------------------------------------------
 " AG (SilverSearcher) Settings
 "-----------------------------------------------------------------------------
-nmap ,sf :AgForFiletype 
+nmap ,sf :AgForCurrentFileDir 
+nmap ,sr :AgForProjectRoot 
+let g:ag_results_mapping = {
+\   'open_and_close': '<cr>',
+\   'open': 'o',
+\ }
 
 "-----------------------------------------------------------------------------
 " FSwitch mappings
