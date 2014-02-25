@@ -65,8 +65,19 @@ set hidden
 " the text and replacing it
 set cpoptions=ces$
 
+function! DerekFugitiveStatusLine()
+  let status = fugitive#statusline()
+  let trimmed = substitute(status, '\[Git(\(.*\))\]', '\1', '')
+  let trimmed = substitute(trimmed, '\(\w\)\w\+\ze/', '\1', '')
+  if len(trimmed) == 0
+    return ""
+  else
+    return '{' . trimmed[0:10] . '}'
+  endif
+endfunction
+
 " Set the status line the way i like it
-set stl=%f\ %m\ %r%{fugitive#statusline()}\ Line:%l/%L[%p%%]\ Col:%v\ Buf:#%n\ [%b][0x%B]
+set stl=%f\ %m\ %r%{DerekFugitiveStatusLine()}\ Line:%l/%L[%p%%]\ Col:%v\ Buf:#%n\ [%b][0x%B]
 
 " tell VIM to always put a status line in, even if there is only one window
 set laststatus=2
@@ -411,7 +422,7 @@ endif
 nmap ,sf :AgForCurrentFileDir 
 nmap ,sr :AgForProjectRoot 
 nmap ,se :AgForExtension 
-let g:ag_results_mapping = {
+let g:ag_results_mapping_replacements = {
 \   'open_and_close': '<cr>',
 \   'open': 'o',
 \ }
