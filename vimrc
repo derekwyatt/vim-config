@@ -85,7 +85,7 @@ set laststatus=2
 " Don't update the display while executing macros
 set lazyredraw
 
-" Don't show the current command int he lower right corner.  In OSX, if this is
+" Don't show the current command in the lower right corner.  In OSX, if this is
 " set and lazyredraw is set then it's slow as molasses, so we unset this
 set showcmd
 
