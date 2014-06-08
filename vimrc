@@ -69,10 +69,11 @@ function! DerekFugitiveStatusLine()
   let status = fugitive#statusline()
   let trimmed = substitute(status, '\[Git(\(.*\))\]', '\1', '')
   let trimmed = substitute(trimmed, '\(\w\)\w\+\ze/', '\1', '')
+  let trimmed = substitute(trimmed, '/[^_]*\zs_.*', '', '')
   if len(trimmed) == 0
     return ""
   else
-    return '{' . trimmed[0:10] . '}'
+    return '(' . trimmed[0:10] . ')'
   endif
 endfunction
 
@@ -223,7 +224,8 @@ map <S-Insert> <MiddleMouse>
 map! <S-Insert> <MiddleMouse>
 
 " set text wrapping toggles
-nmap <silent> ,ww :set invwrap<CR>:set wrap?<CR>
+nmap <silent> ,ww :set invwrap<cr>
+nmap <silent> ,wW :windo set invwrap<cr>
 
 " allow command line editing like emacs
 cnoremap <C-A>      <Home>
@@ -364,11 +366,8 @@ let loaded_matchparen = 1
 set nocursorline
 set nocursorcolumn
 
-if hostname() == "franklyn.local"
-  let g:main_font = "Anonymous\\ Pro:h18"
-  let g:small_font = "Anonymous\\ Pro:h2"
-elseif has("mac")
-  let g:main_font = "Anonymous\\ Pro:h12"
+if has("mac")
+  let g:main_font = "Anonymous\\ Pro:h11"
   let g:small_font = "Anonymous\\ Pro:h2"
 else
   let g:main_font = "DejaVu\\ Sans\\ Mono\\ 9"
@@ -502,21 +501,11 @@ let g:ctrlp_prompt_mappings = {
   \ 'PrtHistory(-1)':       ['<c-j>', '<down>'],
   \ 'PrtHistory(1)':        ['<c-i>', '<up>']
 \ }
-map ,fb :CtrlPBuffer<cr>
-map ,ff :CtrlP .<cr>
-map ,fr :CtrlP<cr>
-map ,fm :CtrlPMixed<cr>
-
-"-----------------------------------------------------------------------------
-" SVN Helpers
-"-----------------------------------------------------------------------------
-function! VCSDiffMore(from)
-  let f = expand('%:p')
-  let revisions = split(system("svn log " . f . " | grep '^r[0-9][0-9]*'"), '\n')
-  let revisions = map(revisions, 'substitute(v:val, "r\\(\\d\\+\\) .*$", "\\1", "")')
-  exec ":VCSVimDiff " . revisions[a:from]
-endfunction
-nmap ,dd :call VCSDiffMore(0)<cr>
+nmap ,fb :CtrlPBuffer<cr>
+nmap ,ff :CtrlP .<cr>
+nmap ,fF :execute ":CtrlP " . expand('%:p:h')<cr>
+nmap ,fr :CtrlP<cr>
+nmap ,fm :CtrlPMixed<cr>
 
 "-----------------------------------------------------------------------------
 " Gundo Settings
