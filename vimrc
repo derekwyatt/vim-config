@@ -13,6 +13,13 @@ filetype off
 call pathogen#runtime_append_all_bundles()
 call pathogen#helptags()
 
+if $GIT_DIR != ""
+  let dirs = split(&rtp, ',')
+  let cleaned = filter(dirs, 'v:val !~ "vim-indexer"')
+  let &rtp = join(cleaned, ',')
+  unlet dirs cleaned
+endif
+
 " Add xptemplate global personal directory value
 if has("unix")
   set runtimepath+=~/.vim/xpt-personal
