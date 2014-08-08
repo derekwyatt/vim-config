@@ -79,11 +79,11 @@ nmap <buffer> <silent> ,oK :ScalaSwitchSplitAbove<cr>
 nmap <buffer> <silent> ,oj :ScalaSwitchBelow<cr>
 nmap <buffer> <silent> ,oJ :ScalaSwitchSplitBelow<cr>
 
-nnoremap <buffer> <silent> f= :call search('=\\\|⇒')<cr>
-nnoremap <buffer> <silent> F= :call search('=\\\|⇒', 'b')<cr>
-nnoremap <buffer> <silent> t= :call search('.\\%(=\\\|⇒\\)')<cr>
-nnoremap <buffer> <silent> T= :call search('\\%(=\\\|⇒\\).', 'be')<cr>
-nnoremap <buffer> <silent> f> :call search('>\\\|⇒')<cr>
-nnoremap <buffer> <silent> F> :call search('>\\\|⇒', 'b')<cr>
-nnoremap <buffer> <silent> t> :call search('.\\%(>\\\|⇒\\)')<cr>
-nnoremap <buffer> <silent> T> :call search('\\%(>\\\|⇒\\).', 'be')<cr>
+"nnoremap <buffer> <silent> f= :call search('=\\\|⇒')<cr>
+"nnoremap <buffer> <silent> F= :call search('=\\\|⇒', 'b')<cr>
+"nnoremap <buffer> <silent> t= :call search('.\\%(=\\\|⇒\\)')<cr>
+"nnoremap <buffer> <silent> T= :call search('\\%(=\\\|⇒\\).', 'be')<cr>
+"nnoremap <buffer> <silent> f> :call search('>\\\|⇒')<cr>
+"nnoremap <buffer> <silent> F> :call search('>\\\|⇒', 'b')<cr>
+"nnoremap <buffer> <silent> t> :call search('.\\%(>\\\|⇒\\)')<cr>
+"nnoremap <buffer> <silent> T> :call search('\\%(>\\\|⇒\\).', 'be')<cr>

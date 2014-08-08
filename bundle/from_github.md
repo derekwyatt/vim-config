@@ -8,8 +8,11 @@
 * **EasyMotion**:     `git clone https://github.com/vim-scripts/EasyMotion.git vim-easymotion`
 * **FSwitch**:        `git clone https://github.com/derekwyatt/vim-fswitch.git vim-fswitch`
 * **Fugitive**:       `git clone https://github.com/tpope/vim-fugitive.git vim-fugitive`
+* **Github Colors**:  `git clone https://github.com/endel/vim-github-colorscheme.git vim-github-colors`
 * **GNUPG**:          `git clone https://github.com/vim-scripts/gnupg.vim.git vim-gnupg`
 * **Gundo**:          `git clone https://github.com/sjl/gundo.vim.git vim-gundo`
+* **HowDoI**:         `git clone https://github.com/laurentgoudet/vim-howdoi.git vim-howdoi`
+* **Hemisu**:         `git clone https://github.com/noahfrederick/vim-hemisu.git vim-hemisu`
 * **Indexer**:        `git clone https://github.com/vim-scripts/indexer.tar.gz vim-indexer`
 * **Jellybeans**:     `git clone https://github.com/nanotech/jellybeans.vim.git vim-jellybeans`
 * **JSON**:           `git clone https://github.com/elzr/vim-json.git vim-json`
