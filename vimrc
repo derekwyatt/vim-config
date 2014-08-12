@@ -8,10 +8,42 @@
 " Global Stuff
 "-----------------------------------------------------------------------------
 
-" Get pathogen up and running
+" Get Vundle up and running
+set nocompatible
 filetype off 
-call pathogen#runtime_append_all_bundles()
-call pathogen#helptags()
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+Plugin 'derekwyatt/ag.vim'
+Plugin 'bufkill.vim'
+Plugin 'MarcWeber/vim-addon-completion'
+Plugin 'kien/ctrlp.vim'
+Plugin 'DfrankUtil'
+Plugin 'EasyMotion'
+Plugin 'derekwyatt/vim-fswitch'
+Plugin 'tpope/vim-fugitive'
+Plugin 'endel/vim-github-colorscheme'
+Plugin 'vim-scripts/gnupg.vim'
+Plugin 'sjl/gundo.vim'
+Plugin 'laurentgoudet/vim-howdoi'
+Plugin 'noahfrederick/vim-hemisu'
+Plugin 'indexer.tar.gz'
+Plugin 'nanotech/jellybeans.vim'
+Plugin 'elzr/vim-json'
+Plugin 'scrooloose/nerdtree'
+Plugin 'derekwyatt/vim-protodef'
+Plugin 'derekwyatt/vim-sbt'
+Plugin 'derekwyatt/vim-scala'
+Plugin 'altercation/vim-colors-solarized'
+Plugin 'tpope/vim-surround'
+Plugin 'godlygeek/tabular'
+Plugin 'vim-scripts/TwitVim'
+Plugin 'tpope/vim-unimpaired'
+Plugin 'vimprj'
+Plugin 'VisIncr'
+Plugin 'drmingdrmer/xptemplate'
+Plugin 'GEverding/vim-hocon'
+call vundle#end()
+filetype plugin indent on
 
 if $GIT_DIR != ""
   let dirs = split(&rtp, ',')
@@ -703,34 +735,11 @@ command! ToggleMinimap call ToggleMinimap()
 " nnoremap <space> :ToggleMinimap<CR>
 
 "-----------------------------------------------------------------------------
-" Commands
-"-----------------------------------------------------------------------------
-function! FreemindToListF()
-  setl filetype=
-  silent! :%s/^\(\s*\).*TEXT="\([^"]*\)".*$/\1- \2/
-  silent! :g/^\s*</d
-  silent! :%s/&quot;/"/g
-  silent! :%s/&apos;/\'/g
-  silent! g/^-/s/- //
-  silent! g/^\w/t.|s/./=/g
-  silent! g/^\s*-/normal O
-  silent! normal 3GgqG
-  silent! %s/^\s\{4}\zs-/o/
-  silent! %s/^\s\{12}\zs-/+/
-  silent! %s/^\s\{16}\zs-/*/
-  silent! %s/^\s\{20}\zs-/#/
-  silent! normal gg
-endfunction
-
-command! FreemindToList call FreemindToListF()
-
-"-----------------------------------------------------------------------------
 " Auto commands
 "-----------------------------------------------------------------------------
 augroup derek_xsd
   au!
   au BufEnter *.xsd,*.wsdl,*.xml setl tabstop=4 shiftwidth=4
-  au BufEnter *.xsd,*.wsdl,*.xml setl formatoptions=crq textwidth=120 colorcolumn=120
 augroup END
 
 augroup Binary
@@ -791,7 +800,7 @@ iab teh        the
 "-----------------------------------------------------------------------------
 if has("gui_running")
   exe "set guifont=" . g:main_font
-  colorscheme xoria256
+  colorscheme zenburn
   if !exists("g:vimrcloaded")
     winpos 0 0
     if !&diff
