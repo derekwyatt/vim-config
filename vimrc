@@ -11,7 +11,7 @@
 " Get Vundle up and running
 set nocompatible
 filetype off 
-set rtp+=~/.vim/bundle/Vundle.vim
+set runtimepath+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 Plugin 'derekwyatt/ag.vim'
 Plugin 'bufkill.vim'
@@ -26,7 +26,6 @@ Plugin 'vim-scripts/gnupg.vim'
 Plugin 'sjl/gundo.vim'
 Plugin 'laurentgoudet/vim-howdoi'
 Plugin 'noahfrederick/vim-hemisu'
-Plugin 'indexer.tar.gz'
 Plugin 'nanotech/jellybeans.vim'
 Plugin 'elzr/vim-json'
 Plugin 'scrooloose/nerdtree'
@@ -42,15 +41,11 @@ Plugin 'vimprj'
 Plugin 'VisIncr'
 Plugin 'drmingdrmer/xptemplate'
 Plugin 'GEverding/vim-hocon'
+if $GIT_DIR == ""
+  Plugin 'indexer.tar.gz'
+endif
 call vundle#end()
 filetype plugin indent on
-
-if $GIT_DIR != ""
-  let dirs = split(&rtp, ',')
-  let cleaned = filter(dirs, 'v:val !~ "vim-indexer"')
-  let &rtp = join(cleaned, ',')
-  unlet dirs cleaned
-endif
 
 " Add xptemplate global personal directory value
 if has("unix")
