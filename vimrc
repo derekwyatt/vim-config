@@ -8,6 +8,15 @@
 " Global Stuff
 "-----------------------------------------------------------------------------
 
+function! RunningInsideGit()
+  let result = system('env | grep ^GIT_')
+  if result == ""
+    return 0
+  else
+    return 1
+  endif
+endfunction
+
 " Get Vundle up and running
 set nocompatible
 filetype off 
@@ -29,6 +38,7 @@ Plugin 'noahfrederick/vim-hemisu'
 Plugin 'nanotech/jellybeans.vim'
 Plugin 'elzr/vim-json'
 Plugin 'scrooloose/nerdtree'
+Plugin 'derekwyatt/vim-npl'
 Plugin 'derekwyatt/vim-protodef'
 Plugin 'derekwyatt/vim-sbt'
 Plugin 'derekwyatt/vim-scala'
@@ -41,7 +51,7 @@ Plugin 'vimprj'
 Plugin 'VisIncr'
 Plugin 'drmingdrmer/xptemplate'
 Plugin 'GEverding/vim-hocon'
-if $GIT_DIR == ""
+if !RunningInsideGit()
   Plugin 'indexer.tar.gz'
 endif
 call vundle#end()
@@ -795,7 +805,7 @@ iab teh        the
 "-----------------------------------------------------------------------------
 if has("gui_running")
   exe "set guifont=" . g:main_font
-  colorscheme zenburn
+  colorscheme jellybeans
   if !exists("g:vimrcloaded")
     winpos 0 0
     if !&diff
