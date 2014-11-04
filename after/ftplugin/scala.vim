@@ -1,7 +1,7 @@
 " We want to keep comments within an 80 column limit, but not code.
 " These two options give us that
 setlocal formatoptions=crq
-setlocal textwidth=80
+setlocal textwidth=100
 
 "-----------------------------------------------------------------------------
 " SBT Quickfix settings
@@ -10,11 +10,11 @@ let g:quickfix_load_mapping = ",qf"
 let g:quickfix_next_mapping = ",qn"
 
 function! scala#UnicodeCharsToNiceChars()
-  %s/⇒/=>/eg|exec "norm!``"|%s/←/<-/eg|norm!``
+  exec "norm!mz"|%s/⇒/=>/eg|%s/←/<-/eg|norm!`z
 endfunction
 
 function! scala#NiceCharsToUnicodeChars()
-  %s/=>/⇒/eg|exec "norm!``"|%s/<-/←/eg|norm!``
+  exec "norm!mz"|%s/=>/⇒/eg|%s/<-/←/eg|norm!`z
 endfunction
 
 augroup ScalaUnicodes

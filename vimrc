@@ -22,6 +22,7 @@ set nocompatible
 filetype off 
 set runtimepath+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
+Plugin 'bling/vim-airline'
 Plugin 'derekwyatt/ag.vim'
 Plugin 'bufkill.vim'
 Plugin 'MarcWeber/vim-addon-completion'
