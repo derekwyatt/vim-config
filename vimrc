@@ -17,10 +17,17 @@ function! RunningInsideGit()
   endif
 endfunction
 
+let g:jellybeans_overrides = {
+\  'Cursor': { 'guibg': 'ff00ee', 'guifg': '000000' },
+\  'Search': { 'guifg': '00ffff', 'attr': 'underline' },
+\}
+
+let g:indexer_debugLogLevel = 2
+
 " Get Vundle up and running
 set nocompatible
 filetype off 
-set runtimepath+=~/.vim/bundle/Vundle.vim
+set runtimepath+=~/.vim/bundle/Vundle.vim,~/.vim/bundle/vim-jira,~/.vim/bundle/vim-mpc
 call vundle#begin()
 Plugin 'bling/vim-airline'
 Plugin 'derekwyatt/ag.vim'
@@ -52,8 +59,9 @@ Plugin 'vimprj'
 Plugin 'VisIncr'
 Plugin 'drmingdrmer/xptemplate'
 Plugin 'GEverding/vim-hocon'
+Plugin 'xolox/vim-misc'
 if !RunningInsideGit()
-  Plugin 'indexer.tar.gz'
+  Plugin 'xolox/vim-easytags'
 endif
 call vundle#end()
 filetype plugin indent on
@@ -109,21 +117,6 @@ set hidden
 " Make the 'cw' and like commands put a $ at the end instead of just deleting
 " the text and replacing it
 set cpoptions=ces$
-
-function! DerekFugitiveStatusLine()
-  let status = fugitive#statusline()
-  let trimmed = substitute(status, '\[Git(\(.*\))\]', '\1', '')
-  let trimmed = substitute(trimmed, '\(\w\)\w\+\ze/', '\1', '')
-  let trimmed = substitute(trimmed, '/[^_]*\zs_.*', '', '')
-  if len(trimmed) == 0
-    return ""
-  else
-    return '(' . trimmed[0:10] . ')'
-  endif
-endfunction
-
-" Set the status line the way i like it
-set stl=%f\ %m\ %r%{DerekFugitiveStatusLine()}\ Line:%l/%L[%p%%]\ Col:%v\ Buf:#%n\ [%b][0x%B]
 
 " tell VIM to always put a status line in, even if there is only one window
 set laststatus=2
@@ -188,8 +181,8 @@ set complete=.,w,b,t
 " When completing by tag, show the whole tag, not just the function name
 set showfulltag
 
-" Set the textwidth to be 80 chars
-set textwidth=80
+" Disable it... every time I hit the limit I unset this anyway. It's annoying
+set textwidth=0
 
 " get rid of the silly characters in separators
 set fillchars = ""
@@ -536,7 +529,7 @@ let g:ctrlp_switch_buffer = 'E'
 let g:ctrlp_tabpage_position = 'c'
 let g:ctrlp_working_path_mode = 'rc'
 let g:ctrlp_root_markers = ['.project.root']
-let g:ctrlp_custom_ignore = '\v%(/\.%(git|hg|svn)|\.%(class|o|png|jpg|jpeg|bmp|tar|jar|tgz|deb|zip)$|/target/%(quickfix|resolution-cache|streams)|/target/scala-2.10/%(classes|test-classes|sbt-0.13|cache)|/project/target|/project/project)'
+let g:ctrlp_custom_ignore = '\v%(/\.%(git|hg|svn)|\.%(class|o|png|jpg|jpeg|bmp|tar|jar|tgz|deb|zip|xml|html)$|/target/%(quickfix|resolution-cache|streams)|/target/scala-2.10/%(classes|test-classes|sbt-0.13|cache)|/project/target|/project/project)'
 let g:ctrlp_open_new_file = 'r'
 let g:ctrlp_open_multiple_files = '1ri'
 let g:ctrlp_match_window = 'max:40'
@@ -565,6 +558,13 @@ let g:ConqueTerm_ReadUnfocused = 1
 let g:ConqueTerm_InsertOnEnter = 1
 let g:ConqueTerm_PromptRegex = '^-->'
 let g:ConqueTerm_TERM = 'xterm'
+
+"-----------------------------------------------------------------------------
+" EasyTags
+"-----------------------------------------------------------------------------
+let g:home_code_dir = '/Users/dwyatt/code'
+let g:easytags_async = 1
+let g:easytags_auto_highlight = 0
 
 "-----------------------------------------------------------------------------
 " Functions

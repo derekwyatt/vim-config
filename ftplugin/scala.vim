@@ -79,11 +79,35 @@ nmap <buffer> <silent> ,oK :ScalaSwitchSplitAbove<cr>
 nmap <buffer> <silent> ,oj :ScalaSwitchBelow<cr>
 nmap <buffer> <silent> ,oJ :ScalaSwitchSplitBelow<cr>
 
-"nnoremap <buffer> <silent> f= :call search('=\\\|⇒')<cr>
-"nnoremap <buffer> <silent> F= :call search('=\\\|⇒', 'b')<cr>
-"nnoremap <buffer> <silent> t= :call search('.\\%(=\\\|⇒\\)')<cr>
-"nnoremap <buffer> <silent> T= :call search('\\%(=\\\|⇒\\).', 'be')<cr>
-"nnoremap <buffer> <silent> f> :call search('>\\\|⇒')<cr>
-"nnoremap <buffer> <silent> F> :call search('>\\\|⇒', 'b')<cr>
-"nnoremap <buffer> <silent> t> :call search('.\\%(>\\\|⇒\\)')<cr>
-"nnoremap <buffer> <silent> T> :call search('\\%(>\\\|⇒\\).', 'be')<cr>
+function! RunScalaCtags(dir)
+  if a:dir =~ '^' . g:home_code_dir . '/[^/]*/.*$'
+    let dirname = substitute(a:dir, '^' . g:home_code_dir . '/[^/]*\zs/.*$', '', '')
+  else
+    let dirname = a:dir
+  endif
+  echo 'Hold on... updating the ctags for ' . dirname
+  let cmd = g:easytags_cmd . ' --recurse --languages=Scala -f ' . b:easytags_file . ' ' . dirname
+  let result = system(cmd)
+  echo 'Done!'
+  echo result
+endfunction
+
+function! MaybeRunScalaCtags()
+  if expand('%:p') =~ '^' . g:home_code_dir . '/.*$'
+    let project = substitute(expand('%:p'), '^' . g:home_code_dir . '/\([^/]*\)/.*$', '\1', '')
+    let dir = g:home_code_dir . '/' . project
+    let branch = substitute(fugitive#head(), '/', '-', 'g')
+    let b:easytags_file = $HOME . '/.vim-tags/' . project . '-' . branch . '-tags'
+    execute 'setlocal tags=' . b:easytags_file
+    if !filereadable(b:easytags_file)
+      call RunScalaCtags(dir)
+    endif
+  endif
+endfunction
+
+augroup dwscala
+  au!
+  au BufEnter *.scala call MaybeRunScalaCtags()
+augroup END
+
+command! RunScalaCtags call RunScalaCtags(expand('%:p:h'))
