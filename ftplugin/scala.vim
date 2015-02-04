@@ -79,7 +79,21 @@ nmap <buffer> <silent> ,oK :ScalaSwitchSplitAbove<cr>
 nmap <buffer> <silent> ,oj :ScalaSwitchBelow<cr>
 nmap <buffer> <silent> ,oJ :ScalaSwitchSplitBelow<cr>
 
-function! RunScalaCtags(dir)
+let s:last_known_auvik_branch = ''
+
+function! GetThatBranch()
+  return s:last_known_auvik_branch
+endfunction
+
+function! UpdateThatBranch()
+  let s:last_known_auvik_branch = GetThisBranch()
+endfunction
+
+function! GetThisBranch()
+  return substitute(fugitive#head(), '/', '-', 'g')
+endfunction
+
+function! RunBranchSwitch(dir)
   if a:dir =~ '^' . g:home_code_dir . '/[^/]*/.*$'
     let dirname = substitute(a:dir, '^' . g:home_code_dir . '/[^/]*\zs/.*$', '', '')
   else
@@ -92,22 +106,27 @@ function! RunScalaCtags(dir)
   echo result
 endfunction
 
-function! MaybeRunScalaCtags()
-  if expand('%:p') =~ '^' . g:home_code_dir . '/.*$'
-    let project = substitute(expand('%:p'), '^' . g:home_code_dir . '/\([^/]*\)/.*$', '\1', '')
-    let dir = g:home_code_dir . '/' . project
-    let branch = substitute(fugitive#head(), '/', '-', 'g')
-    let b:easytags_file = $HOME . '/.vim-tags/' . project . '-' . branch . '-tags'
-    execute 'setlocal tags=' . b:easytags_file
-    if !filereadable(b:easytags_file)
-      call RunScalaCtags(dir)
+function! MaybeRunBranchSwitch()
+  let thisbranch = GetThisBranch()
+  let thatbranch = GetThatBranch()
+  if thisbranch != thatbranch
+    call UpdateThatBranch()
+    CtrlPClearCache
+    if expand('%:p') =~ '^' . g:home_code_dir . '/.*$'
+      let project = substitute(expand('%:p'), '^' . g:home_code_dir . '/\([^/]*\)/.*$', '\1', '')
+      let dir = g:home_code_dir . '/' . project
+      let b:easytags_file = $HOME . '/.vim-tags/' . project . '-' . thisbranch . '-tags'
+      execute 'setlocal tags=' . b:easytags_file
+      if !filereadable(b:easytags_file)
+        call RunScalaCtags(dir)
+      endif
     endif
   endif
 endfunction
 
 augroup dwscala
   au!
-  au BufEnter *.scala call MaybeRunScalaCtags()
+  au BufEnter *.scala call MaybeRunBranchSwitch()
 augroup END
 
-command! RunScalaCtags call RunScalaCtags(expand('%:p:h'))
+command! RunBranchSwitch call RunBranchSwitch(expand('%:p:h'))
