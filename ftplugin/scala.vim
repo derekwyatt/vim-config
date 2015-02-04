@@ -79,14 +79,27 @@ nmap <buffer> <silent> ,oK :ScalaSwitchSplitAbove<cr>
 nmap <buffer> <silent> ,oj :ScalaSwitchBelow<cr>
 nmap <buffer> <silent> ,oJ :ScalaSwitchSplitBelow<cr>
 
-let s:last_known_auvik_branch = ''
+if !exists('g:last_known_auvik_branch')
+  let g:last_known_auvik_branch = {}
+endif
 
 function! GetThatBranch()
-  return s:last_known_auvik_branch
+  let root = FindGitDirOrRoot() " In ~/.vimrc
+  if root != '/'
+    if !has_key(g:last_known_auvik_branch, root)
+      let g:last_known_auvik_branch[root] = ''
+    endif
+    return g:last_known_auvik_branch[root]
+  else
+    return ''
+  endif
 endfunction
 
 function! UpdateThatBranch()
-  let s:last_known_auvik_branch = GetThisBranch()
+  let root = FindGitDirOrRoot() " In ~/.vimrc
+  if root != '/'
+    let g:last_known_auvik_branch[root] = GetThisBranch()
+  endif
 endfunction
 
 function! GetThisBranch()
@@ -109,17 +122,15 @@ endfunction
 function! MaybeRunBranchSwitch()
   let thisbranch = GetThisBranch()
   let thatbranch = GetThatBranch()
+  let project = substitute(expand('%:p'), '^' . g:home_code_dir . '/\([^/]*\)/.*$', '\1', '')
+  let b:easytags_file = $HOME . '/.vim-tags/' . project . '-' . thisbranch . '-tags'
+  execute 'setlocal tags=' . b:easytags_file
   if thisbranch != thatbranch
     call UpdateThatBranch()
     CtrlPClearCache
-    if expand('%:p') =~ '^' . g:home_code_dir . '/.*$'
-      let project = substitute(expand('%:p'), '^' . g:home_code_dir . '/\([^/]*\)/.*$', '\1', '')
-      let dir = g:home_code_dir . '/' . project
-      let b:easytags_file = $HOME . '/.vim-tags/' . project . '-' . thisbranch . '-tags'
-      execute 'setlocal tags=' . b:easytags_file
-      if !filereadable(b:easytags_file)
-        call RunScalaCtags(dir)
-      endif
+    let dir = g:home_code_dir . '/' . project
+    if !filereadable(b:easytags_file)
+      call RunScalaCtags(dir)
     endif
   endif
 endfunction

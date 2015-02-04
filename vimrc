@@ -600,9 +600,9 @@ endfunction
 
 function! FindGitDirOrRoot()
   let curdir = expand('%:p:h')
-  let gitdir = finddir('.git', curdir . ';')
-  if gitdir != ''
-    return substitute(gitdir, '\/\.git$', '', '')
+  let gitdir = fnamemodify(finddir('.git', curdir . ';'), ':p')
+  if strlen(gitdir) != 0
+    return substitute(gitdir, '\/\.git/\?$', '', '')
   else
     return '/'
   endif
