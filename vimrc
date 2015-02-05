@@ -599,12 +599,13 @@ function! IndentToNextBraceInLineAbove()
 endfunction
 
 function! FindGitDirOrRoot()
-  let curdir = expand('%:p:h')
-  let gitdir = fnamemodify(finddir('.git', curdir . ';'), ':p')
-  if strlen(gitdir) != 0
-    return substitute(gitdir, '\/\.git/\?$', '', '')
-  else
+  let filedir = expand('%:p:h')
+  let cmd = 'bash -c "(cd ' . filedir . '; git rev-parse --show-toplevel 2>/dev/null)"'
+  let gitdir = system(cmd)
+  if strlen(gitdir) == 0
     return '/'
+  else
+    return gitdir[:-2] " chomp
   endif
 endfunction
 

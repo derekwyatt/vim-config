@@ -106,32 +106,15 @@ function! GetThisBranch()
   return substitute(fugitive#head(), '/', '-', 'g')
 endfunction
 
-function! RunBranchSwitch(dir)
-  if a:dir =~ '^' . g:home_code_dir . '/[^/]*/.*$'
-    let dirname = substitute(a:dir, '^' . g:home_code_dir . '/[^/]*\zs/.*$', '', '')
-  else
-    let dirname = a:dir
-  endif
-  echo 'Hold on... updating the ctags for ' . dirname
-  let cmd = g:easytags_cmd . ' --recurse --languages=Scala -f ' . b:easytags_file . ' ' . dirname
-  let result = system(cmd)
-  echo 'Done!'
-  echo result
-endfunction
-
 function! MaybeRunBranchSwitch()
   let thisbranch = GetThisBranch()
   let thatbranch = GetThatBranch()
-  let project = substitute(expand('%:p'), '^' . g:home_code_dir . '/\([^/]*\)/.*$', '\1', '')
-  let b:easytags_file = $HOME . '/.vim-tags/' . project . '-' . thisbranch . '-tags'
+  let gitdir = substitute(FindGitDirOrRoot(), '/', '-', 'g')[1:]
+  let b:easytags_file = $HOME . '/.vim-tags/' . gitdir . '-' . thisbranch . '-tags'
   execute 'setlocal tags=' . b:easytags_file
   if thisbranch != thatbranch
     call UpdateThatBranch()
     CtrlPClearCache
-    let dir = g:home_code_dir . '/' . project
-    if !filereadable(b:easytags_file)
-      call RunScalaCtags(dir)
-    endif
   endif
 endfunction
 
