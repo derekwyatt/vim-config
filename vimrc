@@ -60,9 +60,6 @@ Plugin 'VisIncr'
 Plugin 'drmingdrmer/xptemplate'
 Plugin 'GEverding/vim-hocon'
 Plugin 'xolox/vim-misc'
-if !RunningInsideGit()
-  Plugin 'xolox/vim-easytags'
-endif
 call vundle#end()
 filetype plugin indent on
 
@@ -459,6 +456,7 @@ endif
 nmap ,sf :AgForCurrentFileDir 
 nmap ,sr :AgForProjectRoot 
 nmap ,se :AgForExtension 
+let g:agprg = '/usr/local/bin/ag'
 let g:ag_results_mapping_replacements = {
 \   'open_and_close': '<cr>',
 \   'open': 'o',
@@ -529,7 +527,14 @@ let g:ctrlp_switch_buffer = 'E'
 let g:ctrlp_tabpage_position = 'c'
 let g:ctrlp_working_path_mode = 'rc'
 let g:ctrlp_root_markers = ['.project.root']
-let g:ctrlp_custom_ignore = '\v%(/\.%(git|hg|svn)|\.%(class|o|png|jpg|jpeg|bmp|tar|jar|tgz|deb|zip|xml|html)$|/target/%(quickfix|resolution-cache|streams)|/target/scala-2.10/%(classes|test-classes|sbt-0.13|cache)|/project/target|/project/project)'
+let g:ctrlp_custom_ignore = '\v'
+let g:ctrlp_custom_ignore .= '%(/\.'
+let g:ctrlp_custom_ignore .= '%(git|hg|svn)|'
+let g:ctrlp_custom_ignore .= '\.%(class|o|png|jpg|jpeg|bmp|tar|jar|tgz|deb|zip|xml|html)$|'
+let g:ctrlp_custom_ignore .= '/target/%(quickfix|resolution-cache|streams)|'
+let g:ctrlp_custom_ignore .= '/target/scala-2.1./%(classes|test-classes|sbt-0.13|cache)|'
+let g:ctrlp_custom_ignore .= '/project/target|/project/project'
+let g:ctrlp_custom_ignore .= ')'
 let g:ctrlp_open_new_file = 'r'
 let g:ctrlp_open_multiple_files = '1ri'
 let g:ctrlp_match_window = 'max:40'
@@ -565,6 +570,64 @@ let g:ConqueTerm_TERM = 'xterm'
 let g:home_code_dir = '/Users/dwyatt/code'
 let g:easytags_async = 1
 let g:easytags_auto_highlight = 0
+
+"-----------------------------------------------------------------------------
+" Branches and Tags
+"-----------------------------------------------------------------------------
+let g:last_known_branch = {}
+
+function! HasGitRepo()
+  let result = system('cd ' . expand('%:p:h') . '; git rev-parse --show-toplevel')
+  if result == 'fatal: Not a git repository (or any of the parent directories): .git'
+    return 0
+  else
+    return 1
+  endif
+endfunction
+
+function! GetThatBranch()
+  let root = FindGitDirOrRoot() " In ~/.vimrc
+  if root != '/'
+    if !has_key(g:last_known_branch, root)
+      let g:last_known_branch[root] = ''
+    endif
+    return g:last_known_branch[root]
+  else
+    return ''
+  endif
+endfunction
+
+function! UpdateThatBranch()
+  let root = FindGitDirOrRoot() " In ~/.vimrc
+  if root != '/'
+    let g:last_known_branch[root] = GetThisBranch()
+  endif
+endfunction
+
+function! GetThisBranch()
+  return substitute(fugitive#head(), '/', '-', 'g')
+endfunction
+
+function! MaybeRunBranchSwitch()
+  if HasGitRepo()
+    let thisbranch = GetThisBranch()
+    let thatbranch = GetThatBranch()
+    let gitdir = substitute(FindGitDirOrRoot(), '/', '-', 'g')[1:]
+    let b:easytags_file = $HOME . '/.vim-tags/' . gitdir . '-' . thisbranch . '-tags'
+    execute 'setlocal tags=' . b:easytags_file
+    if thisbranch != thatbranch
+      call UpdateThatBranch()
+      CtrlPClearCache
+    endif
+  endif
+endfunction
+
+augroup dw_git
+  au!
+  au BufEnter * call MaybeRunBranchSwitch()
+augroup END
+
+command! RunBranchSwitch call RunBranchSwitch(expand('%:p:h'))
 
 "-----------------------------------------------------------------------------
 " Functions
