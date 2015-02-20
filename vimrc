@@ -93,7 +93,7 @@ set noignorecase
 " set the forward slash to be the slash of note.  Backslashes suck
 set shellslash
 if has("unix")
-  set shell=bash
+  set shell=zsh
 else
   set shell=ksh.exe
 endif
