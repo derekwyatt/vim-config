@@ -14,8 +14,12 @@ if !exists("*s:CodeOrTestFile")
       let specExt = "Test.scala"
     endif
   	if current =~ "/src/main/"
-  		let other = substitute(current, "/main/", "/test/", "")
+  		let other = substitute(current, "/main/", "/it/", "")
   		let other = substitute(other, ".scala$", specExt, "")
+      if !filereadable(other)
+        let other = substitute(current, "/main/", "/test/", "")
+        let other = substitute(other, ".scala$", specExt, "")
+      endif
   	elseif current =~ "/src/test/"
   		let other = substitute(current, "/test/", "/main/", "")
   		let other = substitute(other, specExt . "$", ".scala", "")

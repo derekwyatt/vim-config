@@ -29,8 +29,9 @@ set nocompatible
 filetype off 
 set runtimepath+=~/.vim/bundle/Vundle.vim,~/.vim/bundle/vim-jira,~/.vim/bundle/vim-mpc
 call vundle#begin()
-Plugin 'bling/vim-airline'
-Plugin 'derekwyatt/ag.vim'
+" OMG This makes editing soooooo sllloooooowwwwww
+" Plugin 'bling/vim-airline'
+Plugin 'rking/ag.vim'
 Plugin 'bufkill.vim'
 Plugin 'MarcWeber/vim-addon-completion'
 Plugin 'kien/ctrlp.vim'
@@ -114,6 +115,21 @@ set hidden
 " Make the 'cw' and like commands put a $ at the end instead of just deleting
 " the text and replacing it
 set cpoptions=ces$
+
+function! DerekFugitiveStatusLine()
+  let status = fugitive#statusline()
+  let trimmed = substitute(status, '\[Git(\(.*\))\]', '\1', '')
+  let trimmed = substitute(trimmed, '\(\w\)\w\+\ze/', '\1', '')
+  let trimmed = substitute(trimmed, '/[^_]*\zs_.*', '', '')
+  if len(trimmed) == 0
+    return ""
+  else
+    return '(' . trimmed[0:10] . ')'
+  endif
+endfunction
+
+" Set the status line the way i like it
+set stl=%f\ %m\ %r%{DerekFugitiveStatusLine()}\ Line:%l/%L[%p%%]\ Col:%v\ Buf:#%n\ [%b][0x%B]
 
 " tell VIM to always put a status line in, even if there is only one window
 set laststatus=2
@@ -232,7 +248,7 @@ let g:scala_use_default_keymappings = 0
 let mapleader = ","
 
 " Wipe out all buffers
-nmap <silent> ,wa :1,9000bwipeout<cr>
+nmap <silent> ,wa :call BWipeoutAll()<cr>
 
 " Toggle paste mode
 nmap <silent> ,p :set invpaste<CR>:set paste?<CR>
@@ -453,9 +469,14 @@ endif
 "-----------------------------------------------------------------------------
 " AG (SilverSearcher) Settings
 "-----------------------------------------------------------------------------
-nmap ,sf :AgForCurrentFileDir 
-nmap ,sr :AgForProjectRoot 
-nmap ,se :AgForExtension 
+function! AgProjectRoot(pattern)
+  let dir = FindGitDirOrRoot()
+  execute ':Ag ' . a:pattern . ' ' . dir
+endfunction
+
+command! -nargs=+ AgProjectRoot call AgProjectRoot(<q-args>)
+
+nmap ,sr :AgProjectRoot 
 let g:agprg = '/usr/local/bin/ag'
 let g:ag_results_mapping_replacements = {
 \   'open_and_close': '<cr>',
@@ -585,38 +606,42 @@ function! HasGitRepo()
   endif
 endfunction
 
-function! GetThatBranch()
-  let root = FindGitDirOrRoot() " In ~/.vimrc
-  if root != '/'
-    if !has_key(g:last_known_branch, root)
-      let g:last_known_branch[root] = ''
+function! GetThatBranch(root)
+  if a:root != '/'
+    if !has_key(g:last_known_branch, a:root)
+      let g:last_known_branch[a:root] = ''
     endif
-    return g:last_known_branch[root]
+    return g:last_known_branch[a:root]
   else
     return ''
   endif
 endfunction
 
-function! UpdateThatBranch()
-  let root = FindGitDirOrRoot() " In ~/.vimrc
-  if root != '/'
-    let g:last_known_branch[root] = GetThisBranch()
+function! UpdateThatBranch(root)
+  if a:root != '/'
+    let g:last_known_branch[a:root] = GetThisBranch(a:root)
   endif
 endfunction
 
-function! GetThisBranch()
-  return substitute(fugitive#head(), '/', '-', 'g')
+function! GetThisBranch(root)
+  let file = a:root . '/.current_branch'
+  if filereadable(file)
+    return substitute(readfile(file)[0], '/', '-', 'g')
+  else
+    return substitute(fugitive#head(), '/', '-', 'g')
+  endif
 endfunction
 
 function! MaybeRunBranchSwitch()
-  if HasGitRepo()
-    let thisbranch = GetThisBranch()
-    let thatbranch = GetThatBranch()
-    let gitdir = substitute(FindGitDirOrRoot(), '/', '-', 'g')[1:]
+  let root = FindGitDirOrRoot()
+  if root != "/"
+    let thisbranch = GetThisBranch(root)
+    let thatbranch = GetThatBranch(root)
+    let gitdir = substitute(root, '/', '-', 'g')[1:]
     let b:easytags_file = $HOME . '/.vim-tags/' . gitdir . '-' . thisbranch . '-tags'
     execute 'setlocal tags=' . b:easytags_file
     if thisbranch != thatbranch
-      call UpdateThatBranch()
+      call UpdateThatBranch(root)
       CtrlPClearCache
     endif
   endif
@@ -632,6 +657,13 @@ command! RunBranchSwitch call RunBranchSwitch(expand('%:p:h'))
 "-----------------------------------------------------------------------------
 " Functions
 "-----------------------------------------------------------------------------
+function! BWipeoutAll()
+  let lastbuf = bufnr('$')
+  let ids = sort(filter(range(1, bufnr('$')), 'bufexists(v:val)'))
+  execute ":" . ids[0] . "," . lastbuf . "bwipeout"
+  unlet lastbuf
+endfunction
+
 if !exists('g:bufferJumpList')
   let g:bufferJumpList = {}
 endif
@@ -663,12 +695,16 @@ endfunction
 
 function! FindGitDirOrRoot()
   let filedir = expand('%:p:h')
-  let cmd = 'bash -c "(cd ' . filedir . '; git rev-parse --show-toplevel 2>/dev/null)"'
-  let gitdir = system(cmd)
-  if strlen(gitdir) == 0
-    return '/'
+  if isdirectory(filedir)
+    let cmd = 'bash -c "(cd ' . filedir . '; git rev-parse --show-toplevel 2>/dev/null)"'
+    let gitdir = system(cmd)
+    if strlen(gitdir) == 0
+      return '/'
+    else
+      return gitdir[:-2] " chomp
+    endif
   else
-    return gitdir[:-2] " chomp
+    return '/'
   endif
 endfunction
 

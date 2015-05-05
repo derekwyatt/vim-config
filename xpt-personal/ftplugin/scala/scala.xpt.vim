@@ -53,7 +53,7 @@ function! s:f.multijvmBase(...)
 endfunction
 
 function! s:f.classNameFromSpec(...)
-  return substitute(s:f.classname(), 'Spec$', '', '')
+  return substitute(s:f.classname(), '\%(Spec\|Test\)$', '', '')
 endfunction
 
 function! s:f.classNameFromTest(...)
@@ -211,7 +211,17 @@ class `classname()^ extends WordSpec with Matchers {
         `cursor^
     }
 }
-// vim:fdl=1:
+
+XPT fileflatspec hint=Creates\ a\ new\ FlatSpec\ test\ file
+`getPackageLine()^
+
+import org.scalatest.{ FlatSpec, Matchers }
+
+class `classname()^ extends FlatSpec with Matchers {
+    "`classNameFromSpec()^" should "`do someting^" in {
+        `cursor^
+    }
+}
 
 XPT eorp hint=envOrNone.orElse.propOrNone
 envOrNone("`Variable^").orElse(propOrNone("`property^"))
@@ -279,18 +289,6 @@ class `classname()^ extends TestKit(ActorSystem("`classname()^"))
     }
 }
 
-XPT auviktest hint=Test\ file\ for\ Auvik\ code
-`getPackageLine()^
-
-import com.auvik.npl.common.AkkaTest
-
-class `classname()^ extends AkkaTest {
-
-    "`classNameFromTest()^" should "`do something^" in {
-        `cursor^
-    }
-}
-
 XPT multijvm hint=Multi\ JVM\ Test\ for\ Scala
 `getPackageLine()^
 
@@ -350,3 +348,26 @@ libraryDependencies := Seq(
     "`groupId^" % "`artifactId^" % "`revision^",
     "org.scalatest" %% "scalatest" % "2.0" % "test"
 )
+
+XPT extension hint=Creates\ a\ new\ Akka\ Extension
+import akka.actor.{ Extension => AkkaExtension, ExtensionId => AkkaExtensionId, ExtensionIdProvider => AkkaExtensionIdProvider }
+
+class `extensionName^(system: ExtendedActorSystem) extends AkkaExtension {
+    `cursor^
+}
+
+object `extensionName^ extends AkkaExtensionId[`extensionName^] with AkkaExtensionIdProvider {
+    def lookup() = this
+    def createExtension(system: ExtendedActorSystem): `extensionName^ = new `extensionName^(system)
+}
+
+XPT auviktest hint=Creates\ a\ new\ Auivk\ style\ Akka\ test\ file
+`getPackageLine()^
+
+import com.auvik.npl.common.AkkaTest
+
+class `classname()^ extends AkkaTest {
+    "`classNameFromSpec()^" should "`description^" in {
+        `cursor^
+    }
+}
