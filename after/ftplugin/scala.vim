@@ -10,11 +10,15 @@ let g:quickfix_load_mapping = ",qf"
 let g:quickfix_next_mapping = ",qn"
 
 function! scala#UnicodeCharsToNiceChars()
+  let view = winsaveview()
   exec "norm!mz"|%s/⇒/=>/eg|%s/←/<-/eg|norm!`z
+  call winrestview(view)
 endfunction
 
 function! scala#NiceCharsToUnicodeChars()
+  let view = winsaveview()
   exec "norm!mz"|%s/=>/⇒/eg|%s/<-/←/eg|norm!`z
+  call winrestview(view)
 endfunction
 
 augroup ScalaUnicodes
