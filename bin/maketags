@@ -1,0 +1,27 @@
+#!/bin/bash
+
+code_dir=$(git rev-parse --show-toplevel)
+branch=$(git branch | grep '^\*' | cut -c3-)
+tagbranch=$(echo $branch | tr '/ ' '-')
+processes=$(pgrep ctags)
+if [[ -n $processes ]]; then
+  echo "Killing off: $processes"
+  pkill ctags
+fi
+find $code_dir -type d -and '(' -name src -or -name generated-scala ')' | grep -v 'Eclipse NPL Highlighting' | \
+while read dir
+do
+  tagfile=$(echo $dir | tr '/ ' '-' | cut -c2-)-$tagbranch-tags
+  tagoutput=~/.vim-tags/$tagfile
+  run=0
+  if [[ ! -f $tagoutput ]]; then
+    run=1
+  elif [[ -n $(find $dir -newer $tagoutput) ]]; then
+    run=1
+  fi
+  if [[ $run = 1 ]]; then
+    echo Running CTAGS to $tagfile
+    /usr/local/bin/ctags --recurse -f $tagoutput $dir 2>/dev/null &
+  fi
+done
+wait

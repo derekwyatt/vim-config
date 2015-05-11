@@ -20,6 +20,7 @@ endfunction
 let g:jellybeans_overrides = {
 \  'Cursor': { 'guibg': 'ff00ee', 'guifg': '000000' },
 \  'Search': { 'guifg': '00ffff', 'attr': 'underline' },
+\  'StatusLine': { 'guibg': 'ffb964', 'guifg': '000000', 'attr': 'bold' }
 \}
 
 let g:indexer_debugLogLevel = 2
@@ -637,12 +638,17 @@ function! MaybeRunBranchSwitch()
   if root != "/"
     let thisbranch = GetThisBranch(root)
     let thatbranch = GetThatBranch(root)
-    let gitdir = substitute(root, '/', '-', 'g')[1:]
-    let b:easytags_file = $HOME . '/.vim-tags/' . gitdir . '-' . thisbranch . '-tags'
-    execute 'setlocal tags=' . b:easytags_file
-    if thisbranch != thatbranch
-      call UpdateThatBranch(root)
-      CtrlPClearCache
+    if thisbranch != ''
+      let gitdir = substitute(root, '/', '-', 'g')[1:]
+      let pat = $HOME . '/.vim-tags/*' . thisbranch . '*'
+      let fs = glob(pat)
+      if len(fs) != 0
+        execute 'setlocal tags=' . substitute(fs, "\n", ",", "g")
+      endif
+      if thisbranch != thatbranch
+        call UpdateThatBranch(root)
+        CtrlPClearCache
+      endif
     endif
   endif
 endfunction
