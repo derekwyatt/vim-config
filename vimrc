@@ -633,6 +633,20 @@ function! GetThisBranch(root)
   endif
 endfunction
 
+function! ListTagFiles(thisdir, thisbranch)
+  let fs = split(glob($HOME . '/.vim-tags/*'), "\n")
+  let ret = []
+  for f in fs
+    let fprime = substitute(f, '^.*/' . a:thisdir, '', '')
+    if fprime ==# f
+      call add(ret, f)
+    elseif match(f, '-' . a:thisbranch . '-') != -1
+      call add(ret, f)
+    endif
+  endfor
+  return ret
+endfunction
+
 function! MaybeRunBranchSwitch()
   let root = FindGitDirOrRoot()
   if root != "/"
@@ -640,10 +654,9 @@ function! MaybeRunBranchSwitch()
     let thatbranch = GetThatBranch(root)
     if thisbranch != ''
       let gitdir = substitute(root, '/', '-', 'g')[1:]
-      let pat = $HOME . '/.vim-tags/*' . thisbranch . '*'
-      let fs = glob(pat)
+      let fs = ListTagFiles(gitdir, thisbranch)
       if len(fs) != 0
-        execute 'setlocal tags=' . substitute(fs, "\n", ",", "g")
+        execute 'setlocal tags=' . join(fs, ",")
       endif
       if thisbranch != thatbranch
         call UpdateThatBranch(root)
@@ -653,9 +666,17 @@ function! MaybeRunBranchSwitch()
   endif
 endfunction
 
+function! MaybeRunMakeTags()
+  let root = FindGitDirOrRoot()
+  if root != "/"
+    call system("cd " . root . "; ~/bin/maketags &")
+  endif
+endfunction
+
 augroup dw_git
   au!
   au BufEnter * call MaybeRunBranchSwitch()
+  au BufWritePost *.scala,*.npl,*.js call MaybeRunMakeTags()
 augroup END
 
 command! RunBranchSwitch call RunBranchSwitch(expand('%:p:h'))

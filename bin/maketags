@@ -1,11 +1,29 @@
 #!/bin/bash
 
+verbose=0
+
+while getopts v opt
+do
+  case $opt in
+    v) verbose=1
+      ;;
+  esac
+done
+shift $((OPTIND-1))
+
+function vecho
+{
+  if [[ $verbose = 1 ]]; then
+    echo $@
+  fi
+}
+
 code_dir=$(git rev-parse --show-toplevel)
 branch=$(git branch | grep '^\*' | cut -c3-)
 tagbranch=$(echo $branch | tr '/ ' '-')
 processes=$(pgrep ctags)
 if [[ -n $processes ]]; then
-  echo "Killing off: $processes"
+  vecho "Killing off: $processes"
   pkill ctags
 fi
 find $code_dir -type d -and '(' -name src -or -name generated-scala ')' | grep -v 'Eclipse NPL Highlighting' | \
@@ -20,7 +38,7 @@ do
     run=1
   fi
   if [[ $run = 1 ]]; then
-    echo Running CTAGS to $tagfile
+    vecho Running CTAGS to $tagfile
     /usr/local/bin/ctags --recurse -f $tagoutput $dir 2>/dev/null &
   fi
 done
