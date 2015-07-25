@@ -1,11 +1,14 @@
 #!/bin/bash
 
 verbose=0
+force=0
 
-while getopts v opt
+while getopts vf opt
 do
   case $opt in
     v) verbose=1
+      ;;
+    f) force=1
       ;;
   esac
 done
@@ -31,6 +34,9 @@ while read dir
 do
   tagfile=$(echo $dir | tr '/ ' '-' | cut -c2-)-$tagbranch-tags
   tagoutput=~/.vim-tags/$tagfile
+  if [[ $force == 1 ]]; then
+    rm -f $tagoutput
+  fi
   run=0
   if [[ ! -f $tagoutput ]]; then
     run=1

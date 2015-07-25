@@ -62,6 +62,8 @@ Plugin 'VisIncr'
 Plugin 'drmingdrmer/xptemplate'
 Plugin 'GEverding/vim-hocon'
 Plugin 'xolox/vim-misc'
+Plugin 'jceb/vim-hier'
+Plugin 'vim-scripts/vim-geeknote'
 call vundle#end()
 filetype plugin indent on
 
@@ -220,6 +222,7 @@ set grepprg=grep\ -nH\ $*
 
 " Trying out the line numbering thing... never liked it, but that doesn't mean
 " I shouldn't give it another go :)
+set number
 set relativenumber
 
 " Types of files to ignore when autocompleting things
@@ -419,8 +422,8 @@ set nocursorline
 set nocursorcolumn
 
 if has("mac")
-  let g:main_font = "Anonymous\\ Pro:h11"
-  let g:small_font = "Anonymous\\ Pro:h2"
+  let g:main_font =  "Source Code Pro ExtraLight:h11"
+  let g:small_font = "Source Code Pro ExtraLight:h2"
 else
   let g:main_font = "DejaVu\\ Sans\\ Mono\\ 9"
   let g:small_font = "DejaVu\\ Sans\\ Mono\\ 2"
@@ -549,14 +552,9 @@ let g:ctrlp_switch_buffer = 'E'
 let g:ctrlp_tabpage_position = 'c'
 let g:ctrlp_working_path_mode = 'rc'
 let g:ctrlp_root_markers = ['.project.root']
-let g:ctrlp_custom_ignore = '\v'
-let g:ctrlp_custom_ignore .= '%(/\.'
-let g:ctrlp_custom_ignore .= '%(git|hg|svn)|'
-let g:ctrlp_custom_ignore .= '\.%(class|o|png|jpg|jpeg|bmp|tar|jar|tgz|deb|zip|xml|html)$|'
-let g:ctrlp_custom_ignore .= '/target/%(quickfix|resolution-cache|streams)|'
-let g:ctrlp_custom_ignore .= '/target/scala-2.1./%(classes|test-classes|sbt-0.13|cache)|'
-let g:ctrlp_custom_ignore .= '/project/target|/project/project'
-let g:ctrlp_custom_ignore .= ')'
+let g:ctrlp_user_command = 'find %s -type f | grep -E "\.conf$|\.scala$|\.java$|\.npl$|\.rb$|\.sh$|\.bash$|\.py$" | grep -v -E "/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes"'
+let g:ctrlp_max_depth = 30
+let g:ctrlp_max_files = 0
 let g:ctrlp_open_new_file = 'r'
 let g:ctrlp_open_multiple_files = '1ri'
 let g:ctrlp_match_window = 'max:40'
