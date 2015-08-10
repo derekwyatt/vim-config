@@ -28,42 +28,48 @@ let g:indexer_debugLogLevel = 2
 " Get Vundle up and running
 set nocompatible
 filetype off 
-set runtimepath+=~/.vim/bundle/Vundle.vim,~/.vim/bundle/vim-jira,~/.vim/bundle/vim-mpc
+set runtimepath+=~/.vim/bundle/Vundle.vim,~/.vim/bundle/vim-jira,~/.vim/bundle/vim-mpc,~/.vim/bundle/vim-sbt
+
 call vundle#begin()
 " OMG This makes editing soooooo sllloooooowwwwww
 " Plugin 'bling/vim-airline'
-Plugin 'rking/ag.vim'
-Plugin 'bufkill.vim'
-Plugin 'MarcWeber/vim-addon-completion'
-Plugin 'kien/ctrlp.vim'
 Plugin 'DfrankUtil'
 Plugin 'EasyMotion'
-Plugin 'derekwyatt/vim-fswitch'
-Plugin 'tpope/vim-fugitive'
-Plugin 'endel/vim-github-colorscheme'
-Plugin 'vim-scripts/gnupg.vim'
-Plugin 'sjl/gundo.vim'
-Plugin 'laurentgoudet/vim-howdoi'
-Plugin 'noahfrederick/vim-hemisu'
-Plugin 'nanotech/jellybeans.vim'
-Plugin 'elzr/vim-json'
-Plugin 'scrooloose/nerdtree'
-Plugin 'derekwyatt/vim-npl'
-Plugin 'derekwyatt/vim-protodef'
-Plugin 'derekwyatt/vim-sbt'
-Plugin 'derekwyatt/vim-scala'
-Plugin 'altercation/vim-colors-solarized'
-Plugin 'tpope/vim-surround'
-Plugin 'godlygeek/tabular'
-Plugin 'vim-scripts/TwitVim'
-Plugin 'tpope/vim-unimpaired'
-Plugin 'vimprj'
-Plugin 'VisIncr'
-Plugin 'drmingdrmer/xptemplate'
 Plugin 'GEverding/vim-hocon'
-Plugin 'xolox/vim-misc'
+Plugin 'MarcWeber/vim-addon-completion'
+Plugin 'VisIncr'
+Plugin 'altercation/vim-colors-solarized'
+Plugin 'bufkill.vim'
+Plugin 'derekwyatt/vim-fswitch'
+Plugin 'derekwyatt/vim-protodef'
+Plugin 'derekwyatt/vim-scala'
+Plugin 'drmingdrmer/xptemplate'
+Plugin 'elzr/vim-json'
+Plugin 'endel/vim-github-colorscheme'
+Plugin 'fmoralesc/vim-pad'
+Plugin 'godlygeek/tabular'
+Plugin 'gregsexton/gitv'
+Plugin 'itchyny/lightline.vim'
 Plugin 'jceb/vim-hier'
+Plugin 'kien/ctrlp.vim'
+Plugin 'laurentgoudet/vim-howdoi'
+Plugin 'nanotech/jellybeans.vim'
+Plugin 'nathanaelkane/vim-indent-guides'
+Plugin 'noahfrederick/vim-hemisu'
+Plugin 'rking/ag.vim'
+Plugin 'scrooloose/nerdtree'
+" Plugin 'scrooloose/syntastic'
+Plugin 'sjl/gundo.vim'
+Plugin 'terryma/vim-multiple-cursors'
+Plugin 'tpope/vim-fugitive'
+Plugin 'tpope/vim-surround'
+Plugin 'tpope/vim-unimpaired'
+Plugin 'vim-scripts/TwitVim'
+Plugin 'vim-scripts/gnupg.vim'
 Plugin 'vim-scripts/vim-geeknote'
+Plugin 'vimprj'
+Plugin 'whatyouhide/vim-gotham'
+Plugin 'xolox/vim-misc'
 call vundle#end()
 filetype plugin indent on
 
@@ -422,12 +428,92 @@ set nocursorline
 set nocursorcolumn
 
 if has("mac")
-  let g:main_font =  "Source Code Pro ExtraLight:h11"
-  let g:small_font = "Source Code Pro ExtraLight:h2"
+  let g:main_font = "Source\\ Code\\ Pro\\ Light:h10"
+  let g:small_font = "Source\\ Code\\ Pro\\ Light:h2"
 else
   let g:main_font = "DejaVu\\ Sans\\ Mono\\ 9"
   let g:small_font = "DejaVu\\ Sans\\ Mono\\ 2"
 endif
+
+"-----------------------------------------------------------------------------
+" Lightline
+"-----------------------------------------------------------------------------
+let g:lightline = {
+  \ 'colorscheme': 'gotham',
+  \ 'mode_map':  { 'c': 'NORMAL' },
+  \ 'active': {
+  \    'left': [ [ 'mode', 'paste' ], [ 'fugitive', 'filename' ] ],
+  \    'right': [ [ 'percent' ], [ 'mycharvalue', 'lineinfo' ] ]
+  \ },
+  \ 'component_function':  {
+  \   'fugitive': 'DerekFugitiveStatusLine',
+  \   'filename': 'LightLineFilename',
+  \   'mycharvalue': 'LightLineCharacter',
+  \   'mode': 'LightLineMode'
+  \ },
+  \ 'separator':  { 'left': '>', 'right': '<' },
+  \ 'subseparator': { 'left': '|', 'right': '|' }
+  \ }
+
+function! LightLineModified()
+  return &ft =~ 'help\|vimfiler\|gundo' ? '' : &modified ? '+' : &modifiable ? '' : '-'
+endfunction
+
+function! LightLineReadonly()
+  return &ft !~? 'help\|vimfiler\|gundo' && &readonly ? 'o' : ''
+endfunction
+
+function! LightLineFilename()
+  return ('' != LightLineReadonly() ? LightLineReadonly() . ' ' : '') .
+        \ (&ft == 'vimfiler' ? vimfiler#get_status_string() : 
+        \  &ft == 'unite' ? unite#get_status_string() : 
+        \  &ft == 'vimshell' ? vimshell#get_status_string() :
+        \ '' != expand('%:t') ? expand('%:t') : '[No Name]') .
+        \ ('' != LightLineModified() ? ' ' . LightLineModified() : '')
+endfunction
+
+function! LightLineFugitive()
+  if &ft !~? 'vimfiler\|gundo' && exists("*fugitive#head")
+    let _ = fugitive#head()
+    return strlen(_) ? _ : ''
+  endif
+  return ''
+endfunction
+
+function! LightLineCharacter()
+  let dec = char2nr(matchstr(getline('.'), '\%' . col('.') . 'c.'))
+  let hex = printf("%X", dec)
+
+  return dec . "/0x" . hex
+endfunction
+
+function! LightLineFileformat()
+  return winwidth(0) > 70 ? &fileformat : ''
+endfunction
+
+function! LightLineFiletype()
+  return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype : 'no ft') : ''
+endfunction
+
+function! LightLineFileencoding()
+  return winwidth(0) > 70 ? (strlen(&fenc) ? &fenc : &enc) : ''
+endfunction
+
+function! LightLineMode()
+  return winwidth(0) > 60 ? lightline#mode() : ''
+endfunction
+
+"-----------------------------------------------------------------------------
+" Pad
+"-----------------------------------------------------------------------------
+let g:pad#dir = "~/.pad"
+
+"-----------------------------------------------------------------------------
+" Indent Guides
+"-----------------------------------------------------------------------------
+let g:indent_guides_color_change_percent = 3
+let g:indent_guides_guide_size = 1
+let g:indent_guides_enable_on_vim_startup = 1
 
 "-----------------------------------------------------------------------------
 " Fugitive
@@ -548,11 +634,12 @@ let g:make_scala_fuf_mappings = 0
 "-----------------------------------------------------------------------------
 " CtrlP Settings
 "-----------------------------------------------------------------------------
+let g:ctrlp_regexp = 1
 let g:ctrlp_switch_buffer = 'E'
 let g:ctrlp_tabpage_position = 'c'
 let g:ctrlp_working_path_mode = 'rc'
 let g:ctrlp_root_markers = ['.project.root']
-let g:ctrlp_user_command = 'find %s -type f | grep -E "\.conf$|\.scala$|\.java$|\.npl$|\.rb$|\.sh$|\.bash$|\.py$" | grep -v -E "/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes"'
+let g:ctrlp_user_command = 'find %s -type f | grep -E "\.conf$|\.scala$|\.java$|\.rb$|\.sh$|\.bash$|\.py$" | grep -v -E "/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes"'
 let g:ctrlp_max_depth = 30
 let g:ctrlp_max_files = 0
 let g:ctrlp_open_new_file = 'r'
@@ -674,7 +761,7 @@ endfunction
 augroup dw_git
   au!
   au BufEnter * call MaybeRunBranchSwitch()
-  au BufWritePost *.scala,*.npl,*.js call MaybeRunMakeTags()
+  au BufWritePost *.scala,*.js call MaybeRunMakeTags()
 augroup END
 
 command! RunBranchSwitch call RunBranchSwitch(expand('%:p:h'))
@@ -884,7 +971,6 @@ augroup Binary
   au BufWritePost *.bin set nomod | endif
 augroup END
 
-
 "-----------------------------------------------------------------------------
 " Fix constant spelling mistakes
 "-----------------------------------------------------------------------------
@@ -931,7 +1017,7 @@ iab teh        the
 "-----------------------------------------------------------------------------
 if has("gui_running")
   exe "set guifont=" . g:main_font
-  colorscheme jellybeans
+  colorscheme gotham
   if !exists("g:vimrcloaded")
     winpos 0 0
     if !&diff

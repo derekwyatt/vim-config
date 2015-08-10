@@ -212,6 +212,18 @@ class `classname()^ extends WordSpec with Matchers {
     }
 }
 
+
+XPT flatspec hint=Creates\ a\ new\ FlatSpec\ test\ file
+`getPackageLine()^
+
+import org.scalatest.{ FlatSpec, Matchers }
+
+class `classname()^ extends FlatSpec with Matchers {
+    "`classNameFromSpec()^" should "`description^" in {
+        `cursor^
+    }
+}
+
 XPT fileflatspec hint=Creates\ a\ new\ FlatSpec\ test\ file
 `getPackageLine()^
 
@@ -340,13 +352,13 @@ name := "`name^"
 
 version := "`0.1^"
 
-scalaVersion := "`2.10.3^"
+scalaVersion := "`2.11.7^"
 `^
 
 XPT dep hint=libraryDependencies\ :=\ Seq\(...\)
 libraryDependencies := Seq(
     "`groupId^" % "`artifactId^" % "`revision^",
-    "org.scalatest" %% "scalatest" % "2.0" % "test"
+    "org.scalatest" %% "scalatest" % "2.2.4" % "test"
 )
 
 XPT extension hint=Creates\ a\ new\ Akka\ Extension

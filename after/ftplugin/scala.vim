@@ -16,8 +16,8 @@ function! scala#UnicodeCharsToNiceChars()
     undojoin
   catch /undojoin/
   endtry
-  %s/⇒/=>/eg
-  %s/←/<-/eg
+  v/^\s*\*/s/⇒/=>/eg
+  v/^\s*\*/s/←/<-/eg
   norm!`z
   call winrestview(view)
 endfunction
@@ -29,8 +29,8 @@ function! scala#NiceCharsToUnicodeChars()
     undojoin
   catch /undojoin/
   endtry
-  %s/=>/⇒/eg
-  %s/<-/←/eg
+  v/^\s*\*/s/=>/⇒/eg
+  v/^\s*\*/s/<-/←/eg
   norm!`z
   call winrestview(view)
 endfunction
