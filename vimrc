@@ -31,8 +31,6 @@ filetype off
 set runtimepath+=~/.vim/bundle/Vundle.vim,~/.vim/bundle/vim-jira,~/.vim/bundle/vim-mpc,~/.vim/bundle/vim-sbt
 
 call vundle#begin()
-" OMG This makes editing soooooo sllloooooowwwwww
-" Plugin 'bling/vim-airline'
 Plugin 'DfrankUtil'
 Plugin 'EasyMotion'
 Plugin 'GEverding/vim-hocon'
@@ -49,7 +47,6 @@ Plugin 'endel/vim-github-colorscheme'
 Plugin 'fmoralesc/vim-pad'
 Plugin 'godlygeek/tabular'
 Plugin 'gregsexton/gitv'
-Plugin 'itchyny/lightline.vim'
 Plugin 'jceb/vim-hier'
 Plugin 'kien/ctrlp.vim'
 Plugin 'laurentgoudet/vim-howdoi'
@@ -58,7 +55,6 @@ Plugin 'nathanaelkane/vim-indent-guides'
 Plugin 'noahfrederick/vim-hemisu'
 Plugin 'rking/ag.vim'
 Plugin 'scrooloose/nerdtree'
-" Plugin 'scrooloose/syntastic'
 Plugin 'sjl/gundo.vim'
 Plugin 'terryma/vim-multiple-cursors'
 Plugin 'tpope/vim-fugitive'
@@ -67,6 +63,7 @@ Plugin 'tpope/vim-unimpaired'
 Plugin 'vim-scripts/TwitVim'
 Plugin 'vim-scripts/gnupg.vim'
 Plugin 'vim-scripts/vim-geeknote'
+Plugin 'vim-scripts/vimwiki'
 Plugin 'vimprj'
 Plugin 'whatyouhide/vim-gotham'
 Plugin 'xolox/vim-misc'
@@ -436,77 +433,14 @@ else
 endif
 
 "-----------------------------------------------------------------------------
-" Lightline
+" VimWiki
 "-----------------------------------------------------------------------------
-let g:lightline = {
-  \ 'colorscheme': 'gotham',
-  \ 'mode_map':  { 'c': 'NORMAL' },
-  \ 'active': {
-  \    'left': [ [ 'mode', 'paste' ], [ 'fugitive', 'filename' ] ],
-  \    'right': [ [ 'percent' ], [ 'mycharvalue', 'lineinfo' ] ]
-  \ },
-  \ 'component_function':  {
-  \   'fugitive': 'DerekFugitiveStatusLine',
-  \   'filename': 'LightLineFilename',
-  \   'mycharvalue': 'LightLineCharacter',
-  \   'mode': 'LightLineMode'
-  \ },
-  \ 'separator':  { 'left': '>', 'right': '<' },
-  \ 'subseparator': { 'left': '|', 'right': '|' }
-  \ }
-
-function! LightLineModified()
-  return &ft =~ 'help\|vimfiler\|gundo' ? '' : &modified ? '+' : &modifiable ? '' : '-'
-endfunction
-
-function! LightLineReadonly()
-  return &ft !~? 'help\|vimfiler\|gundo' && &readonly ? 'o' : ''
-endfunction
-
-function! LightLineFilename()
-  return ('' != LightLineReadonly() ? LightLineReadonly() . ' ' : '') .
-        \ (&ft == 'vimfiler' ? vimfiler#get_status_string() : 
-        \  &ft == 'unite' ? unite#get_status_string() : 
-        \  &ft == 'vimshell' ? vimshell#get_status_string() :
-        \ '' != expand('%:t') ? expand('%:t') : '[No Name]') .
-        \ ('' != LightLineModified() ? ' ' . LightLineModified() : '')
-endfunction
-
-function! LightLineFugitive()
-  if &ft !~? 'vimfiler\|gundo' && exists("*fugitive#head")
-    let _ = fugitive#head()
-    return strlen(_) ? _ : ''
-  endif
-  return ''
-endfunction
-
-function! LightLineCharacter()
-  let dec = char2nr(matchstr(getline('.'), '\%' . col('.') . 'c.'))
-  let hex = printf("%X", dec)
-
-  return dec . "/0x" . hex
-endfunction
-
-function! LightLineFileformat()
-  return winwidth(0) > 70 ? &fileformat : ''
-endfunction
-
-function! LightLineFiletype()
-  return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype : 'no ft') : ''
-endfunction
-
-function! LightLineFileencoding()
-  return winwidth(0) > 70 ? (strlen(&fenc) ? &fenc : &enc) : ''
-endfunction
-
-function! LightLineMode()
-  return winwidth(0) > 60 ? lightline#mode() : ''
-endfunction
-
-"-----------------------------------------------------------------------------
-" Pad
-"-----------------------------------------------------------------------------
-let g:pad#dir = "~/.pad"
+let g:vimwiki_list = [ { 'path': '~/Notes/TDC', 'path_html': '~/Notes/TDC_html' } ]
+nmap ,vw :VimwikiIndex<cr>
+augroup derek_vimwiki
+  au!
+  au BufEnter *.wiki setlocal textwidth=100
+augroup END
 
 "-----------------------------------------------------------------------------
 " Indent Guides
@@ -608,8 +542,8 @@ function! TwitVimMappings()
     nmap <buffer> 2 :NextTwitter<cr>
 endfunction
 augroup derek_twitvim
-    au!
-    au FileType twitvim call TwitVimMappings()
+  au!
+  au FileType twitvim call TwitVimMappings()
 augroup END
 
 "-----------------------------------------------------------------------------
@@ -1017,7 +951,7 @@ iab teh        the
 "-----------------------------------------------------------------------------
 if has("gui_running")
   exe "set guifont=" . g:main_font
-  colorscheme gotham
+  colorscheme navajo-night
   if !exists("g:vimrcloaded")
     winpos 0 0
     if !&diff
