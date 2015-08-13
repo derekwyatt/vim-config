@@ -47,6 +47,7 @@ Plugin 'endel/vim-github-colorscheme'
 Plugin 'fmoralesc/vim-pad'
 Plugin 'godlygeek/tabular'
 Plugin 'gregsexton/gitv'
+Plugin 'idbrii/vim-perforce'
 Plugin 'jceb/vim-hier'
 Plugin 'kien/ctrlp.vim'
 Plugin 'laurentgoudet/vim-howdoi'
@@ -425,7 +426,7 @@ set nocursorline
 set nocursorcolumn
 
 if has("mac")
-  let g:main_font = "Source\\ Code\\ Pro\\ Light:h10"
+  let g:main_font = "Source\\ Code\\ Pro\\ Light:h11"
   let g:small_font = "Source\\ Code\\ Pro\\ Light:h2"
 else
   let g:main_font = "DejaVu\\ Sans\\ Mono\\ 9"
@@ -433,9 +434,11 @@ else
 endif
 
 "-----------------------------------------------------------------------------
-" VimWiki
+" Vimwiki
 "-----------------------------------------------------------------------------
-let g:vimwiki_list = [ { 'path': '~/Notes/TDC', 'path_html': '~/Notes/TDC_html' } ]
+let g:vimwiki_list = [ { 'path': '~/code/stuff/vimwiki/TDC', 'path_html': '~/code/stuff/vimwiki/TDC_html' } ]
+let g:vimwiki_hl_headers = 1
+let g:vimwiki_hl_cb_checked = 1
 nmap ,vw :VimwikiIndex<cr>
 augroup derek_vimwiki
   au!
@@ -446,7 +449,7 @@ augroup END
 " Indent Guides
 "-----------------------------------------------------------------------------
 let g:indent_guides_color_change_percent = 3
-let g:indent_guides_guide_size = 1
+"let g:indent_guides_guide_size = 1
 let g:indent_guides_enable_on_vim_startup = 1
 
 "-----------------------------------------------------------------------------
