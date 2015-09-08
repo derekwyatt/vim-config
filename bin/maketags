@@ -21,15 +21,38 @@ function vecho
   fi
 }
 
-code_dir=$(git rev-parse --show-toplevel)
-branch=$(git branch | grep '^\*' | cut -c3-)
+function in_git_repo
+{
+  git status > /dev/null 2>&1
+}
+
+function get_code_dir
+{
+  if in_git_repo; then
+    git rev-parse --show-toplevel
+  else
+    p4 client -o | grep ^Root | awk '{print $2}'
+  fi
+}
+
+function get_branch
+{
+  if in_git_repo; then
+    git branch | grep '^\*' | cut -c3-
+  else
+    p4 client -o | grep ^Client | awk '{print $2}'
+  fi
+}
+
+code_dir=$(get_code_dir)
+branch=$(get_branch)
 tagbranch=$(echo $branch | tr '/ ' '-')
 processes=$(pgrep ctags)
 if [[ -n $processes ]]; then
   vecho "Killing off: $processes"
   pkill ctags
 fi
-find $code_dir -type d -and '(' -name src -or -name generated-scala ')' | grep -v 'Eclipse NPL Highlighting' | \
+find $code_dir -type d -and -name src | \
 while read dir
 do
   tagfile=$(echo $dir | tr '/ ' '-' | cut -c2-)-$tagbranch-tags

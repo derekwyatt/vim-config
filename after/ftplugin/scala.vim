@@ -35,12 +35,5 @@ function! scala#NiceCharsToUnicodeChars()
   call winrestview(view)
 endfunction
 
-" Thankfully, I don't need this at NetSuite
-" augroup ScalaUnicodes
-"   au!
-"   au BufRead,BufWritePost *.scala silent call scala#UnicodeCharsToNiceChars()
-"   au BufWritePre *.scala silent call scala#NiceCharsToUnicodeChars()
-" augroup END
-
 map ,SU :call scala#NiceCharsToUnicodeChars()<cr>
 map ,SA :call scala#UnicodeCharsToNiceChars()<cr>

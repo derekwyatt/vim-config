@@ -38,6 +38,7 @@ Plugin 'MarcWeber/vim-addon-completion'
 Plugin 'VisIncr'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'bufkill.vim'
+Plugin 'clones/vim-genutils'
 Plugin 'derekwyatt/vim-fswitch'
 Plugin 'derekwyatt/vim-protodef'
 Plugin 'derekwyatt/vim-scala'
@@ -55,6 +56,8 @@ Plugin 'nanotech/jellybeans.vim'
 Plugin 'nathanaelkane/vim-indent-guides'
 Plugin 'noahfrederick/vim-hemisu'
 Plugin 'rking/ag.vim'
+Plugin 'Shougo/vimproc.vim'
+Plugin 'Shougo/unite.vim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'sjl/gundo.vim'
 Plugin 'terryma/vim-multiple-cursors'
@@ -263,7 +266,7 @@ nmap <silent> ,p :set invpaste<CR>:set paste?<CR>
 
 " cd to the directory containing the file in the buffer
 nmap <silent> ,cd :lcd %:h<CR>
-nmap <silent> ,cr :lcd <c-r>=FindGitDirOrRoot()<cr><cr>
+nmap <silent> ,cr :lcd <c-r>=FindCodeDirOrRoot()<cr><cr>
 nmap <silent> ,md :!mkdir -p %:p:h<CR>
 
 " Turn off that stupid highlight search
@@ -434,6 +437,14 @@ else
 endif
 
 "-----------------------------------------------------------------------------
+" Perforce
+"-----------------------------------------------------------------------------
+let g:p4DefaultPreset = 'ssl:p4p-kit001.corp.netsuite.com:1667 dwyatt_mac dwyatt'
+let g:p4ClientRoot = '/webdev'
+map ,co :execute ':PEdit ' . expand('%:p')<cr>
+map ,cr :execute ':PRevert ' . expand('%:p')<cr>
+
+"-----------------------------------------------------------------------------
 " Vimwiki
 "-----------------------------------------------------------------------------
 let g:vimwiki_list = [ { 'path': '~/code/stuff/vimwiki/TDC', 'path_html': '~/code/stuff/vimwiki/TDC_html' } ]
@@ -497,7 +508,7 @@ endif
 " AG (SilverSearcher) Settings
 "-----------------------------------------------------------------------------
 function! AgProjectRoot(pattern)
-  let dir = FindGitDirOrRoot()
+  let dir = FindCodeDirOrRoot()
   execute ':Ag ' . a:pattern . ' ' . dir
 endfunction
 
@@ -576,7 +587,7 @@ let g:ctrlp_switch_buffer = 'E'
 let g:ctrlp_tabpage_position = 'c'
 let g:ctrlp_working_path_mode = 'rc'
 let g:ctrlp_root_markers = ['.project.root']
-let g:ctrlp_user_command = 'find %s -type f | grep -E "\.conf$|\.scala$|\.java$|\.rb$|\.sh$|\.bash$|\.py$" | grep -v -E "/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes"'
+let g:ctrlp_user_command = 'find %s -type f | grep -E "\.conf$|\.scala$|\.java$|\.rb$|\.sh$|\.bash$|\.py|\.json$" | grep -v -E "/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes"'
 let g:ctrlp_max_depth = 30
 let g:ctrlp_max_files = 0
 let g:ctrlp_open_new_file = 'r'
@@ -620,9 +631,41 @@ let g:easytags_auto_highlight = 0
 "-----------------------------------------------------------------------------
 let g:last_known_branch = {}
 
-function! HasGitRepo()
-  let result = system('cd ' . expand('%:p:h') . '; git rev-parse --show-toplevel')
-  if result == 'fatal: Not a git repository (or any of the parent directories): .git'
+function! PerforceClientRoot()
+  return '/webdev'
+endfunction
+
+function! PerforceClientName()
+  return 'dwyatt_mac'
+endfunction
+
+function! FindCodeDirOrRoot()
+  let filedir = expand('%:p:h')
+  if isdirectory(filedir)
+    if HasGitRepo(filedir)
+      let cmd = 'bash -c "(cd ' . filedir . '; git rev-parse --show-toplevel 2>/dev/null)"'
+      let gitdir = system(cmd)
+      if strlen(gitdir) == 0
+        return '/'
+      else
+        return gitdir[:-2] " chomp
+      endif
+    else
+      let p4root = PerforceClientRoot()
+      if stridx(filedir, p4root) == 0
+        return p4root
+      else
+        return '/'
+      endif
+    endif
+  else
+    return '/'
+  endif
+endfunction
+
+function! HasGitRepo(path)
+  let result = system('cd ' . a:path . '; git rev-parse --show-toplevel')
+  if result =~# 'fatal:.*'
     return 0
   else
     return 1
@@ -650,8 +693,10 @@ function! GetThisBranch(root)
   let file = a:root . '/.current_branch'
   if filereadable(file)
     return substitute(readfile(file)[0], '/', '-', 'g')
-  else
+  elseif HasGitRepo(a:root)
     return substitute(fugitive#head(), '/', '-', 'g')
+  else
+    return PerforceClientName()
   endif
 endfunction
 
@@ -670,7 +715,7 @@ function! ListTagFiles(thisdir, thisbranch)
 endfunction
 
 function! MaybeRunBranchSwitch()
-  let root = FindGitDirOrRoot()
+  let root = FindCodeDirOrRoot()
   if root != "/"
     let thisbranch = GetThisBranch(root)
     let thatbranch = GetThatBranch(root)
@@ -689,7 +734,7 @@ function! MaybeRunBranchSwitch()
 endfunction
 
 function! MaybeRunMakeTags()
-  let root = FindGitDirOrRoot()
+  let root = FindCodeDirOrRoot()
   if root != "/"
     call system("cd " . root . "; ~/bin/maketags &")
   endif
@@ -698,10 +743,10 @@ endfunction
 augroup dw_git
   au!
   au BufEnter * call MaybeRunBranchSwitch()
-  au BufWritePost *.scala,*.js call MaybeRunMakeTags()
+  au BufWritePost *.scala,*.js,*.java call MaybeRunMakeTags()
 augroup END
 
-command! RunBranchSwitch call RunBranchSwitch(expand('%:p:h'))
+command! RunBranchSwitch call MaybeRunBranchSwitch()
 
 "-----------------------------------------------------------------------------
 " Functions
@@ -717,24 +762,6 @@ if !exists('g:bufferJumpList')
   let g:bufferJumpList = {}
 endif
 
-function! MarkBufferInJumpList(bufstr, letter)
-  let g:bufferJumpList[a:letter] = a:bufstr
-endfunction
-
-function! JumpToBufferInJumpList(letter)
-  if has_key(g:bufferJumpList, a:letter)
-    exe ":buffer " . g:bufferJumpList[a:letter]
-  else
-    echoerr a:letter . " isn't mapped to any existing buffer"
-  endif
-endfunction
-
-function! ListJumpToBuffers()
-  for key in keys(g:bufferJumpList)
-    echo key . " = " . g:bufferJumpList[key]
-  endfor
-endfunction
-
 function! IndentToNextBraceInLineAbove()
   :normal 0wk
   :normal "vyf(
@@ -742,38 +769,7 @@ function! IndentToNextBraceInLineAbove()
   :normal j"vPl
 endfunction
 
-function! FindGitDirOrRoot()
-  let filedir = expand('%:p:h')
-  if isdirectory(filedir)
-    let cmd = 'bash -c "(cd ' . filedir . '; git rev-parse --show-toplevel 2>/dev/null)"'
-    let gitdir = system(cmd)
-    if strlen(gitdir) == 0
-      return '/'
-    else
-      return gitdir[:-2] " chomp
-    endif
-  else
-    return '/'
-  endif
-endfunction
-
 nmap <silent> ,ii :call IndentToNextBraceInLineAbove()<cr>
-
-nmap <silent> ,mba :call MarkBufferInJumpList(expand('%:p'), 'a')<cr>
-nmap <silent> ,mbb :call MarkBufferInJumpList(expand('%:p'), 'b')<cr>
-nmap <silent> ,mbc :call MarkBufferInJumpList(expand('%:p'), 'c')<cr>
-nmap <silent> ,mbd :call MarkBufferInJumpList(expand('%:p'), 'd')<cr>
-nmap <silent> ,mbe :call MarkBufferInJumpList(expand('%:p'), 'e')<cr>
-nmap <silent> ,mbf :call MarkBufferInJumpList(expand('%:p'), 'f')<cr>
-nmap <silent> ,mbg :call MarkBufferInJumpList(expand('%:p'), 'g')<cr>
-nmap <silent> ,jba :call JumpToBufferInJumpList('a')<cr>
-nmap <silent> ,jbb :call JumpToBufferInJumpList('b')<cr>
-nmap <silent> ,jbc :call JumpToBufferInJumpList('c')<cr>
-nmap <silent> ,jbd :call JumpToBufferInJumpList('d')<cr>
-nmap <silent> ,jbe :call JumpToBufferInJumpList('e')<cr>
-nmap <silent> ,jbf :call JumpToBufferInJumpList('f')<cr>
-nmap <silent> ,jbg :call JumpToBufferInJumpList('g')<cr>
-nmap <silent> ,ljb :call ListJumpToBuffers()<cr>
 
 function! DiffCurrentFileAgainstAnother(snipoff, replacewith)
   let currentFile = expand('%:p')
@@ -966,3 +962,10 @@ if has("gui_running")
   endif
 endif
 :nohls
+
+"-----------------------------------------------------------------------------
+" Local system overrides
+"-----------------------------------------------------------------------------
+if filereadable($HOME . "/.vimrc.local")
+  execute "source " . $HOME . "/.vimrc.local"
+endif
