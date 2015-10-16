@@ -587,7 +587,7 @@ let g:ctrlp_switch_buffer = 'E'
 let g:ctrlp_tabpage_position = 'c'
 let g:ctrlp_working_path_mode = 'rc'
 let g:ctrlp_root_markers = ['.project.root']
-let g:ctrlp_user_command = 'find %s -type f | grep -E "\.conf$|\.scala$|\.java$|\.rb$|\.sh$|\.bash$|\.py|\.json$" | grep -v -E "/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes"'
+let g:ctrlp_user_command = 'find %s -type f | grep -E "\.(conf|scala|java|rb|sh|bash|py|json|js)$" | grep -v -E "/build/|/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes"'
 let g:ctrlp_max_depth = 30
 let g:ctrlp_max_files = 0
 let g:ctrlp_open_new_file = 'r'
@@ -602,7 +602,7 @@ let g:ctrlp_prompt_mappings = {
 nmap ,fb :CtrlPBuffer<cr>
 nmap ,ff :CtrlP .<cr>
 nmap ,fF :execute ":CtrlP " . expand('%:p:h')<cr>
-nmap ,fr :CtrlP<cr>
+nmap ,fr :CtrlP substitute(expand('%:p'), '^\(/webdev/NetLedger[^/]*\)/.*$', '\1', '')<cr>
 nmap ,fm :CtrlPMixed<cr>
 
 "-----------------------------------------------------------------------------
@@ -632,7 +632,12 @@ let g:easytags_auto_highlight = 0
 let g:last_known_branch = {}
 
 function! PerforceClientRoot()
-  return '/webdev'
+  let path = expand('%:p')
+  if path =~? '^/webdev/NetLedger.*'
+    return substitute(path, '^\(/webdev/NetLedger[^/]*\)/.*$', '\1', '')
+  else
+    return '/webdev'
+  endif
 endfunction
 
 function! PerforceClientName()
@@ -700,14 +705,14 @@ function! GetThisBranch(root)
   endif
 endfunction
 
-function! ListTagFiles(thisdir, thisbranch)
+function! ListTagFiles(thisdir, thisbranch, isGit)
   let fs = split(glob($HOME . '/.vim-tags/*'), "\n")
   let ret = []
   for f in fs
     let fprime = substitute(f, '^.*/' . a:thisdir, '', '')
-    if fprime ==# f
+    if fprime !=# f
       call add(ret, f)
-    elseif match(f, '-' . a:thisbranch . '-') != -1
+    elseif a:isGit && match(f, '-' . a:thisbranch . '-') != -1
       call add(ret, f)
     endif
   endfor
@@ -716,12 +721,13 @@ endfunction
 
 function! MaybeRunBranchSwitch()
   let root = FindCodeDirOrRoot()
+  let isGit = HasGitRepo(expand('%:p:h'))
   if root != "/"
     let thisbranch = GetThisBranch(root)
     let thatbranch = GetThatBranch(root)
     if thisbranch != ''
-      let gitdir = substitute(root, '/', '-', 'g')[1:]
-      let fs = ListTagFiles(gitdir, thisbranch)
+      let codedir = substitute(root, '/', '-', 'g')[1:]
+      let fs = ListTagFiles(codedir, thisbranch, isGit)
       if len(fs) != 0
         execute 'setlocal tags=' . join(fs, ",")
       endif
@@ -736,7 +742,7 @@ endfunction
 function! MaybeRunMakeTags()
   let root = FindCodeDirOrRoot()
   if root != "/"
-    call system("cd " . root . "; ~/bin/maketags &")
+    call system("cd " . root . "; ~/bin/maketags -c " . root . " &")
   endif
 endfunction
 

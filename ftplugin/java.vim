@@ -3,7 +3,8 @@ setlocal textwidth=80
 setlocal foldmethod=marker
 setlocal foldmarker=//{,//}
 setlocal foldlevel=0
-setlocal sw=4
+setlocal sw=4 sts=4 ts=4
+setlocal noexpandtab
 
 if !exists("*s:CodeOrTestFile")
   function! s:CodeOrTestFile(precmd)
@@ -68,3 +69,20 @@ nmap <buffer> <silent> ,ok :JavaSwitchAbove<cr>
 nmap <buffer> <silent> ,oK :JavaSwitchSplitAbove<cr>
 nmap <buffer> <silent> ,oj :JavaSwitchBelow<cr>
 nmap <buffer> <silent> ,oJ :JavaSwitchSplitBelow<cr>
+
+function! JavaUnhangBraces()
+	:%s/) {/)\r{\s*$/eg
+	:%s/try\zs {/\r{\s*$/eg
+	:%s/else\zs {/\r{\s*$/eg
+	:%s/throws.*\zs {\s*$/\r{/eg
+	:%s/}\zs\s\+\zeelse/\r/eg
+	:%s/}\zs\s\+\zecatch/\r/eg
+	:%s/\%(class\|interface\|enum\).*\zs {\s*$/\r{/eg
+	:%s/class.*\zs\s*{$/\r{/eg
+	:g/^\%({\|else\|catch\)/normal ==
+endfunction
+
+function! JavaHangBraces()
+	:g/^\s*{/-join
+	:g/^\s*\%(catch\|else\)/-join
+endfunction

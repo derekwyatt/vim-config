@@ -2,13 +2,16 @@
 
 verbose=0
 force=0
+code_dir=
 
-while getopts vf opt
+while getopts vfc: opt
 do
   case $opt in
     v) verbose=1
       ;;
     f) force=1
+      ;;
+    c) code_dir=$OPTARG
       ;;
   esac
 done
@@ -44,7 +47,9 @@ function get_branch
   fi
 }
 
-code_dir=$(get_code_dir)
+if [[ -z $code_dir ]]; then
+	code_dir=$(get_code_dir)
+fi
 branch=$(get_branch)
 tagbranch=$(echo $branch | tr '/ ' '-')
 processes=$(pgrep ctags)
@@ -52,9 +57,12 @@ if [[ -n $processes ]]; then
   vecho "Killing off: $processes"
   pkill ctags
 fi
-find $code_dir -type d -and -name src | \
-while read dir
+
+for dir in $(echo $code_dir/src $code_dir/*/src $code_dir/*/*/src $code_dir/*/*/*/src $code_dir/*/*/*/*/src $code_dir/*/*/*/*/*/src $code_dir/*/*/*/*/*/*/src)
 do
+  if [[ ! -d $dir ]]; then
+	  continue
+  fi
   tagfile=$(echo $dir | tr '/ ' '-' | cut -c2-)-$tagbranch-tags
   tagoutput=~/.vim-tags/$tagfile
   if [[ $force == 1 ]]; then
