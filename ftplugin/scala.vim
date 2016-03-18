@@ -1,10 +1,53 @@
 setlocal formatoptions=crq
-setlocal textwidth=80
+setlocal textwidth=100
 setlocal foldmethod=marker
 setlocal foldmarker=//{,//}
 setlocal foldlevel=0
-setlocal sw=2
+setlocal ts=2 sts=2 sw=2
+setlocal expandtab
 
+"-----------------------------------------------------------------------------
+" SBT Quickfix settings
+"-----------------------------------------------------------------------------
+let g:quickfix_load_mapping = ",qf"
+let g:quickfix_next_mapping = ",qn"
+
+"-----------------------------------------------------------------------------
+" Transforming from ⇒and ←to => and <- and back again
+"-----------------------------------------------------------------------------
+function! scala#UnicodeCharsToNiceChars()
+  let view = winsaveview()
+  norm!mz
+  try
+    undojoin
+  catch /undojoin/
+  endtry
+  v/^\s*\*/s/⇒/=>/eg
+  v/^\s*\*/s/←/<-/eg
+  norm!`z
+  call winrestview(view)
+endfunction
+
+function! scala#NiceCharsToUnicodeChars()
+  let view = winsaveview()
+  norm!mz
+  try
+    undojoin
+  catch /undojoin/
+  endtry
+  v/^\s*\*/s/=>/⇒/eg
+  v/^\s*\*/s/<-/←/eg
+  norm!`z
+  call winrestview(view)
+endfunction
+
+map ,SU :call scala#NiceCharsToUnicodeChars()<cr>
+map ,SA :call scala#UnicodeCharsToNiceChars()<cr>
+
+
+"-----------------------------------------------------------------------------
+" Transitioning between test files and source files
+"-----------------------------------------------------------------------------
 if !exists("*s:CodeOrTestFile")
   function! s:CodeOrTestFile(precmd)
   	let current = expand('%:p')
@@ -82,3 +125,16 @@ nmap <buffer> <silent> ,ok :ScalaSwitchAbove<cr>
 nmap <buffer> <silent> ,oK :ScalaSwitchSplitAbove<cr>
 nmap <buffer> <silent> ,oj :ScalaSwitchBelow<cr>
 nmap <buffer> <silent> ,oJ :ScalaSwitchSplitBelow<cr>
+
+function! ExternalScalariform()
+  if &readonly == 1
+    echomsg "Current buffer is read-only. Can't Scalariform it."
+  else
+    :normal mm
+    :%!/webdev/Tools/lazy/bin/scalariform --stdin
+    :normal `m
+  endif
+endfunction
+
+com! -buffer Scalariform :call ExternalScalariform()
+nmap <buffer> <silent> ,sf :Scalariform<cr>

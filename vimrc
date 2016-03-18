@@ -28,9 +28,10 @@ let g:indexer_debugLogLevel = 2
 " Get Vundle up and running
 set nocompatible
 filetype off 
-set runtimepath+=~/.vim/bundle/Vundle.vim,~/.vim/bundle/vim-jira,~/.vim/bundle/vim-mpc,~/.vim/bundle/vim-sbt
+set runtimepath+=~/.vim/bundle/Vundle.vim
 
 call vundle#begin()
+Plugin 'henrik/vim-indexed-search'
 Plugin 'DfrankUtil'
 Plugin 'EasyMotion'
 Plugin 'GEverding/vim-hocon'
@@ -43,9 +44,9 @@ Plugin 'derekwyatt/vim-fswitch'
 Plugin 'derekwyatt/vim-protodef'
 Plugin 'derekwyatt/vim-scala'
 Plugin 'drmingdrmer/xptemplate'
+Plugin 'edsono/vim-matchit'
 Plugin 'elzr/vim-json'
 Plugin 'endel/vim-github-colorscheme'
-Plugin 'fmoralesc/vim-pad'
 Plugin 'godlygeek/tabular'
 Plugin 'gregsexton/gitv'
 Plugin 'idbrii/vim-perforce'
@@ -53,7 +54,9 @@ Plugin 'jceb/vim-hier'
 Plugin 'kien/ctrlp.vim'
 Plugin 'laurentgoudet/vim-howdoi'
 Plugin 'nanotech/jellybeans.vim'
-Plugin 'nathanaelkane/vim-indent-guides'
+if has("gui")
+  Plugin 'nathanaelkane/vim-indent-guides'
+endif
 Plugin 'noahfrederick/vim-hemisu'
 Plugin 'rking/ag.vim'
 Plugin 'Shougo/vimproc.vim'
@@ -84,7 +87,7 @@ filetype on
 filetype plugin on
 filetype indent on
 
-" Tabstops are 4 spaces
+" Tabstops are 2 spaces
 set tabstop=2
 set shiftwidth=2
 set softtabstop=2
@@ -238,7 +241,7 @@ set wildignore+=*.o,*.class,*.git,*.svn
 " Various characters are "wider" than normal fixed width characters, but the
 " default setting of ambiwidth (single) squeezes them into "normal" width, which
 " sucks.  Setting it to double makes it awesome.
-set ambiwidth=double
+set ambiwidth=single
 
 " OK, so I'm gonna remove the VIM safety net for a while and see if kicks my ass
 set nobackup
@@ -286,6 +289,7 @@ map <S-Insert> <MiddleMouse>
 map! <S-Insert> <MiddleMouse>
 
 " set text wrapping toggles
+nmap <silent> <c-/> <Plug>WimwikiIndex
 nmap <silent> ,ww :set invwrap<cr>
 nmap <silent> ,wW :windo set invwrap<cr>
 
@@ -353,6 +357,7 @@ nmap <silent> ,sw :execute ":resize " . line('$')<cr>
 
 " Use the bufkill plugin to eliminate a buffer but keep the window layout
 nmap ,bd :BD<cr>
+nmap ,bw :BW<cr>
 
 " Use CTRL-E to replace the original ',' mapping
 nnoremap <C-E> ,
@@ -441,8 +446,9 @@ endif
 "-----------------------------------------------------------------------------
 let g:p4DefaultPreset = 'ssl:p4p-kit001.corp.netsuite.com:1667 dwyatt_mac dwyatt'
 let g:p4ClientRoot = '/webdev'
-map ,co :execute ':PEdit ' . expand('%:p')<cr>
-map ,cr :execute ':PRevert ' . expand('%:p')<cr>
+map ,ca :execute ':!/usr/local/bin/p4 -c dwyatt_mac -u dwyatt -p ssl:p4p-kit001.corp.netsuite.com:1667 add ' . expand('%:p') . ' &'<cr>
+map ,co :execute ':!bash -c "chmod 664 ' . expand('%:p') . ' && (/usr/local/bin/p4 -c dwyatt_mac -u dwyatt -p ssl:p4p-kit001.corp.netsuite.com:1667 edit ' . expand('%:p') . ' &)"'<cr>
+map ,cr :execute ':!bash -c "chmod 444 ' . expand('%:p') . ' && (/usr/local/bin/p4 -c dwyatt_mac -u dwyatt -p ssl:p4p-kit001.corp.netsuite.com:1667 revert ' . expand('%:p') . ' &)"'<cr>
 
 "-----------------------------------------------------------------------------
 " Vimwiki
@@ -500,22 +506,31 @@ let NERDTreeIgnore=[ '\.ncb$', '\.suo$', '\.vcproj\.RIMNET', '\.obj$',
 " GPG Stuff
 "-----------------------------------------------------------------------------
 if has("mac")
-    let g:GPGExecutable = "gpg2"
-    let g:GPGUseAgent = 0
+  let g:GPGExecutable = "gpg2"
+  let g:GPGUseAgent = 0
 endif
 
 "-----------------------------------------------------------------------------
 " AG (SilverSearcher) Settings
 "-----------------------------------------------------------------------------
-function! AgProjectRoot(pattern)
+function! AgRoot(pattern)
   let dir = FindCodeDirOrRoot()
   execute ':Ag ' . a:pattern . ' ' . dir
 endfunction
 
+function! AgProjectRoot(pattern)
+  let dir = FindCodeDirOrRoot()
+  let current = expand('%:p')
+  let thedir = substitute(current, '^\(' . dir . '/[^/]\+\).*', '\1', '')
+  execute ':Ag ' . a:pattern . ' ' . thedir
+endfunction
+
+command! -nargs=+ AgRoot call AgRoot(<q-args>)
 command! -nargs=+ AgProjectRoot call AgProjectRoot(<q-args>)
 
-nmap ,sr :AgProjectRoot 
-let g:agprg = '/usr/local/bin/ag'
+nmap ,sR :AgRoot --scala --java --js
+nmap ,sr :AgProjectRoot --scala --java --js
+let g:ag_prg = '/usr/local/bin/ag'
 let g:ag_results_mapping_replacements = {
 \   'open_and_close': '<cr>',
 \   'open': 'o',
@@ -587,7 +602,7 @@ let g:ctrlp_switch_buffer = 'E'
 let g:ctrlp_tabpage_position = 'c'
 let g:ctrlp_working_path_mode = 'rc'
 let g:ctrlp_root_markers = ['.project.root']
-let g:ctrlp_user_command = 'find %s -type f | grep -E "\.(conf|scala|java|rb|sh|bash|py|json|js)$" | grep -v -E "/build/|/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes"'
+let g:ctrlp_user_command = 'find %s -type f | grep -E "\.(gradle|sbt|conf|scala|java|rb|sh|bash|py|json|js|xml)$" | grep -v -E "/build/|/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes"'
 let g:ctrlp_max_depth = 30
 let g:ctrlp_max_files = 0
 let g:ctrlp_open_new_file = 'r'
@@ -706,7 +721,7 @@ function! GetThisBranch(root)
 endfunction
 
 function! ListTagFiles(thisdir, thisbranch, isGit)
-  let fs = split(glob($HOME . '/.vim-tags/*'), "\n")
+  let fs = split(glob($HOME . '/.vim-tags/*-tags'), "\n")
   let ret = []
   for f in fs
     let fprime = substitute(f, '^.*/' . a:thisdir, '', '')
@@ -742,14 +757,18 @@ endfunction
 function! MaybeRunMakeTags()
   let root = FindCodeDirOrRoot()
   if root != "/"
-    call system("cd " . root . "; ~/bin/maketags -c " . root . " &")
+    for f in [ 'tdc', 'mbus', 'era', 'config' ]
+      if isdirectory(root . "/" . f)
+        call system("cd " . root . "; ~/bin/maketags -c " . root . "/" . f . "&")
+      endif
+    endfor
   endif
 endfunction
 
 augroup dw_git
   au!
   au BufEnter * call MaybeRunBranchSwitch()
-  au BufWritePost *.scala,*.js,*.java call MaybeRunMakeTags()
+  au BufWritePost *.scala,*.js,*.java,*.conf call MaybeRunMakeTags()
 augroup END
 
 command! RunBranchSwitch call MaybeRunBranchSwitch()

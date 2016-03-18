@@ -27,8 +27,7 @@ function! s:f.getPackageForFile(...)
                 \   [ '/src/multi-jvm/scala', '/src/multi-jvm/scala' ],
                 \   [ '/app/model/scala',     '/app/model/scala' ],
                 \   [ '/app/controllers',     '/app' ],
-                \   [ '/test/scala',          '/test/scala' ]
-                \ ]
+                \   [ '/test/scala',          '/test/scala' ] ]
     for e in regexes
       let idx = match(dir, e[0])
       if idx != -1
@@ -136,8 +135,8 @@ XPT afun hint=Creates\ an\ anonymous\ function
     `cursor^
 }
 
-XPT cclass hint=Creates\ a\ case\ class
-case class `className^(`...^`attrName^: `type^`...^)
+XPT cc hint=Creates\ a\ case\ class
+final case class `className^(`...^`attrName^: `type^`...^)
 
 XPT cobj hint=Creates\ a\ case\ object
 case object `objectName^

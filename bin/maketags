@@ -48,7 +48,7 @@ function get_branch
 }
 
 if [[ -z $code_dir ]]; then
-	code_dir=$(get_code_dir)
+	code_dir=$(get_code_dir)/tdc
 fi
 branch=$(get_branch)
 tagbranch=$(echo $branch | tr '/ ' '-')
@@ -57,6 +57,7 @@ if [[ -n $processes ]]; then
   vecho "Killing off: $processes"
   pkill ctags
 fi
+rm -f ~/.vim-tags/*.[0-9][0-9]*
 
 for dir in $(echo $code_dir/src $code_dir/*/src $code_dir/*/*/src $code_dir/*/*/*/src $code_dir/*/*/*/*/src $code_dir/*/*/*/*/*/src $code_dir/*/*/*/*/*/*/src)
 do
@@ -76,7 +77,12 @@ do
   fi
   if [[ $run = 1 ]]; then
     vecho Running CTAGS to $tagfile
-    /usr/local/bin/ctags --recurse -f $tagoutput $dir 2>/dev/null &
+    (
+      tempfile=$tagoutput.$$;
+      trap "rm -f $tempfile" EXIT;
+      /usr/local/bin/ctags --recurse -f $tempfile $dir;
+      mv $tempfile $tagoutput
+    ) &
   fi
 done
 wait
