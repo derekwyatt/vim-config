@@ -281,21 +281,13 @@ XPT package hint=package\ for\ this\ file
 XPT akkatest hint=Test\ file\ for\ Akka\ code
 `getPackageLine()^
 
-import akka.actor.{ActorSystem, Props, Actor, ActorRef}
-import akka.testkit.{TestKit, ImplicitSender}
-import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import akka.actor.{ ActorSystem, Props, Actor, ActorRef }
+import akka.testkit.{ TestKit, TestProbe }
+import org.scalatest.{ FlatSpecLike, Matchers }
 
-class `classname()^ extends TestKit(ActorSystem("`classname()^"))
-            with ImplicitSender
-            with WordSpecLike
-            with BeforeAndAfterAll
-            with Matchers {
+class `classname()^ extends TestKit(ActorSystem()) with FlatSpecLike with Matchers {
 
-    override def afterAll() {
-        system.shutdown()
-    }
-
-    "`classNameFromSpec()^" should {
+    "`classNameFromSpec()^" should "`do something^" in {
         `cursor^
     }
 }

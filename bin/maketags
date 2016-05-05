@@ -48,7 +48,7 @@ function get_branch
 }
 
 if [[ -z $code_dir ]]; then
-	code_dir=$(get_code_dir)/tdc
+	code_dir=$(get_code_dir)
 fi
 branch=$(get_branch)
 tagbranch=$(echo $branch | tr '/ ' '-')

@@ -49,7 +49,6 @@ Plugin 'elzr/vim-json'
 Plugin 'endel/vim-github-colorscheme'
 Plugin 'godlygeek/tabular'
 Plugin 'gregsexton/gitv'
-Plugin 'idbrii/vim-perforce'
 Plugin 'jceb/vim-hier'
 Plugin 'kien/ctrlp.vim'
 Plugin 'laurentgoudet/vim-howdoi'
@@ -442,15 +441,6 @@ else
 endif
 
 "-----------------------------------------------------------------------------
-" Perforce
-"-----------------------------------------------------------------------------
-let g:p4DefaultPreset = 'ssl:p4p-kit001.corp.netsuite.com:1667 dwyatt_mac dwyatt'
-let g:p4ClientRoot = '/webdev'
-map ,ca :execute ':!/usr/local/bin/p4 -c dwyatt_mac -u dwyatt -p ssl:p4p-kit001.corp.netsuite.com:1667 add ' . expand('%:p') . ' &'<cr>
-map ,co :execute ':!bash -c "chmod 664 ' . expand('%:p') . ' && (/usr/local/bin/p4 -c dwyatt_mac -u dwyatt -p ssl:p4p-kit001.corp.netsuite.com:1667 edit ' . expand('%:p') . ' &)"'<cr>
-map ,cr :execute ':!bash -c "chmod 444 ' . expand('%:p') . ' && (/usr/local/bin/p4 -c dwyatt_mac -u dwyatt -p ssl:p4p-kit001.corp.netsuite.com:1667 revert ' . expand('%:p') . ' &)"'<cr>
-
-"-----------------------------------------------------------------------------
 " Vimwiki
 "-----------------------------------------------------------------------------
 let g:vimwiki_list = [ { 'path': '~/code/stuff/vimwiki/TDC', 'path_html': '~/code/stuff/vimwiki/TDC_html' } ]
@@ -597,12 +587,32 @@ let g:make_scala_fuf_mappings = 0
 "-----------------------------------------------------------------------------
 " CtrlP Settings
 "-----------------------------------------------------------------------------
+function! LaunchForThisGitProject(cmd)
+  let dirs = split(expand('%:p:h'), '/')
+  let target = '/'
+  while len(dirs) != 0
+    let d = '/' . join(dirs, '/')
+    if isdirectory(d . '/.git')
+      let target = d
+      break
+    else
+      let dirs = dirs[:-2]
+    endif
+  endwhile
+  if target == '/'
+    echoerr "Project directory resolved to '/'"
+  else
+    execute ":" . a:cmd . " " . target
+  endif
+endfunction
+
 let g:ctrlp_regexp = 1
 let g:ctrlp_switch_buffer = 'E'
 let g:ctrlp_tabpage_position = 'c'
 let g:ctrlp_working_path_mode = 'rc'
 let g:ctrlp_root_markers = ['.project.root']
-let g:ctrlp_user_command = 'find %s -type f | grep -E "\.(gradle|sbt|conf|scala|java|rb|sh|bash|py|json|js|xml)$" | grep -v -E "/build/|/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes"'
+" let g:ctrlp_user_command = 'find %s -type f | grep -E "\.(gradle|sbt|conf|scala|java|rb|sh|bash|py|json|js|xml)$" | grep -v -E "/build/|/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes"'
+let g:ctrlp_user_command = 'find %s -type f | grep -v -E "\.git/|/build/|/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes|\.jar$"'
 let g:ctrlp_max_depth = 30
 let g:ctrlp_max_files = 0
 let g:ctrlp_open_new_file = 'r'
@@ -617,7 +627,7 @@ let g:ctrlp_prompt_mappings = {
 nmap ,fb :CtrlPBuffer<cr>
 nmap ,ff :CtrlP .<cr>
 nmap ,fF :execute ":CtrlP " . expand('%:p:h')<cr>
-nmap ,fr :CtrlP substitute(expand('%:p'), '^\(/webdev/NetLedger[^/]*\)/.*$', '\1', '')<cr>
+nmap ,fr :call LaunchForThisGitProject("CtrlP")<cr>
 nmap ,fm :CtrlPMixed<cr>
 
 "-----------------------------------------------------------------------------
@@ -646,19 +656,6 @@ let g:easytags_auto_highlight = 0
 "-----------------------------------------------------------------------------
 let g:last_known_branch = {}
 
-function! PerforceClientRoot()
-  let path = expand('%:p')
-  if path =~? '^/webdev/NetLedger.*'
-    return substitute(path, '^\(/webdev/NetLedger[^/]*\)/.*$', '\1', '')
-  else
-    return '/webdev'
-  endif
-endfunction
-
-function! PerforceClientName()
-  return 'dwyatt_mac'
-endfunction
-
 function! FindCodeDirOrRoot()
   let filedir = expand('%:p:h')
   if isdirectory(filedir)
@@ -671,12 +668,7 @@ function! FindCodeDirOrRoot()
         return gitdir[:-2] " chomp
       endif
     else
-      let p4root = PerforceClientRoot()
-      if stridx(filedir, p4root) == 0
-        return p4root
-      else
-        return '/'
-      endif
+      return '/'
     endif
   else
     return '/'
@@ -716,7 +708,7 @@ function! GetThisBranch(root)
   elseif HasGitRepo(a:root)
     return substitute(fugitive#head(), '/', '-', 'g')
   else
-    return PerforceClientName()
+    throw "You're not in a git repo"
   endif
 endfunction
 
