@@ -211,6 +211,16 @@ class `classname()^ extends WordSpec with Matchers {
     }
 }
 
+XPT tdcflatspec hint=Creates\ a\ TDC\ specific\ FlatSpec\ test\ file
+`getPackageLine()^
+
+import com.netsuite.tdc.TDCFlatSpec
+
+class `classname()^ extends TDCFlatSpec {
+    "`classNameFromSpec()^" should "`description^" in {
+        `cursor^
+    }
+}
 
 XPT flatspec hint=Creates\ a\ new\ FlatSpec\ test\ file
 `getPackageLine()^
@@ -243,7 +253,7 @@ def `receive^: Receive = {
 }
 
 XPT actor hint=Akka\ Actor\ class
-class `ActorName^ extends Actor with ActorLogging {
+class `ActorName^ extends Actor with LazyLogging {
     def receive = {
         `cursor^
     }

@@ -52,6 +52,8 @@ Plugin 'gregsexton/gitv'
 Plugin 'jceb/vim-hier'
 Plugin 'kien/ctrlp.vim'
 Plugin 'laurentgoudet/vim-howdoi'
+" let g:raindbow_active = 1
+" Plugin 'luochen1990/rainbow'
 Plugin 'nanotech/jellybeans.vim'
 if has("gui")
   Plugin 'nathanaelkane/vim-indent-guides'
@@ -131,7 +133,7 @@ set cpoptions=ces$
 function! DerekFugitiveStatusLine()
   let status = fugitive#statusline()
   let trimmed = substitute(status, '\[Git(\(.*\))\]', '\1', '')
-  let trimmed = substitute(trimmed, '\(\w\)\w\+\ze/', '\1', '')
+  let trimmed = substitute(trimmed, '\(\w\)\w\+[_/]\ze', '\1/', '')
   let trimmed = substitute(trimmed, '/[^_]*\zs_.*', '', '')
   if len(trimmed) == 0
     return ""
@@ -612,7 +614,8 @@ let g:ctrlp_tabpage_position = 'c'
 let g:ctrlp_working_path_mode = 'rc'
 let g:ctrlp_root_markers = ['.project.root']
 " let g:ctrlp_user_command = 'find %s -type f | grep -E "\.(gradle|sbt|conf|scala|java|rb|sh|bash|py|json|js|xml)$" | grep -v -E "/build/|/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes"'
-let g:ctrlp_user_command = 'find %s -type f | grep -v -E "\.git/|/build/|/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes|\.jar$"'
+" let g:ctrlp_user_command = 'find %s -type f | grep -v -E "\.git/|/build/|/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes|\.jar$"'
+let g:ctrlp_user_command = 'find %s -type f | grep -v -E "\.git/|/build/|/target|/project/project|\.jar$"'
 let g:ctrlp_max_depth = 30
 let g:ctrlp_max_files = 0
 let g:ctrlp_open_new_file = 'r'
@@ -749,11 +752,7 @@ endfunction
 function! MaybeRunMakeTags()
   let root = FindCodeDirOrRoot()
   if root != "/"
-    for f in [ 'tdc', 'mbus', 'era', 'config' ]
-      if isdirectory(root . "/" . f)
-        call system("cd " . root . "; ~/bin/maketags -c " . root . "/" . f . "&")
-      endif
-    endfor
+    call system("~/bin/maketags -c " . root . " &")
   endif
 endfunction
 
@@ -770,9 +769,8 @@ command! RunBranchSwitch call MaybeRunBranchSwitch()
 "-----------------------------------------------------------------------------
 function! BWipeoutAll()
   let lastbuf = bufnr('$')
-  let ids = sort(filter(range(1, bufnr('$')), 'bufexists(v:val)'))
+  let ids = sort(filter(range(1, lastbuf), 'bufexists(v:val)'))
   execute ":" . ids[0] . "," . lastbuf . "bwipeout"
-  unlet lastbuf
 endfunction
 
 if !exists('g:bufferJumpList')
