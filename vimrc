@@ -31,6 +31,8 @@ filetype off
 set runtimepath+=~/.vim/bundle/Vundle.vim
 
 call vundle#begin()
+Plugin 'hashivim/vim-terraform'
+Plugin 'VundleVim/Vundle.vim'
 Plugin 'henrik/vim-indexed-search'
 Plugin 'DfrankUtil'
 Plugin 'EasyMotion'
@@ -44,12 +46,11 @@ Plugin 'derekwyatt/vim-fswitch'
 Plugin 'derekwyatt/vim-protodef'
 Plugin 'derekwyatt/vim-scala'
 Plugin 'drmingdrmer/xptemplate'
-Plugin 'edsono/vim-matchit'
 Plugin 'elzr/vim-json'
 Plugin 'endel/vim-github-colorscheme'
 Plugin 'godlygeek/tabular'
 Plugin 'gregsexton/gitv'
-Plugin 'jceb/vim-hier'
+" Plugin 'jceb/vim-hier'
 Plugin 'kien/ctrlp.vim'
 Plugin 'laurentgoudet/vim-howdoi'
 " let g:raindbow_active = 1
@@ -59,7 +60,7 @@ if has("gui")
   Plugin 'nathanaelkane/vim-indent-guides'
 endif
 Plugin 'noahfrederick/vim-hemisu'
-Plugin 'rking/ag.vim'
+Plugin 'mileszs/ack.vim'
 Plugin 'Shougo/vimproc.vim'
 Plugin 'Shougo/unite.vim'
 Plugin 'scrooloose/nerdtree'
@@ -70,6 +71,7 @@ Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-unimpaired'
 Plugin 'vim-scripts/TwitVim'
 Plugin 'vim-scripts/gnupg.vim'
+Plugin 'vim-scripts/nginx.vim'
 Plugin 'vim-scripts/vim-geeknote'
 Plugin 'vim-scripts/vimwiki'
 Plugin 'vimprj'
@@ -94,6 +96,9 @@ set shiftwidth=2
 set softtabstop=2
 set expandtab
 set autoindent
+
+" By default, I don't like wrapping
+set nowrap
 
 " Printing options
 set printoptions=header:0,duplex:long,paper:letter
@@ -342,7 +347,7 @@ nmap <silent> <C-o> 10zl
 nmap <silent> <C-i> 10zh
 
 " Add a GUID to the current line
-imap <C-J>d <C-r>=substitute(system("uuidgen"), '.$', '', 'g')<CR>
+imap <C-Q>d <C-r>=substitute(substitute(system("uuidgen"), '.$', '', 'g'), '\\(\\u\\)', '\\l\\1', 'g')<CR>
 
 " Toggle fullscreen mode
 nmap <silent> <F3> :call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
@@ -380,29 +385,39 @@ nmap ,x :w<cr>:!chmod 755 %<cr>:e<cr>
 
 " Digraphs
 " Alpha
-imap <c-l><c-a> <c-k>a*
+inoremap <c-q><c-a> <c-k>a*
 " Beta
-imap <c-l><c-b> <c-k>b*
+inoremap <c-q><c-b> <c-k>b*
 " Gamma
-imap <c-l><c-g> <c-k>g*
+inoremap <c-q><c-g> <c-k>g*
 " Delta
-imap <c-l><c-d> <c-k>d*
+inoremap <c-q><c-d> <c-k>d*
 " Epslion
-imap <c-l><c-e> <c-k>e*
+inoremap <c-q><c-e> <c-k>e*
 " Lambda
-imap <c-l><c-l> <c-k>l*
+inoremap <c-q><c-l> <c-k>l*
 " Eta
-imap <c-l><c-y> <c-k>y*
+inoremap <c-q><c-y> <c-k>y*
 " Theta
-imap <c-l><c-h> <c-k>h*
+inoremap <c-q><c-h> <c-k>h*
 " Mu
-imap <c-l><c-m> <c-k>m*
+inoremap <c-q><c-m> <c-k>m*
 " Rho
-imap <c-l><c-r> <c-k>r*
+inoremap <c-q><c-r> <c-k>r*
 " Pi
-imap <c-l><c-p> <c-k>p*
+inoremap <c-q><c-p> <c-k>p*
 " Phi
-imap <c-l><c-f> <c-k>f*
+inoremap <c-q><c-f> <c-k>f*
+
+" ergonomics
+inoremap <C-H> (
+inoremap <C-J> )
+inoremap <C-K> {
+inoremap <C-L> }
+inoremap <C-Y> [
+inoremap <C-U> ]
+inoremap <C-D> *
+inoremap <C-F> _
 
 function! ClearText(type, ...)
 	let sel_save = &selection
@@ -505,28 +520,25 @@ endif
 "-----------------------------------------------------------------------------
 " AG (SilverSearcher) Settings
 "-----------------------------------------------------------------------------
+let g:ackprg = 'ag --nogroup --nocolor --column --vimgrep'
+let g:ack_wildignore = 0
 function! AgRoot(pattern)
   let dir = FindCodeDirOrRoot()
-  execute ':Ag ' . a:pattern . ' ' . dir
+  execute ':Ack! ' . a:pattern . ' ' . dir
 endfunction
 
 function! AgProjectRoot(pattern)
   let dir = FindCodeDirOrRoot()
   let current = expand('%:p')
   let thedir = substitute(current, '^\(' . dir . '/[^/]\+\).*', '\1', '')
-  execute ':Ag ' . a:pattern . ' ' . thedir
+  execute ':Ack! ' . a:pattern . ' ' . thedir
 endfunction
 
 command! -nargs=+ AgRoot call AgRoot(<q-args>)
 command! -nargs=+ AgProjectRoot call AgProjectRoot(<q-args>)
 
-nmap ,sR :AgRoot --scala --java --js
-nmap ,sr :AgProjectRoot --scala --java --js
-let g:ag_prg = '/usr/local/bin/ag'
-let g:ag_results_mapping_replacements = {
-\   'open_and_close': '<cr>',
-\   'open': 'o',
-\ }
+nmap ,sR :AgRoot --scala --java --js 
+nmap ,sr :AgProjectRoot --scala --java --js 
 
 "-----------------------------------------------------------------------------
 " FSwitch mappings
@@ -632,6 +644,7 @@ nmap ,ff :CtrlP .<cr>
 nmap ,fF :execute ":CtrlP " . expand('%:p:h')<cr>
 nmap ,fr :call LaunchForThisGitProject("CtrlP")<cr>
 nmap ,fm :CtrlPMixed<cr>
+nmap ,fC :CtrlPClearCache<cr>
 
 "-----------------------------------------------------------------------------
 " Gundo Settings
@@ -720,9 +733,11 @@ function! ListTagFiles(thisdir, thisbranch, isGit)
   let ret = []
   for f in fs
     let fprime = substitute(f, '^.*/' . a:thisdir, '', '')
-    if fprime !=# f
-      call add(ret, f)
-    elseif a:isGit && match(f, '-' . a:thisbranch . '-') != -1
+    if a:isGit
+      if match(f, '-' . a:thisbranch . '-') != -1
+        call add(ret, f)
+      endif
+    elseif fprime !=# f
       call add(ret, f)
     endif
   endfor
@@ -760,6 +775,11 @@ augroup dw_git
   au!
   au BufEnter * call MaybeRunBranchSwitch()
   au BufWritePost *.scala,*.js,*.java,*.conf call MaybeRunMakeTags()
+augroup END
+
+augroup dw_scala
+  au!
+  au BufEnter *.scala setl breakindent linebreak showbreak=.. breakindentopt=min:80
 augroup END
 
 command! RunBranchSwitch call MaybeRunBranchSwitch()

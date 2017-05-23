@@ -222,6 +222,17 @@ class `classname()^ extends TDCFlatSpec {
     }
 }
 
+XPT tdcakkaspec hint=Creates\ a\ TDC\ specific\ Akka\ test\ file
+`getPackageLine()^
+
+import com.netsuite.tdc.TDCAkkaTest
+
+class `classname()^ extends TDCAkkaTest {
+    "`classNameFromSpec()^" should "`description^" in {
+        `cursor^
+    }
+}
+
 XPT flatspec hint=Creates\ a\ new\ FlatSpec\ test\ file
 `getPackageLine()^
 
@@ -359,7 +370,7 @@ scalaVersion := "`2.11.7^"
 XPT dep hint=libraryDependencies\ :=\ Seq\(...\)
 libraryDependencies := Seq(
     "`groupId^" % "`artifactId^" % "`revision^",
-    "org.scalatest" %% "scalatest" % "2.2.4" % "test"
+    "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 )
 
 XPT extension hint=Creates\ a\ new\ Akka\ Extension
