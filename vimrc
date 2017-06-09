@@ -31,6 +31,10 @@ filetype off
 set runtimepath+=~/.vim/bundle/Vundle.vim
 
 call vundle#begin()
+Plugin 'atelierbram/vim-colors_atelier-schemes'
+Plugin 'prognostic/plasticine'
+Plugin 'cseelus/vim-colors-lucid'
+Plugin 'mhartington/oceanic-next'
 Plugin 'hashivim/vim-terraform'
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'henrik/vim-indexed-search'
@@ -370,6 +374,7 @@ nnoremap <C-E> ,
 
 " Alright... let's try this out
 imap jj <esc>
+imap jw <esc>:wq<c-r>
 cmap jj <esc>
 
 " I like jj - Let's try something else fun
@@ -414,8 +419,6 @@ inoremap <C-H> (
 inoremap <C-J> )
 inoremap <C-K> {
 inoremap <C-L> }
-inoremap <C-Y> [
-inoremap <C-U> ]
 inoremap <C-D> *
 inoremap <C-F> _
 
@@ -450,8 +453,8 @@ set nocursorline
 set nocursorcolumn
 
 if has("mac")
-  let g:main_font = "Source\\ Code\\ Pro\\ Light:h11"
-  let g:small_font = "Source\\ Code\\ Pro\\ Light:h2"
+  let g:main_font = "Source\\ Code\\ Pro\\ Medium:h11"
+  let g:small_font = "Source\\ Code\\ Pro\\ Medium:h2"
 else
   let g:main_font = "DejaVu\\ Sans\\ Mono\\ 9"
   let g:small_font = "DejaVu\\ Sans\\ Mono\\ 2"
@@ -985,7 +988,8 @@ iab teh        the
 "-----------------------------------------------------------------------------
 if has("gui_running")
   exe "set guifont=" . g:main_font
-  colorscheme navajo-night
+  set background=light
+  colorscheme Atelier_LakesideLight
   if !exists("g:vimrcloaded")
     winpos 0 0
     if !&diff
