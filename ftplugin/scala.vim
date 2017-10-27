@@ -44,6 +44,28 @@ endfunction
 map ,SU :call scala#NiceCharsToUnicodeChars()<cr>
 map ,SA :call scala#UnicodeCharsToNiceChars()<cr>
 
+function! ScalaImportFromTag(tag)
+  let tags = taglist(a:tag)
+  let import = ''
+  for t in tags
+    let pack = substitute(system('grep ^package ' . t['filename'] . ' | head | cut -f2 -d" "'), '\n\+$', '', '')
+    if pack != ''
+      let import = 'import ' . pack . '.' . a:tag
+      break
+    endif
+  endfor
+
+  if import != ''
+    normal mz
+    execute ':/package/+ normal o' . import
+    call SortScalaImports()
+    normal `z
+  else
+    echoerr 'Unable to find proper import for ' . a:tag
+  endif
+endfunction
+
+nmap <buffer> <silent> ,it :call ScalaImportFromTag(expand("<cword>"))<cr>
 
 "-----------------------------------------------------------------------------
 " Transitioning between test files and source files

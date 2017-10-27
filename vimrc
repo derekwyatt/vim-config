@@ -60,15 +60,16 @@ Plugin 'laurentgoudet/vim-howdoi'
 " let g:raindbow_active = 1
 " Plugin 'luochen1990/rainbow'
 Plugin 'nanotech/jellybeans.vim'
-if has("gui")
-  Plugin 'nathanaelkane/vim-indent-guides'
-endif
+" if has("gui")
+"   Plugin 'nathanaelkane/vim-indent-guides'
+" endif
 Plugin 'noahfrederick/vim-hemisu'
 Plugin 'mileszs/ack.vim'
 Plugin 'Shougo/vimproc.vim'
 Plugin 'Shougo/unite.vim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'sjl/gundo.vim'
+Plugin 'suan/vim-instant-markdown'
 Plugin 'terryma/vim-multiple-cursors'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-surround'
@@ -374,7 +375,7 @@ nnoremap <C-E> ,
 
 " Alright... let's try this out
 imap jj <esc>
-imap jw <esc>:wq<c-r>
+imap jw <esc>:w
 cmap jj <esc>
 
 " I like jj - Let's try something else fun
@@ -453,7 +454,7 @@ set nocursorline
 set nocursorcolumn
 
 if has("mac")
-  let g:main_font = "Source\\ Code\\ Pro\\ Medium:h11"
+  let g:main_font = "Source\\ Code\\ Pro\\ Medium:h10"
   let g:small_font = "Source\\ Code\\ Pro\\ Medium:h2"
 else
   let g:main_font = "DejaVu\\ Sans\\ Mono\\ 9"
@@ -525,23 +526,37 @@ endif
 "-----------------------------------------------------------------------------
 let g:ackprg = 'ag --nogroup --nocolor --column --vimgrep'
 let g:ack_wildignore = 0
+let b:ack_filetypes = ''
+
+let g:ack_mappings = {
+      \ "t": "<C-W><CR><C-W>T",
+      \ "T": "<C-W><CR><C-W>TgT<C-W>j",
+      \ "O": "<CR>",
+      \ "o": "<CR><C-W><C-W>:ccl<CR>",
+      \ "go": "<CR><C-W>j",
+      \ "h": "<C-W><CR><C-W>K",
+      \ "H": "<C-W><CR><C-W>K<C-W>b",
+      \ "v": "<C-W><CR><C-W>H<C-W>b<C-W>J<C-W>t",
+      \ "gv": "<C-W><CR><C-W>H<C-W>b<C-W>J" }
+
 function! AgRoot(pattern)
   let dir = FindCodeDirOrRoot()
-  execute ':Ack! ' . a:pattern . ' ' . dir
+  let cmd = ':Ack! ' . b:ack_filetypes . ' ' . a:pattern . ' ' . dir
+  execute cmd
 endfunction
 
 function! AgProjectRoot(pattern)
   let dir = FindCodeDirOrRoot()
   let current = expand('%:p')
   let thedir = substitute(current, '^\(' . dir . '/[^/]\+\).*', '\1', '')
-  execute ':Ack! ' . a:pattern . ' ' . thedir
+  execute ':Ack! ' . b:ack_filetypes . ' ' . a:pattern . ' ' . thedir
 endfunction
 
 command! -nargs=+ AgRoot call AgRoot(<q-args>)
 command! -nargs=+ AgProjectRoot call AgProjectRoot(<q-args>)
 
-nmap ,sR :AgRoot --scala --java --js 
-nmap ,sr :AgProjectRoot --scala --java --js 
+nmap ,sr :AgRoot<space>
+nmap ,sp :AgProjectRoot<space>
 
 "-----------------------------------------------------------------------------
 " FSwitch mappings
@@ -570,36 +585,17 @@ nmap ,tw :FriendsTwitter<cr>
 nmap ,tm :UserTwitter<cr>
 nmap ,tM :MentionsTwitter<cr>
 function! TwitVimMappings()
-    nmap <buffer> U :exe ":UnfollowTwitter " . expand("<cword>")<cr>
-    nmap <buffer> F :exe ":FollowTwitter " . expand("<cword>")<cr>
-    nmap <buffer> 7 :BackTwitter<cr>
-    nmap <buffer> 8 :ForwardTwitter<cr>
-    nmap <buffer> 1 :PreviousTwitter<cr>
-    nmap <buffer> 2 :NextTwitter<cr>
+  nmap <buffer> U :exe ":UnfollowTwitter " . expand("<cword>")<cr>
+  nmap <buffer> F :exe ":FollowTwitter " . expand("<cword>")<cr>
+  nmap <buffer> 7 :BackTwitter<cr>
+  nmap <buffer> 8 :ForwardTwitter<cr>
+  nmap <buffer> 1 :PreviousTwitter<cr>
+  nmap <buffer> 2 :NextTwitter<cr>
 endfunction
 augroup derek_twitvim
   au!
   au FileType twitvim call TwitVimMappings()
 augroup END
-
-"-----------------------------------------------------------------------------
-" VimSokoban settings
-"-----------------------------------------------------------------------------
-" Sokoban stuff
-let g:SokobanLevelDirectory = "/home/dwyatt/.vim/bundle/vim-sokoban/VimSokoban/"
-
-"-----------------------------------------------------------------------------
-" FuzzyFinder Settings
-"-----------------------------------------------------------------------------
-let g:fuf_splitPathMatching = 1
-let g:fuf_maxMenuWidth = 110
-let g:fuf_timeFormat = ''
-nmap <silent> ,fv :FufFile ~/.vim/<cr>
-nmap <silent> ,fc :FufMruCmd<cr>
-nmap <silent> ,fm :FufMruFile<cr>
-
-let g:CommandTMatchWindowAtTop = 1
-let g:make_scala_fuf_mappings = 0
 
 "-----------------------------------------------------------------------------
 " CtrlP Settings
@@ -630,7 +626,7 @@ let g:ctrlp_working_path_mode = 'rc'
 let g:ctrlp_root_markers = ['.project.root']
 " let g:ctrlp_user_command = 'find %s -type f | grep -E "\.(gradle|sbt|conf|scala|java|rb|sh|bash|py|json|js|xml)$" | grep -v -E "/build/|/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes"'
 " let g:ctrlp_user_command = 'find %s -type f | grep -v -E "\.git/|/build/|/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes|\.jar$"'
-let g:ctrlp_user_command = 'find %s -type f | grep -v -E "\.git/|/build/|/target|/project/project|\.jar$"'
+let g:ctrlp_user_command = 'find %s -type f | grep -v -E "\.idea/|\.git/|/build/|/target|/project/project|\.jar$"'
 let g:ctrlp_max_depth = 30
 let g:ctrlp_max_files = 0
 let g:ctrlp_open_new_file = 'r'
@@ -783,6 +779,7 @@ augroup END
 augroup dw_scala
   au!
   au BufEnter *.scala setl breakindent linebreak showbreak=.. breakindentopt=min:80
+  au BufEnter *.scala let b:ack_filetypes='--scala --java --json'
 augroup END
 
 command! RunBranchSwitch call MaybeRunBranchSwitch()
@@ -792,8 +789,19 @@ command! RunBranchSwitch call MaybeRunBranchSwitch()
 "-----------------------------------------------------------------------------
 function! BWipeoutAll()
   let lastbuf = bufnr('$')
-  let ids = sort(filter(range(1, lastbuf), 'bufexists(v:val)'))
+  let ids = sort(filter(range(1, lastbuf), 'bufexists(v:val)'), 'n')
   execute ":" . ids[0] . "," . lastbuf . "bwipeout"
+endfunction
+
+function! CloseBufferIfNoFile()
+  let lastbuf = bufnr('$')
+  let ids = sort(filter(range(1, lastbuf), 'bufexists(v:val) && buflisted(v:val) && bufloaded(v:val)'), 'n')
+  for b in ids
+    let name = bufname(b)
+    if !filereadable(name)
+      execute ':' . b . 'bwipeout!'
+    endif
+  endfor
 endfunction
 
 if !exists('g:bufferJumpList')

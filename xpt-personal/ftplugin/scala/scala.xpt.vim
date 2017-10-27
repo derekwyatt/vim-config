@@ -364,7 +364,7 @@ name := "`name^"
 
 version := "`0.1^"
 
-scalaVersion := "`2.11.7^"
+scalaVersion := "`2.12.2^"
 `^
 
 XPT dep hint=libraryDependencies\ :=\ Seq\(...\)
