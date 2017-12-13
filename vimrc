@@ -541,7 +541,12 @@ let g:ack_mappings = {
 
 function! AgRoot(pattern)
   let dir = FindCodeDirOrRoot()
-  let cmd = ':Ack! ' . b:ack_filetypes . ' ' . a:pattern . ' ' . dir
+  if exists('b:ack_filetypes')
+    let ft = b:ack_filetypes
+  else
+    let ft = ''
+  endif
+  let cmd = ':Ack! ' . ft . ' ' . a:pattern . ' ' . dir
   execute cmd
 endfunction
 
@@ -549,7 +554,12 @@ function! AgProjectRoot(pattern)
   let dir = FindCodeDirOrRoot()
   let current = expand('%:p')
   let thedir = substitute(current, '^\(' . dir . '/[^/]\+\).*', '\1', '')
-  execute ':Ack! ' . b:ack_filetypes . ' ' . a:pattern . ' ' . thedir
+  if exists('b:ack_filetypes')
+    let ft = b:ack_filetypes
+  else
+    let ft = ''
+  endif
+  execute ':Ack! ' . ft . ' ' . a:pattern . ' ' . thedir
 endfunction
 
 command! -nargs=+ AgRoot call AgRoot(<q-args>)
