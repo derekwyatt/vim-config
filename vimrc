@@ -44,44 +44,30 @@ Plugin 'GEverding/vim-hocon'
 Plugin 'MarcWeber/vim-addon-completion'
 Plugin 'VisIncr'
 Plugin 'altercation/vim-colors-solarized'
-Plugin 'bufkill.vim'
 Plugin 'clones/vim-genutils'
 Plugin 'derekwyatt/vim-fswitch'
-Plugin 'derekwyatt/vim-protodef'
 Plugin 'derekwyatt/vim-scala'
 Plugin 'drmingdrmer/xptemplate'
 Plugin 'elzr/vim-json'
 Plugin 'endel/vim-github-colorscheme'
 Plugin 'godlygeek/tabular'
 Plugin 'gregsexton/gitv'
-" Plugin 'jceb/vim-hier'
 Plugin 'kien/ctrlp.vim'
-Plugin 'laurentgoudet/vim-howdoi'
-" let g:raindbow_active = 1
-" Plugin 'luochen1990/rainbow'
+" Plugin 'laurentgoudet/vim-howdoi'
 Plugin 'nanotech/jellybeans.vim'
-" if has("gui")
-"   Plugin 'nathanaelkane/vim-indent-guides'
-" endif
-Plugin 'noahfrederick/vim-hemisu'
+if has("gui")
+  Plugin 'nathanaelkane/vim-indent-guides'
+endif
 Plugin 'mileszs/ack.vim'
-Plugin 'Shougo/vimproc.vim'
-Plugin 'Shougo/unite.vim'
-Plugin 'scrooloose/nerdtree'
 Plugin 'sjl/gundo.vim'
 Plugin 'suan/vim-instant-markdown'
-Plugin 'terryma/vim-multiple-cursors'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-unimpaired'
-Plugin 'vim-scripts/TwitVim'
 Plugin 'vim-scripts/gnupg.vim'
 Plugin 'vim-scripts/nginx.vim'
-Plugin 'vim-scripts/vim-geeknote'
-Plugin 'vim-scripts/vimwiki'
-Plugin 'vimprj'
-Plugin 'whatyouhide/vim-gotham'
 Plugin 'xolox/vim-misc'
+Plugin 'bufkill.vim'
 call vundle#end()
 filetype plugin indent on
 
@@ -207,7 +193,7 @@ set scrolloff=8
 set virtualedit=all
 
 " Disable encryption (:X)
-set key=
+" set key=
 
 " Make the command-line completion better
 set wildmenu
@@ -241,10 +227,13 @@ set autoread
 
 set grepprg=grep\ -nH\ $*
 
-" Trying out the line numbering thing... never liked it, but that doesn't mean
-" I shouldn't give it another go :)
+" Line numbering
 set number
 set relativenumber
+
+augroup terminalstuff
+  au! BufNew,BufNewFile,BufEnter,BufWinEnter term://* setlocal nonumber norelativenumber
+augroup END
 
 " Types of files to ignore when autocompleting things
 set wildignore+=*.o,*.class,*.git,*.svn
@@ -317,6 +306,64 @@ cnoremap <ESC>f     <S-Right>
 cnoremap <ESC><C-F> <S-Right>
 cnoremap <ESC><C-H> <C-W>
 
+function! SwitchToTerminal()
+  let termbuf = bufname('term://*')
+  if termbuf == ''
+    vsplit
+    wincmd L
+    vertical resize 100
+    terminal
+  else
+    let winnr = bufwinnr(termbuf)
+    execute ':' . winnr . 'wincmd w'
+    normal GA
+  endif
+endfunction
+
+function! LeaveTerminal()
+  execute ':' . winnr('#') . 'wincmd w'
+endfunction
+
+function! WindowLayout()
+  let termbuf = bufname('term://*')
+  let wincount = winnr('$')
+  let width = 416
+  if termbuf != ''
+    let winnr = bufwinnr(termbuf)
+    execute ':' . winnr . 'wincmd w'
+    wincmd L
+    vertical resize 100
+    let width = width - 100
+    let wincount = wincount - 1
+  endif
+  if wincount == 1
+    :1wincmd w
+    wincmd H
+    execute ':vertical resize ' . width
+  elseif wincount == 2
+    :1wincmd w
+    wincmd H
+    execute ':vertical resize ' . width / 2
+    :2wincmd w
+    execute ':vertical resize ' . width / 2
+  elseif termbuf != ''
+    let wincount = wincount - 1
+    if wincount == 3
+      :1wincmd w
+      wincmd H
+      execute ':vertical resize ' . width / 2
+      :2wincmd w
+      resize 52
+    elseif wincount == 4
+      :1wincmd w
+      execute ':vertical resize ' . width / 2
+      resize 52
+      :3wincmd w
+      resize 52
+    endif
+  endif
+endfunction
+
 " Maps to make handling windows a bit easier
 "noremap <silent> ,h :wincmd h<CR>
 "noremap <silent> ,j :wincmd j<CR>
@@ -342,6 +389,14 @@ noremap <silent> <C-7> <C-W>>
 noremap <silent> <C-8> <C-W>+
 noremap <silent> <C-9> <C-W>+
 noremap <silent> <C-0> <C-W>>
+noremap <silent> ,ct :call SwitchToTerminal()<CR>
+noremap <silent> ,cq :1wincmd w<CR>
+noremap <silent> ,ca :2wincmd w<CR>
+noremap <silent> ,cw :3wincmd w<CR>
+noremap <silent> ,cs :4wincmd w<CR>
+noremap <silent> ,c3 :call WindowLayout()<CR>
+noremap <silent> ,cz :execute ':' . g:lastWindowNumber . 'wincmd w'<cr>
+tnoremap <silent> <c-,> <c-\><c-n>:call LeaveTerminal()<CR>
 
 " Edit the vimrc file
 nmap <silent> ,ev :e $MYVIMRC<CR>
@@ -375,7 +430,7 @@ nnoremap <C-E> ,
 
 " Alright... let's try this out
 imap jj <esc>
-imap jw <esc>:w
+" imap jw <esc>:w
 cmap jj <esc>
 
 " I like jj - Let's try something else fun
@@ -424,22 +479,22 @@ inoremap <C-D> *
 inoremap <C-F> _
 
 function! ClearText(type, ...)
-	let sel_save = &selection
-	let &selection = "inclusive"
-	let reg_save = @@
-	if a:0 " Invoked from Visual mode, use '< and '> marks
-		silent exe "normal! '<" . a:type . "'>r w"
-	elseif a:type == 'line'
-		silent exe "normal! '[V']r w"
-	elseif a:type == 'line'
-		silent exe "normal! '[V']r w"
-    elseif a:type == 'block'
-      silent exe "normal! `[\<C-V>`]r w"
-    else
-      silent exe "normal! `[v`]r w"
-    endif
-    let &selection = sel_save
-    let @@ = reg_save
+  let sel_save = &selection
+  let &selection = "inclusive"
+  let reg_save = @@
+  if a:0 " Invoked from Visual mode, use '< and '> marks
+    silent exe "normal! '<" . a:type . "'>r w"
+  elseif a:type == 'line'
+    silent exe "normal! '[V']r w"
+  elseif a:type == 'line'
+    silent exe "normal! '[V']r w"
+  elseif a:type == 'block'
+    silent exe "normal! `[\<C-V>`]r w"
+  else
+    silent exe "normal! `[v`]r w"
+  endif
+  let &selection = sel_save
+  let @@ = reg_save
 endfunction
 
 " Syntax coloring lines that are too long just slows down the world
@@ -455,6 +510,7 @@ set nocursorcolumn
 
 if has("mac")
   let g:main_font = "Source\\ Code\\ Pro\\ Medium:h10"
+  " let g:main_font = "Fira\\ Code\\ Retina:h10"
   let g:small_font = "Source\\ Code\\ Pro\\ Medium:h2"
 else
   let g:main_font = "DejaVu\\ Sans\\ Mono\\ 9"
@@ -476,7 +532,7 @@ augroup END
 "-----------------------------------------------------------------------------
 " Indent Guides
 "-----------------------------------------------------------------------------
-let g:indent_guides_color_change_percent = 3
+let g:indent_guides_color_change_percent = 1.1
 "let g:indent_guides_guide_size = 1
 let g:indent_guides_enable_on_vim_startup = 1
 
@@ -485,15 +541,12 @@ let g:indent_guides_enable_on_vim_startup = 1
 "-----------------------------------------------------------------------------
 " Thanks to Drew Neil
 autocmd User fugitive
-  \ if fugitive#buffer().type() =~# '^\%(tree\|blob\)$' |
-  \  noremap <buffer> .. :edit %:h<cr> |
-  \ endif
+      \ if fugitive#buffer().type() =~# '^\%(tree\|blob\)$' |
+      \  noremap <buffer> .. :edit %:h<cr> |
+      \ endif
 autocmd BufReadPost fugitive://* set bufhidden=delete
 
-nmap ,gs :Gstatus<cr>
-nmap ,ge :Gedit<cr>
-nmap ,gw :Gwrite<cr>
-nmap ,gr :Gread<cr>
+:command! Gammend :Gcommit --amend
 
 "-----------------------------------------------------------------------------
 " NERD Tree Plugin Settings
@@ -509,9 +562,9 @@ let NERDTreeShowBookmarks=1
 
 " Don't display these kinds of files
 let NERDTreeIgnore=[ '\.ncb$', '\.suo$', '\.vcproj\.RIMNET', '\.obj$',
-                   \ '\.ilk$', '^BuildLog.htm$', '\.pdb$', '\.idb$',
-                   \ '\.embed\.manifest$', '\.embed\.manifest.res$',
-                   \ '\.intermediate\.manifest$', '^mt.dep$' ]
+      \ '\.ilk$', '^BuildLog.htm$', '\.pdb$', '\.idb$',
+      \ '\.embed\.manifest$', '\.embed\.manifest.res$',
+      \ '\.intermediate\.manifest$', '^mt.dep$' ]
 
 "-----------------------------------------------------------------------------
 " GPG Stuff
@@ -571,15 +624,15 @@ nmap ,sp :AgProjectRoot<space>
 "-----------------------------------------------------------------------------
 " FSwitch mappings
 "-----------------------------------------------------------------------------
-nmap <silent> ,of :FSHere<CR>
-nmap <silent> ,ol :FSRight<CR>
-nmap <silent> ,oL :FSSplitRight<CR>
-nmap <silent> ,oh :FSLeft<CR>
-nmap <silent> ,oH :FSSplitLeft<CR>
-nmap <silent> ,ok :FSAbove<CR>
-nmap <silent> ,oK :FSSplitAbove<CR>
-nmap <silent> ,oj :FSBelow<CR>
-nmap <silent> ,oJ :FSSplitBelow<CR>
+" nmap <silent> ,of :FSHere<CR>
+" nmap <silent> ,ol :FSRight<CR>
+" nmap <silent> ,oL :FSSplitRight<CR>
+" nmap <silent> ,oh :FSLeft<CR>
+" nmap <silent> ,oH :FSSplitLeft<CR>
+" nmap <silent> ,ok :FSAbove<CR>
+" nmap <silent> ,oK :FSSplitAbove<CR>
+" nmap <silent> ,oj :FSBelow<CR>
+" nmap <silent> ,oJ :FSSplitBelow<CR>
 
 "-----------------------------------------------------------------------------
 " XPTemplate settings
@@ -634,22 +687,21 @@ let g:ctrlp_switch_buffer = 'E'
 let g:ctrlp_tabpage_position = 'c'
 let g:ctrlp_working_path_mode = 'rc'
 let g:ctrlp_root_markers = ['.project.root']
-" let g:ctrlp_user_command = 'find %s -type f | grep -E "\.(gradle|sbt|conf|scala|java|rb|sh|bash|py|json|js|xml)$" | grep -v -E "/build/|/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes"'
-" let g:ctrlp_user_command = 'find %s -type f | grep -v -E "\.git/|/build/|/quickfix|/resolution-cache|/streams|/admin/target|/classes/|/test-classes/|/sbt-0.13/|/cache/|/project/target|/project/project|/test-reports|/it-classes|\.jar$"'
-let g:ctrlp_user_command = 'find %s -type f | grep -v -E "\.idea/|\.git/|/build/|/target|/project/project|\.jar$"'
+let g:ctrlp_user_command = 'find %s -type f | grep -v -E "\.idea/|\.git/|/build/|/project/project|/target/config-classes|/target/docker|/target/k8s|/target/protobuf_external|/target/scala-2\.[0-9]*/api|/target/scala-2\.[0-9]*/classes|/target/scala-2\.[0-9]*/e2etest-classes|/target/scala-2\.[0-9]*/it-classes|/target/scala-2\.[0-9]*/resolution-cache|/target/scala-2\.[0-9]*/sbt-0.13|/target/scala-2\.[0-9]*/test-classes|/target/streams|/target/test-reports|/target/universal|\.jar$"'
 let g:ctrlp_max_depth = 30
 let g:ctrlp_max_files = 0
 let g:ctrlp_open_new_file = 'r'
 let g:ctrlp_open_multiple_files = '1ri'
 let g:ctrlp_match_window = 'max:40'
 let g:ctrlp_prompt_mappings = {
-  \ 'PrtSelectMove("j")':   ['<c-n>'],
-  \ 'PrtSelectMove("k")':   ['<c-p>'],
-  \ 'PrtHistory(-1)':       ['<c-j>', '<down>'],
-  \ 'PrtHistory(1)':        ['<c-i>', '<up>']
-\ }
+      \ 'PrtSelectMove("j")':   ['<c-n>'],
+      \ 'PrtSelectMove("k")':   ['<c-p>'],
+      \ 'PrtHistory(-1)':       ['<c-j>', '<down>'],
+      \ 'PrtHistory(1)':        ['<c-i>', '<up>']
+      \ }
 nmap ,fb :CtrlPBuffer<cr>
 nmap ,ff :CtrlP .<cr>
+nmap ,ft :CtrlPTag<cr>
 nmap ,fF :execute ":CtrlP " . expand('%:p:h')<cr>
 nmap ,fr :call LaunchForThisGitProject("CtrlP")<cr>
 nmap ,fm :CtrlPMixed<cr>
@@ -668,13 +720,6 @@ let g:ConqueTerm_ReadUnfocused = 1
 let g:ConqueTerm_InsertOnEnter = 1
 let g:ConqueTerm_PromptRegex = '^-->'
 let g:ConqueTerm_TERM = 'xterm'
-
-"-----------------------------------------------------------------------------
-" EasyTags
-"-----------------------------------------------------------------------------
-let g:home_code_dir = '/Users/dwyatt/code'
-let g:easytags_async = 1
-let g:easytags_auto_highlight = 0
 
 "-----------------------------------------------------------------------------
 " Branches and Tags
@@ -802,6 +847,18 @@ function! BWipeoutAll()
   let ids = sort(filter(range(1, lastbuf), 'bufexists(v:val)'), 'n')
   execute ":" . ids[0] . "," . lastbuf . "bwipeout"
 endfunction
+
+function! BdRegex(regex)
+  let re = substitute(substitute(a:regex, '^\.\*', '', ''), '\.\*$', '', '')
+  let ids = sort(filter(range(1, bufnr('$')), 'bufexists(v:val) && bufname(v:val) =~ ".*' . re . '.*"'), 'n')
+  for id in ids
+    let name = bufname(id)
+    execute ":" . id . "bwipeout"
+    echo "Deleted: " . name
+  endfor
+endfunction
+
+command! -nargs=1 BdRegex call BdRegex(<q-args>)
 
 function! CloseBufferIfNoFile()
   let lastbuf = bufnr('$')
@@ -1004,18 +1061,20 @@ iab teh        the
 "-----------------------------------------------------------------------------
 " Set up the window colors and size
 "-----------------------------------------------------------------------------
-if has("gui_running")
-  exe "set guifont=" . g:main_font
+if has('gui_running') || has('gui_vimr')
   set background=light
   colorscheme Atelier_LakesideLight
-  if !exists("g:vimrcloaded")
-    winpos 0 0
-    if !&diff
-      winsize 130 120
-    else
-      winsize 227 120
+  if has('gui_running')
+    exe "set guifont=" . g:main_font
+    if !exists("g:vimrcloaded")
+      winpos 0 0
+      if !&diff
+        winsize 130 120
+      else
+        winsize 227 120
+      endif
+      let g:vimrcloaded = 1
     endif
-    let g:vimrcloaded = 1
   endif
 endif
 :nohls
