@@ -28,48 +28,44 @@ let g:indexer_debugLogLevel = 2
 " Get Vundle up and running
 set nocompatible
 filetype off 
-set runtimepath+=~/.vim/bundle/Vundle.vim
 
-call vundle#begin()
-Plugin 'atelierbram/vim-colors_atelier-schemes'
-Plugin 'prognostic/plasticine'
-Plugin 'cseelus/vim-colors-lucid'
-Plugin 'mhartington/oceanic-next'
-Plugin 'hashivim/vim-terraform'
-Plugin 'VundleVim/Vundle.vim'
-Plugin 'henrik/vim-indexed-search'
-Plugin 'DfrankUtil'
-Plugin 'EasyMotion'
-Plugin 'GEverding/vim-hocon'
-Plugin 'MarcWeber/vim-addon-completion'
-Plugin 'VisIncr'
-Plugin 'altercation/vim-colors-solarized'
-Plugin 'clones/vim-genutils'
-Plugin 'derekwyatt/vim-fswitch'
-Plugin 'derekwyatt/vim-scala'
-Plugin 'drmingdrmer/xptemplate'
-Plugin 'elzr/vim-json'
-Plugin 'endel/vim-github-colorscheme'
-Plugin 'godlygeek/tabular'
-Plugin 'gregsexton/gitv'
-Plugin 'kien/ctrlp.vim'
-" Plugin 'laurentgoudet/vim-howdoi'
-Plugin 'nanotech/jellybeans.vim'
+call plug#begin('~/.local/share/nvim/plugged')
+Plug 'atelierbram/vim-colors_atelier-schemes'
+Plug 'prognostic/plasticine'
+Plug 'cseelus/vim-colors-lucid'
+Plug 'mhartington/oceanic-next'
+Plug 'hashivim/vim-terraform'
+Plug 'VundleVim/Vundle.vim'
+Plug 'henrik/vim-indexed-search'
+Plug 'GEverding/vim-hocon'
+Plug 'MarcWeber/vim-addon-completion'
+Plug 'vim-scripts/VisIncr'
+" Plug 'DfrankUtil'
+Plug 'easymotion/vim-easymotion'
+Plug 'qpkorr/vim-bufkill'
+Plug 'altercation/vim-colors-solarized'
+Plug 'clones/vim-genutils'
+Plug 'derekwyatt/vim-fswitch'
+Plug 'derekwyatt/vim-scala'
+Plug 'drmingdrmer/xptemplate'
+Plug 'elzr/vim-json'
+Plug 'endel/vim-github-colorscheme'
+Plug 'godlygeek/tabular'
+Plug 'gregsexton/gitv'
+Plug 'kien/ctrlp.vim'
+Plug 'nanotech/jellybeans.vim'
 if has("gui")
-  Plugin 'nathanaelkane/vim-indent-guides'
+  Plug 'nathanaelkane/vim-indent-guides'
 endif
-Plugin 'mileszs/ack.vim'
-Plugin 'sjl/gundo.vim'
-Plugin 'suan/vim-instant-markdown'
-Plugin 'tpope/vim-fugitive'
-Plugin 'tpope/vim-surround'
-Plugin 'tpope/vim-unimpaired'
-Plugin 'vim-scripts/gnupg.vim'
-Plugin 'vim-scripts/nginx.vim'
-Plugin 'xolox/vim-misc'
-Plugin 'bufkill.vim'
-call vundle#end()
-filetype plugin indent on
+Plug 'mileszs/ack.vim'
+Plug 'sjl/gundo.vim'
+Plug 'suan/vim-instant-markdown'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-unimpaired'
+Plug 'vim-scripts/gnupg.vim'
+Plug 'xolox/vim-misc'
+call plug#end()
 
 " Add xptemplate global personal directory value
 if has("unix")
@@ -318,10 +314,15 @@ function! SwitchToTerminal()
     execute ':' . winnr . 'wincmd w'
     normal GA
   endif
+  nunmap <c-,>
+  tnoremap <silent> <c-,> <c-\><c-n>:call LeaveTerminal()<CR>
 endfunction
 
 function! LeaveTerminal()
   execute ':' . winnr('#') . 'wincmd w'
+  tunmap <c-,>
+  nmap <silent> <c-,> :call SwitchToTerminal()<CR>
+  imap <silent> <c-,> <esc>:call SwitchToTerminal()<CR>
 endfunction
 
 function! WindowLayout()
@@ -389,14 +390,14 @@ noremap <silent> <C-7> <C-W>>
 noremap <silent> <C-8> <C-W>+
 noremap <silent> <C-9> <C-W>+
 noremap <silent> <C-0> <C-W>>
-noremap <silent> ,ct :call SwitchToTerminal()<CR>
 noremap <silent> ,cq :1wincmd w<CR>
 noremap <silent> ,ca :2wincmd w<CR>
 noremap <silent> ,cw :3wincmd w<CR>
 noremap <silent> ,cs :4wincmd w<CR>
 noremap <silent> ,c3 :call WindowLayout()<CR>
 noremap <silent> ,cz :execute ':' . g:lastWindowNumber . 'wincmd w'<cr>
-tnoremap <silent> <c-,> <c-\><c-n>:call LeaveTerminal()<CR>
+imap <silent> <c-,> <esc>:call SwitchToTerminal()<CR>
+nmap <silent> <c-,> :call SwitchToTerminal()<CR>
 
 " Edit the vimrc file
 nmap <silent> ,ev :e $MYVIMRC<CR>

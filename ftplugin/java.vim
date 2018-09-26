@@ -3,8 +3,8 @@ setlocal textwidth=80
 setlocal foldmethod=marker
 setlocal foldmarker=//{,//}
 setlocal foldlevel=0
-setlocal sw=2 sts=2 ts=2
-setlocal expandtab
+setlocal sw=4 sts=4 ts=4
+setlocal noexpandtab
 
 if !exists("*s:CodeOrTestFile")
   function! s:CodeOrTestFile(precmd)

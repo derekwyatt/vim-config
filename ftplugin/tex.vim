@@ -1,6 +1,7 @@
 " this is mostly a matter of taste. but LaTeX looks good with just a bit
 " of indentation.
 setlocal sw=2
+setlocal tw=120
 setlocal spell
 setlocal fdl=0
 setlocal fdm=marker
