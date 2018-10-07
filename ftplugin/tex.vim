@@ -6,6 +6,7 @@ setlocal spell
 setlocal fdl=0
 setlocal fdm=marker
 setlocal fmr=<<<,>>>
+setlocal thesaurus=~/.vim/thesaurus/thesaurus-en-short.txt
 
 imap <buffer> jj <esc>:w<cr>
 imap <buffer> jw <c-o>:w<cr>

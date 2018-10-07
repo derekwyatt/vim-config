@@ -32,15 +32,11 @@ filetype off
 call plug#begin('~/.local/share/nvim/plugged')
 Plug 'atelierbram/vim-colors_atelier-schemes'
 Plug 'prognostic/plasticine'
-Plug 'cseelus/vim-colors-lucid'
-Plug 'mhartington/oceanic-next'
 Plug 'hashivim/vim-terraform'
-Plug 'VundleVim/Vundle.vim'
 Plug 'henrik/vim-indexed-search'
 Plug 'GEverding/vim-hocon'
 Plug 'MarcWeber/vim-addon-completion'
 Plug 'vim-scripts/VisIncr'
-" Plug 'DfrankUtil'
 Plug 'easymotion/vim-easymotion'
 Plug 'qpkorr/vim-bufkill'
 Plug 'altercation/vim-colors-solarized'
@@ -59,7 +55,6 @@ if has("gui")
 endif
 Plug 'mileszs/ack.vim'
 Plug 'sjl/gundo.vim'
-Plug 'suan/vim-instant-markdown'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
@@ -121,6 +116,8 @@ set hidden
 " Make the 'cw' and like commands put a $ at the end instead of just deleting
 " the text and replacing it
 set cpoptions=ces$
+" Neovim seems to make cw include any trailing space, and my fingers can't adjust
+nnoremap cw ce
 
 function! DerekFugitiveStatusLine()
   let status = fugitive#statusline()
@@ -400,8 +397,8 @@ imap <silent> <c-,> <esc>:call SwitchToTerminal()<CR>
 nmap <silent> <c-,> :call SwitchToTerminal()<CR>
 
 " Edit the vimrc file
-nmap <silent> ,ev :e $MYVIMRC<CR>
-nmap <silent> ,sv :so $MYVIMRC<CR>
+nmap <silent> ,ev :e ~/.vimrc<CR>
+nmap <silent> ,sv :so ~/.vimrc<CR>
 
 " Make horizontal scrolling easier
 nmap <silent> <C-o> 10zl
