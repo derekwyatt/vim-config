@@ -30,6 +30,7 @@ set nocompatible
 filetype off 
 
 call plug#begin('~/.local/share/nvim/plugged')
+Plug 'bfredl/nvim-miniyank'
 Plug 'atelierbram/vim-colors_atelier-schemes'
 Plug 'prognostic/plasticine'
 Plug 'hashivim/vim-terraform'
@@ -253,6 +254,10 @@ let g:scala_use_default_keymappings = 0
 
 " System default for mappings is now the "," character
 let mapleader = ","
+
+" Mappings for MiniYank
+map p <Plug>(miniyank-autoput)
+map P <Plug>(miniyank-autoPut)
 
 " Wipe out all buffers
 nmap <silent> ,wa :call BWipeoutAll()<cr>
@@ -1061,7 +1066,7 @@ iab teh        the
 "-----------------------------------------------------------------------------
 if has('gui_running') || has('gui_vimr')
   set background=light
-  colorscheme Atelier_LakesideLight
+  colorscheme xoria256
   if has('gui_running')
     exe "set guifont=" . g:main_font
     if !exists("g:vimrcloaded")
