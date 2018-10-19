@@ -2,7 +2,7 @@
 
 verbose=0
 force=0
-code_dir=
+code_dir=$(pwd)
 
 while getopts vfc: opt
 do
@@ -26,13 +26,17 @@ function vecho
 
 function in_git_repo
 {
-  git status > /dev/null 2>&1
+  if [[ -n $code_dir ]]; then
+    (cd $code_dir; git status > /dev/null 2>&1)
+  else
+    git status > /dev/null 2>&1
+  fi
 }
 
 function get_code_dir
 {
   if in_git_repo; then
-    git rev-parse --show-toplevel
+    (cd $code_dir; git rev-parse --show-toplevel)
   else
     p4 client -o | grep ^Root | awk '{print $2}'
   fi
@@ -41,7 +45,7 @@ function get_code_dir
 function get_branch
 {
   if in_git_repo; then
-    git branch | grep '^\*' | cut -c3-
+    (cd $code_dir; git branch | grep '^\*' | cut -c3-)
   else
     p4 client -o | grep ^Client | awk '{print $2}'
   fi
