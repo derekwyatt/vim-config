@@ -29,8 +29,8 @@ let g:indexer_debugLogLevel = 2
 set nocompatible
 filetype off 
 
-call plug#begin('~/.local/share/nvim/plugged')
-Plug 'bfredl/nvim-miniyank'
+call plug#begin('~/.vim/plugged')
+" Plug 'bfredl/nvim-miniyank'
 Plug 'atelierbram/vim-colors_atelier-schemes'
 Plug 'prognostic/plasticine'
 Plug 'hashivim/vim-terraform'
@@ -60,6 +60,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'vim-scripts/gnupg.vim'
+Plug 'vim-scripts/matchit.zip'
 Plug 'xolox/vim-misc'
 call plug#end()
 
@@ -255,10 +256,6 @@ let g:scala_use_default_keymappings = 0
 " System default for mappings is now the "," character
 let mapleader = ","
 
-" Mappings for MiniYank
-map p <Plug>(miniyank-autoput)
-map P <Plug>(miniyank-autoPut)
-
 " Wipe out all buffers
 nmap <silent> ,wa :call BWipeoutAll()<cr>
 
@@ -411,6 +408,7 @@ nmap <silent> <C-i> 10zh
 
 " Add a GUID to the current line
 imap <C-Q>d <C-r>=substitute(substitute(system("uuidgen"), '.$', '', 'g'), '\\(\\u\\)', '\\l\\1', 'g')<CR>
+imap <C-Q>D <C-r>=substitute(system("/usr/local/opt/coreutils/libexec/gnubin/date -u '+%Y-%m-%dT%H:%M:%S.%3NZ'"), '.$', '', 'g')<CR>
 
 " Toggle fullscreen mode
 nmap <silent> <F3> :call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
