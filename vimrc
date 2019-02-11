@@ -31,8 +31,6 @@ filetype off
 
 call plug#begin('~/.vim/plugged')
 " Plug 'bfredl/nvim-miniyank'
-Plug 'atelierbram/vim-colors_atelier-schemes'
-Plug 'prognostic/plasticine'
 Plug 'hashivim/vim-terraform'
 Plug 'henrik/vim-indexed-search'
 Plug 'GEverding/vim-hocon'
@@ -40,7 +38,6 @@ Plug 'MarcWeber/vim-addon-completion'
 Plug 'vim-scripts/VisIncr'
 Plug 'easymotion/vim-easymotion'
 Plug 'qpkorr/vim-bufkill'
-Plug 'altercation/vim-colors-solarized'
 Plug 'clones/vim-genutils'
 Plug 'derekwyatt/vim-fswitch'
 Plug 'derekwyatt/vim-scala'
@@ -255,6 +252,12 @@ let g:scala_use_default_keymappings = 0
 
 " System default for mappings is now the "," character
 let mapleader = ","
+
+" Some GUI stuff
+let g:lightTheme = 'lakesidelight'
+let g:darkTheme = 'xoria256'
+command! Light :execute ':colorscheme ' . g:lightTheme . ' | set background=light'
+command! Dark  :execute ':colorscheme ' . g:darkTheme . ' | set background=dark'
 
 " Wipe out all buffers
 nmap <silent> ,wa :call BWipeoutAll()<cr>
@@ -542,7 +545,7 @@ let g:indent_guides_enable_on_vim_startup = 1
 "-----------------------------------------------------------------------------
 " Thanks to Drew Neil
 autocmd User fugitive
-      \ if fugitive#buffer().type() =~# '^\%(tree\|blob\)$' |
+      \ if get(b:, 'fugitive_type', '') =~# '^\%(tree\|blob\)$' |
       \  noremap <buffer> .. :edit %:h<cr> |
       \ endif
 autocmd BufReadPost fugitive://* set bufhidden=delete
